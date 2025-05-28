@@ -1,0 +1,46 @@
+import React from "react"
+import {View,TouchableOpacity,TextInput} from "react-native"
+import { PostScreenEmojiPicker,TextInputAddress, TextInputCity, TextInputEmail, TextInputEye,TextInputLock, TextInputPerson, TextInputPhone,TextInputArrowDownCircle, TextInputSearch } from "./vectors"
+import { FAMILLY, TEXT_SIZE } from "../../utils/constants"
+
+export default function CustomTextInput ({name,directState,placeHolder,setState,state,LeftIcon,RightIcon,LeftIconStyles,RightIconStyles,rightIconAction}){
+ 
+     return  (< >
+       
+       {LeftIcon == "face" && <TouchableOpacity style={{...LeftIconStyles}}><PostScreenEmojiPicker/></TouchableOpacity>}
+       {LeftIcon == "search" && <TouchableOpacity style={{...LeftIconStyles}}><TextInputSearch/></TouchableOpacity>}
+       {RightIcon == "arrow" && <TouchableOpacity onPress={() => rightIconAction()} style={{...RightIconStyles}}><TextInputArrowDownCircle/></TouchableOpacity>}
+       {LeftIcon == "email" && <TouchableOpacity style={{...LeftIconStyles}}><TextInputEmail/></TouchableOpacity>}
+       {LeftIcon == "city" && <TouchableOpacity style={{...LeftIconStyles}}><TextInputCity/></TouchableOpacity>}
+       {LeftIcon == "address" && <TouchableOpacity style={{...LeftIconStyles}}><TextInputAddress/></TouchableOpacity>}
+       {LeftIcon == "person" && <TouchableOpacity style={{...LeftIconStyles}}><TextInputPerson/></TouchableOpacity>}
+       {LeftIcon == "lock" && <TouchableOpacity style={{...LeftIconStyles}}><TextInputLock/></TouchableOpacity>}
+       {LeftIcon == "phone" && <TouchableOpacity style={{...LeftIconStyles}}><TextInputPhone/></TouchableOpacity>}
+         {RightIcon == "eye" && <TouchableOpacity style={{...RightIconStyles}}><TextInputEye/></TouchableOpacity>}
+       
+          <TextInput
+            style={{
+            marginTop:3,
+            height:25, 
+            paddingLeft:10,
+            fontSize: TEXT_SIZE.primary,
+            fontFamily: FAMILLY.regular,
+            color:"#818181",
+    
+            width:"100%"
+           
+       }}
+           
+             
+            placeholderTextColor="#818181"
+            placeholder={placeHolder}
+            onChangeText={(text) => {
+              if(directState) setState(text)
+              else setState(text)
+            }}
+            name={name}
+            value={state}
+                      ></TextInput>
+          </>)
+     
+}
