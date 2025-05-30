@@ -9,8 +9,9 @@ import { useGlobalVariable } from "../context/global.jsx";
 import { CustomRegularPoppingText } from "../components/text.jsx";
 import axios from "axios";
 import { deviceName } from "expo-device";
+import AsyncStorage from "@react-native-async-storage/async-storage";
  
-export default function Login({navigation}) {
+const  Login = ({navigation}) => {
  const {err,setErr} = useGlobalVariable()
   const [email,setEmail] = useState("")
   const [isLoading,setIsLoading] = useState(false)
@@ -20,10 +21,10 @@ export default function Login({navigation}) {
     setTimeout(()=>setErr(""),5000)
   },[err])
 
-  useEffect(()=>{
-    navigation.navigate("BottomTabsHome")
-    console.log("called")
-  },[])
+//  useEffect(()=>{
+//     navigation.navigate("BottomTabsHome")
+//     console.log("called")
+//   },[])
   
   const validateEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Basic email regex
@@ -50,22 +51,45 @@ export default function Login({navigation}) {
     return
   }
 
-   let data = {email,password,device_name:deviceName}
+   let data = {email:email.trim(),password:password.trim(),device_name:deviceName}
    console.log(data,"datapppop")
-    await axios.post("https://sdlove-api.altechs.africa/api/login/en",data).then((res) => {
-      console.log(res.data,"res.data")
-      setIsLoading(false)
+
+
+      await axios.get("/sanctum/csrf-cookie").then((response) => {
+      axios
+        .post(`/api/login/en`, data)
+        .then((res) => {
+
+          setIsLoading(false)
       if(res.data.error || res.data.status == 500 || res.data.status === 401) {
         setErr(res.data.message)
      
-      } else {
-        navigation.navigate("BottomTabsHome")
-      }
-    }).catch((err) => {
-      console.log(err)
-      setErr("An error occured please try again")
-      setIsLoading(false)
-    })
+      } else if  (res.data.status === 200) {
+             
+            AsyncStorage.setItem("user_id", JSON.stringify(res.data.user_id));
+            AsyncStorage.setItem(
+              "device_id",
+              JSON.stringify(res.data.device_id)
+            );
+            AsyncStorage.setItem("user_token", res.data.user_token);
+            if (res.data.userImage !== null) {
+              AsyncStorage.setItem("userImage", res.data.userImage);
+            }
+             
+
+               navigation.navigate("BottomTabsHome")
+            
+          }  
+        })
+        .catch(function (error) {
+          console.log(error.message,error," in login",error.response,Object.keys(error))
+          setErr(error.message)
+          
+        });
+    });
+
+
+ 
   }
 
   return (
@@ -84,7 +108,7 @@ export default function Login({navigation}) {
      <Text style={{fontSize:TEXT_SIZE.title *1.2,color:COLORS.gray,fontWeight:"bold",fontFamily:FAMILLY.semibold,marginVertical:10,marginBottom:30}}>Sign in</Text>
  
  
-   <View style={{position:"relative",borderRadius:50,paddingVertical:10,paddingHorizontal:36,width:"80%",     backgroundColor:"rgba(181, 181, 181, 0.12)",}}>
+   <View style={{position:"relative",borderRadius:50,paddingVertical:0,paddingHorizontal:36,width:"80%",     backgroundColor:"rgba(181, 181, 181, 0.12)",}}>
    <CustomTextInput RightIconStyles={null} name="email" placeHolder="Email" LeftIcon={"person"} LeftIconStyles={{position:"absolute",top:15,left:18}} RightIcon={null} setState={setEmail} state={email}/>
    {/* <View style={{position:"absolute",top:15,left:18}}>
    <TextInputPerson/>
@@ -108,7 +132,7 @@ export default function Login({navigation}) {
   </TextInput> */}
    </View>
 
-   <View style={{position:"relative",marginVertical:15,borderRadius:50,paddingVertical:10,paddingHorizontal:36,width:"80%",     backgroundColor:"rgba(181, 181, 181, 0.12)",}}>
+   <View style={{position:"relative",marginVertical:15,borderRadius:50,paddingVertical:0,paddingHorizontal:36,width:"80%",     backgroundColor:"rgba(181, 181, 181, 0.12)",}}>
    <CustomTextInput name="password" placeHolder="Password" LeftIcon={"lock"} LeftIconStyles={{position:"absolute",top:15,left:18}} RightIcon={"eye"} RightIconStyles={{position:"absolute",top:12,right:18}} setState={setPassword} state={password}/>
    {/* <View style={{position:"absolute",top:15,left:18}}>
    <TextInputLock/>
@@ -169,3 +193,6 @@ export default function Login({navigation}) {
    
   );
 }
+
+
+export default Login

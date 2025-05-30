@@ -98,7 +98,7 @@ export default function RegisterStep2({navigation}) {
        <TouchableOpacity onPress={() => setVisible(true)} style={{position:"absolute",right:18,top:15}}><TextInputArrowDownCircle/></TouchableOpacity>
       </View>
              
-      <View style={{marginTop:10,position:"relative",borderRadius:50,paddingVertical:10,paddingHorizontal:36,width:"80%", backgroundColor:"rgba(181, 181, 181, 0.12)",}}>
+      <View style={{marginTop:10,position:"relative",borderRadius:50,paddingVertical:0,paddingHorizontal:36,width:"80%", backgroundColor:"rgba(181, 181, 181, 0.12)",}}>
       {visibleCity &&    <CountryPickerModal check={country.flag} type='city' title="Select country" visible={visibleCity} onSelect={onSelectCity} onClose={()=> setVisibleCity(false)}/>}
           <CustomTextInput rightIconAction={()=> setVisibleCity(true)} name="city" placeHolder="City" LeftIcon={"city"} LeftIconStyles={{position:"absolute",top:15,left:23}} RightIcon={"arrow"} RightIconStyles={{position:"absolute",top:15,right:18}} setState={setCity} state={city}/>
       </View>
@@ -107,7 +107,7 @@ export default function RegisterStep2({navigation}) {
              
              
              
-             <View style={{marginTop:10,position:"relative",borderRadius:50,paddingVertical:10,paddingHorizontal:40,width:"80%", backgroundColor:"rgba(181, 181, 181, 0.12)"}}>
+             <View style={{marginTop:10,position:"relative",borderRadius:50,paddingVertical:0,paddingHorizontal:40,width:"80%", backgroundColor:"rgba(181, 181, 181, 0.12)"}}>
              <CustomTextInput name="address" placeHolder={"Address" }LeftIcon={"address"} LeftIconStyles={{position:"absolute",top:11,left:18}} RightIcon={null} RightIconStyles={null} setState={setAddress} state={address}/>
              </View>
              

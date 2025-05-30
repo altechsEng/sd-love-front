@@ -1,5 +1,5 @@
 import React,{useState} from 'react'
-import {View,Text,TouchableOpacity,Image,Dimensions,FlatList,KeyboardAvoidingView,Platform} from 'react-native'
+import {View,Text,TouchableOpacity,Image,Dimensions,FlatList,KeyboardAvoidingView,Platform, ToastAndroid} from 'react-native'
 import {useRoute} from '@react-navigation/native'
 import { COLORS, FAMILLY, TEXT_SIZE } from "../../../utils/constants";
 import { PostScreenSendComment,HomeFeedBell,PostScreenImagePicker,PostScreenBigComment,PostScreenBookMark, HomeFeedComment,PostScreenDots, HomeFeedGradient, HomeFeedHeart, HomeFeedSearch,HomeFeedShare,HomeFeedSmallArrowRight,HomeFeedThreeDots,LogoSmall, PostScreenMiniHeart } from "../../components/vectors.js";
@@ -11,6 +11,8 @@ import {
    import CustomTextInput from "../../../app/components/textInput";
    import { ScrollView } from "react-native-gesture-handler";
 import MessageSender from '../../../app/components/messageSender.jsx';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
    const {width:SCREEN_WIDTH,height:SCREEN_HEIGHT} = Dimensions.get('window')
 
@@ -48,6 +50,40 @@ const PostScreen = ({navigation}) => {
 
 
  const [isLike,setIslike] = useState(false)
+
+
+const handleBookMark = async(postId) => {
+     try {
+    
+     let token = await AsyncStorage.getItem("user_token")
+   
+
+     if(token)  {
+           console.log(" beofre",token)
+      await axios.post(`/api/save-post`,{postId},{
+          headers:{
+               "Authorization":`Bearer ${token}`,
+          }
+           
+     }).then((res) => {
+          console.log(postId,"op---soOD,",token)
+        console.log(res.data,"repsonse data save post")
+
+     if(res.data.status === 200) {
+          ToastAndroid.show("Post saved sucessfully",1000)
+     }
+     }).catch((err) => {
+          console.log(err,"error in catch")
+     })
+
+  
+     }
+
+     } catch(err) {
+          console.log(err,"the error",token)
+     }
+}
+
  const RenderData = ({item}) => {
     
      return <View style={{borderBottomWidth:2,borderColor:COLORS.light,paddingVertical:10,backgroundColor:"white"}}>
@@ -216,7 +252,7 @@ const PostScreen = ({navigation}) => {
           </View>
 
           <View>
-               <TouchableOpacity><PostScreenBookMark/></TouchableOpacity>
+               <TouchableOpacity onPress={() => handleBookMark(1)}><PostScreenBookMark/></TouchableOpacity>
           </View>
 
      </View>

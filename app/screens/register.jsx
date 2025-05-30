@@ -92,14 +92,14 @@ export default function Register({navigation}) {
   </Text>
 
 
- <View style={{marginTop:hp(5),position:"relative",borderRadius:50,paddingVertical:10,paddingHorizontal:36,width:"80%", backgroundColor:"rgba(181, 181, 181, 0.12)",}}>
+ <View style={{marginTop:hp(5),position:"relative",borderRadius:50,paddingVertical:0,paddingHorizontal:36,width:"80%", backgroundColor:"rgba(181, 181, 181, 0.12)",}}>
      <CustomTextInput name="firstName" placeHolder="First Name" LeftIcon={"person"} LeftIconStyles={{position:"absolute",top:15,left:18}} RightIcon={null} RightIconStyles={null} setState={setFirstName} state={firstName}/>
  
   
  
 </View>
 
-<View style={{marginTop:10,position:"relative",borderRadius:50,paddingVertical:10,paddingHorizontal:36,width:"80%", backgroundColor:"rgba(181, 181, 181, 0.12)",}}>
+<View style={{marginTop:10,position:"relative",borderRadius:50,paddingVertical:0,paddingHorizontal:36,width:"80%", backgroundColor:"rgba(181, 181, 181, 0.12)",}}>
 <CustomTextInput name="lastName" placeHolder="Last Name" LeftIcon={"person"} LeftIconStyles={{position:"absolute",top:15,left:18}} RightIcon={null} RightIconStyles={null} setState={setLastName} state={lastName}/>
      
  
@@ -120,7 +120,7 @@ export default function Register({navigation}) {
       <Text style={{ color:COLORS.gray,fontSize:TEXT_SIZE.small,fontFamily: FAMILLY.regular,textAlign:"center",marginTop:5}}>{country?`${country?.dial_code}`:"+1"}</Text>
       </TouchableOpacity>
 
-      <View style={{ marginLeft:10,flex:2,position:"relative",borderRadius:50,paddingVertical:10,paddingHorizontal:36, backgroundColor:"rgba(181, 181, 181, 0.12)"}}>
+      <View style={{ marginLeft:10,flex:2,position:"relative",borderRadius:50,paddingVertical:0,paddingHorizontal:36, backgroundColor:"rgba(181, 181, 181, 0.12)"}}>
       <CustomTextInput name="phone" placeHolder={"Phone" }LeftIcon={"phone"} LeftIconStyles={{position:"absolute",top:14,left:18}} RightIcon={null} RightIconStyles={null} setState={setPhone} state={phone}/>
 
       </View>
@@ -131,7 +131,7 @@ export default function Register({navigation}) {
 </View>
 
 
-<View style={{marginTop:10,position:"relative",borderRadius:50,paddingVertical:10,paddingHorizontal:40,width:"80%", backgroundColor:"rgba(181, 181, 181, 0.12)"}}>
+<View style={{marginTop:10,position:"relative",borderRadius:50,paddingVertical:0,paddingHorizontal:40,width:"80%", backgroundColor:"rgba(181, 181, 181, 0.12)"}}>
 <CustomTextInput name="email" placeHolder={"Email" }LeftIcon={"email"} LeftIconStyles={{position:"absolute",top:14,left:18}} RightIcon={null} RightIconStyles={null} setState={setEmail} state={email}/>
     
 </View>

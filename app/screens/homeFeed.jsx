@@ -1,13 +1,17 @@
-import React, { useState } from "react"
+import React, { useCallback, useRef, useState,useEffect } from "react"
 import { ScrollView } from "react-native-gesture-handler";
-import {View,Text,TouchableOpacity,Image, FlatList} from "react-native"
+import {View,Text,TouchableOpacity,Image, FlatList, ActivityIndicator} from "react-native"
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { HomeFeedBell, HomeFeedComment, HomeFeedGradient, HomeFeedHeart, HomeFeedSearch,HomeFeedShare,HomeFeedSmallArrowRight,HomeFeedThreeDots,LogoSmall, PostAddIcon } from "../components/vectors.js";
-import { COLORS, FAMILLY, TEXT_SIZE } from "../../utils/constants.js";
+import { COLORS, FAMILLY, POST_LIMIT, TEXT_SIZE } from "../../utils/constants.js";
 import { LinearGradient } from "react-native-linear-gradient";
+import { SafeAreaView } from "react-native-safe-area-context";
+import axios from "axios";
+import {useInfiniteQuery} from "@tanstack/react-query"
+import AsyncStorage from "@react-native-async-storage/async-storage";
  
 
 export default function HomeFeed({navigation}) {
@@ -50,7 +54,7 @@ export default function HomeFeed({navigation}) {
      ])
 
 
-     const [posts,setPosts] = useState([
+          const [posts,setPosts] = useState([
           {
                key:"post1",
                img:require("../../assets/images/test_person1.png"),
@@ -69,6 +73,70 @@ export default function HomeFeed({navigation}) {
                pupil:"SD Academy"
           }
      ])
+
+
+
+     const isSearching = useRef(false);
+      const getAllPost = async({pageParam = 0}) => {
+        try {
+            isSearching.current = true;
+            let url = '/api/get-all-posts';
+            let token = await AsyncStorage.getItem("user_token");
+            
+            if(token) {
+                const response = await axios.post(
+                    url,
+                    {offset: pageParam, limit: POST_LIMIT},
+                    {headers: {"Authorization": `Bearer ${token}`}}
+                );
+
+                isSearching.current = false;
+                return {
+                    posts: response?.data?.posts,
+                    nextOffset: response?.data?.next_offset,
+                };
+            }
+        } catch(err) {
+            console.log(err.message, "in getAllPost");
+            isSearching.current = false;
+            throw err; // Important for React Query error handling
+        }
+    };
+
+    const { 
+        data, 
+        fetchNextPage, 
+        hasNextPage,
+        isFetchingNextPage,
+        isFetching 
+    } = useInfiniteQuery({
+        queryKey: ["posts"],
+        queryFn: getAllPost,
+        getNextPageParam: (lastPage) => lastPage?.nextOffset ?? undefined,
+        initialPageParam: 0,
+    });
+
+    // FLATTEN ALL PAGES INTO SINGLE ARRAY
+    const allPosts = data?.pages.flatMap(page => page.posts) ?? [];
+
+    const loadMoreItem = () => {
+        if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+        }  
+    };
+
+    const renderLoader = () => {
+        return isFetchingNextPage ? (
+            <ActivityIndicator size="large" color={COLORS.blue} />
+        ) : null;
+    };
+
+
+
+ 
+     
+
+
 
 
      const renderMatches = ({item,index}) => {
@@ -98,14 +166,15 @@ export default function HomeFeed({navigation}) {
      }
 
      const renderPosts = ({item,index}) => {
+          console.log(item,"in render posts")
           return (
                <View key={item?.key} style={{flex:1,marginVertical:10,marginRight:20,width:wp(80),flexDirection:"column"}}>
                     <View style={{flexDirection:"row",justifyContent:"space-evenly",alignItems:"center"}}>
                     <View style={{flex:2,flexDirection:"row"}}>
-                    <TouchableOpacity style={{borderRadius:50,height:50,width:50,overflow:"hidden",alignItems:"center"}}><Image source={item.img} resizeMode="cover" style={{height:"100%",width:"100%"}}/></TouchableOpacity>
+                    <TouchableOpacity style={{borderRadius:50,height:50,width:50,overflow:"hidden",alignItems:"center"}}><Image source={item.img || require("../../assets/images/test_person1.png")} resizeMode="cover" style={{height:"100%",width:"100%"}}/></TouchableOpacity>
                     <View style={{flexDirection:"column",justifyContent:"center",marginLeft:10}}>
-                    <Text style={{color:COLORS.black,fontSize:TEXT_SIZE.secondary-2,fontFamily:FAMILLY.semibold}}>{item.name}</Text>
-                    <Text style={{color:COLORS.gray,fontSize:TEXT_SIZE.small,fontFamily:FAMILLY.light}}>{item.time}</Text>
+                    <Text style={{color:COLORS.black,fontSize:TEXT_SIZE.secondary-2,fontFamily:FAMILLY.semibold}}>{item.name || "Johan mark"}</Text>
+                    <Text style={{color:COLORS.gray,fontSize:TEXT_SIZE.small,fontFamily:FAMILLY.light}}>{item.time || "2h ago"}</Text>
                     </View>
                     </View>
 
@@ -113,19 +182,32 @@ export default function HomeFeed({navigation}) {
                     </View> 
                     <View style={{marginVertical:10}}>
                          <Text style={{color:COLORS.black,fontSize:TEXT_SIZE.small,fontFamily:FAMILLY.light}}>
-                         Lorem ipsum dolor sit amet consectetur. Lorem varius quisque odio nisl tempor sit bibendum pulvinar sed. pharetra sed magnis vitae.
+                         {item.text || "Lorem ipsum dolor sit amet consectetur. Lorem varius quisque odio nisl tempor sit bibendum pulvinar sed. pharetra sed magnis vitae."}
                          </Text>
                     </View> 
-                    <TouchableOpacity style={{height:200,margin:0,padding:0,overflow:"hidden",borderRadius:20}}>
-                         <Image source={item.postImg} resizeMode="cover" style={{width:"100%",height:"100%"}}/>
+
+                    <TouchableOpacity onPress={()=> navigation.navigate("Post",{item})} style={{height:200,margin:0,padding:0,overflow:"hidden",borderRadius:20}}>
+                         <Image source={ require("../../assets/images/blog_test.jpg")||{uri:`https://sdlove-api.altechs.africa/public_html/sdlove-api/storage/app/private/public/post_images/${subitem?.url}`}   } resizeMode="cover" style={{width:"100%",height:"100%"}}/>
+                    </TouchableOpacity>
+
+                    {/* <FlatList
+                    data={item.media}
+                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}
+                    horizontal={true}
+                    renderItem={(subitem)=> {
+                         return <TouchableOpacity onPress={()=> navigation.navigate("Post",{item:{...subitem,...item}})} style={{height:200,margin:0,padding:0,overflow:"hidden",borderRadius:20}}>
+                         <Image source={ require("../../assets/images/blog_test.jpg")||{uri:`https://sdlove-api.altechs.africa/public_html/sdlove-api/storage/app/private/public/post_images/${subitem?.url}`} } resizeMode="cover" style={{width:"100%",height:"100%"}}/>
                     </TouchableOpacity> 
+                    }}
+                    /> */}
                     <View style={{height:30,flexDirection:"row",alignItems:"center",justifyContent:"space-between",marginTop:10}}>
 
                          <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between"}} >
 
                          <View style={{marginRight:10,flexDirection:"row",alignItems:"center",justifyContent:"center"}}>
                          <TouchableOpacity><HomeFeedHeart/></TouchableOpacity>
-                         <Text style={{fontFamily:FAMILLY.light,marginLeft:5}}>0</Text>
+                         <Text style={{fontFamily:FAMILLY.light,marginLeft:5}}>{item?.likes_count || 0}</Text>
                          </View>
 
                          <View style={{marginRight:10,flexDirection:"row",alignItems:"center",justifyContent:"center"}}>
@@ -151,8 +233,8 @@ export default function HomeFeed({navigation}) {
 
 
      return (
-           
-                        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{backgroundColor:"white",position:"relative"}}>
+      
+                                       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{backgroundColor:"white",position:"relative"}}>
 
                <View style={{ flexDirection:"row",alignItems:"center",justifyContent:"space-between"}}>
 
@@ -195,23 +277,30 @@ export default function HomeFeed({navigation}) {
 
                <View style={{paddingLeft:20}}>
                <FlatList
-               data={posts}
+               data={allPosts.length == 0 ? posts : allPosts}
                renderItem={renderPosts}
                keyExtractor={(item)=> item?.key || item?.id}
                horizontal={true}
                showsHorizontalScrollIndicator={false}
+               onEndReached={loadMoreItem}
+               onEndReachedThreshold={0.5}
+               ListFooterComponent={renderLoader}
+               ListFooterComponentStyle={{alignItems:"center",justifyContent:"center",paddingBottom:50}}
               
                />
                </View>
- 
-               
- 
+
+
+               <View style={{height:100}}>
+
+               </View>
                <TouchableOpacity onPress={()=>navigation.navigate("PostAdd")} style={{height:50,width:50,zIndex:99,bottom:20,right:10,position:"absolute",borderRadius:100,backgroundColor:"#2E2E2E",alignItems:"center",justifyContent:"center"}}>
                     <PostAddIcon/>
                </TouchableOpacity>
           
-               <View style={{height:70}}></View>
+                
           </ScrollView>
+          
       
      )
 }

@@ -439,7 +439,7 @@ export function Questionaire({navigation}) {
 
           <View style={{marginVertical:20,paddingHorizontal:20}}>
           <CustomRegularPoppingText style={{marginBottom:10}} value="Quelle est ta taille (En centimètres)" color={'black'} fontSize={TEXT_SIZE.primary}/>          
-          <Pressable style={{paddingVertical:10,paddingHorizontal:10,width:"100%",backgroundColor:"#F3F3F3",borderRadius:20,flexDirection:"row",alignItems:"center"}}>
+          <Pressable style={{paddingVertical:0,paddingHorizontal:10,width:"100%",backgroundColor:"#F3F3F3",borderRadius:20,flexDirection:"row",alignItems:"center"}}>
            <CustomTextInput rightIconAction={null} name="height" placeHolder="180" LeftIcon={null} LeftIconStyles={null} RightIcon={null} RightIconStyles={null} directState={true} setState={(text)=> updateAnswer("qP6",text)} state={questionnaireData.answers.qP6}/>
           </Pressable>
           </View>
@@ -636,7 +636,7 @@ export function Questionaire2({navigation}) {
       qP16:JSON.stringify(questionnaireData?.answers.qP16),
       qS10:JSON.stringify(questionnaireData?.answers.qS10),
     }
-   await axios.post("https://sdlove-api.altechs.africa/api/register/en",data).then((res) => {
+   await axios.post("/api/register/en",data).then((res) => {
       console.log(res.data,"resdata")
       if(res.data.errors) {
         setErr(`address: ${res.data.errors?.address}` || `city: ${res.data.errors?.city}`)
@@ -858,7 +858,7 @@ export function Questionaire2({navigation}) {
 <CustomRegularPoppingText value="En quelques mots, comment décrirais-tu ta relation avec Dieu (Ce que Jésus représente pour toi, le type d’église que tu fréquentes…) ?" color={'black'} fontSize={TEXT_SIZE.primary}/>          
 <CustomRegularPoppingText value="C’est l’une des premières choses que les gens liront sur ton profil. Tu auras l’occasion d’en dire plus par la suite" color={null} fontSize={TEXT_SIZE.small} />
 
-<Pressable style={{paddingVertical:10,marginVertical:10,borderRadius:10,paddingHorizontal:15,backgroundColor:"rgba(181, 181, 181, 0.12)"}}>
+<Pressable style={{paddingVertical:0,marginVertical:0,borderRadius:10,paddingHorizontal:15,backgroundColor:"rgba(181, 181, 181, 0.12)"}}>
 <CustomTextInput rightIconAction={null} name="height" placeHolder="Ex: Gagner les âmes, mon combat" LeftIcon={null} LeftIconStyles={null} RightIcon={null} RightIconStyles={null} directState={true} setState={(text) => updateAnswer("qS1",text)} state={questionnaireData.answers.qS1} />
 </Pressable>
 </View>
@@ -925,7 +925,7 @@ export function Questionaire2({navigation}) {
 <View style={{marginVertical:20,paddingHorizontal:20}}>
 <CustomRegularPoppingText value=" Si tu as répondu non à la question précédente, peux-tu donner la raison ?" color={'black'} fontSize={TEXT_SIZE.primary}/>          
 <CustomQuestionDisplayer answers={["Je recherche une église ","Je préfère vivre ma foi à la maison","Je fréquente plusieurs assemblées chrétiennes","Autre"]} direction={"column"} currentValue={questionnaireData.answers.qS9} onSelect={(value) => updateAnswer("qS9", value)}/>
-<Pressable style={{paddingVertical:10,marginVertical:10,borderRadius:10,paddingHorizontal:15,backgroundColor:"rgba(181, 181, 181, 0.12)"}}>
+<Pressable style={{paddingVertical:0,marginVertical:0,borderRadius:10,paddingHorizontal:15,backgroundColor:"rgba(181, 181, 181, 0.12)"}}>
 <CustomTextInput rightIconAction={null} name="height" placeHolder="Ta réponse ici" LeftIcon={null} LeftIconStyles={null} RightIcon={null} RightIconStyles={null} directState={true} setState={(text) => updateAnswer("qS9",text)} state={questionnaireData.answers.qS9}/>
 </Pressable>
 </View>

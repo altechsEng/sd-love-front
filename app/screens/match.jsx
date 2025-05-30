@@ -9,13 +9,14 @@ import MapView, { Marker, Circle, PROVIDER_GOOGLE } from "react-native-maps";
  
 import MasonryList from "@react-native-seoul/masonry-list"
 import * as Location from "expo-location"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 const {width:SCREEN_WIDTH,height:SCREEN_HEIGHT} = Dimensions.get('window')
 
  
 
 
-export default function MatchScreen({navigation}) {
+const  MatchScreen = ({navigation}) => {
      const [userLocation, setUserLocation] = useState();
     
      const getDistance = (lat1, lon1, lat2, lon2) => {
@@ -40,7 +41,7 @@ export default function MatchScreen({navigation}) {
        };
 
      const requestLocationPermission = async () => {
-         
+         console.log("called...")
           let {status} = await Location.requestForegroundPermissionsAsync()
           if(status !== 'granted'){
                console.log("permission denied")  
@@ -61,8 +62,9 @@ export default function MatchScreen({navigation}) {
     };
 
 useEffect(() => {
-     requestLocationPermission();
- }, []);
+    if(activeScreen == "box")  requestLocationPermission();
+ }, [activeScreen]);
+
      const [activeScreen,setActiveScreen] = useState('side')
 
      const [mapRegion, setMapRegion] = useState({
@@ -152,8 +154,9 @@ useEffect(() => {
           </View>
      )
 
-     return <View style={{backgroundColor:"white",paddingTop:20,paddingHorizontal:20,position:"relative",flex:1}}>
-          <View style={{height:50 }}></View>
+     return  (<SafeAreaView style={{flex:1,backgroundColor:"white"}}>
+        <View style={{backgroundColor:"white",paddingTop:20,paddingHorizontal:20,position:"relative",flex:1}}>
+         
           <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between"}}>
           <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-evenly"}}>
                <TouchableOpacity style={{marginRight:10}}><MatchScreenAdress/></TouchableOpacity>
@@ -356,29 +359,10 @@ useEffect(() => {
 
 
      </View>
+     </SafeAreaView>)
+    
 }
 
 
 
- 
-
-
-
-
- 
- 
- 
- 
-
-
-
-
-
-
-
-
-
-
-
-
- 
+export default MatchScreen

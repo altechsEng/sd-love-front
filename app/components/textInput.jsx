@@ -20,13 +20,16 @@ export default function CustomTextInput ({name,directState,placeHolder,setState,
        
           <TextInput
             style={{
-            marginTop:3,
-            height:25, 
-            paddingLeft:10,
+            
+         
+              
+             
+            
             fontSize: TEXT_SIZE.primary,
             fontFamily: FAMILLY.regular,
             color:"#818181",
-    
+            marginTop:3,
+             
             width:"100%"
            
        }}

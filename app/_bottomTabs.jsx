@@ -6,13 +6,17 @@ import {
 } from "react-native-responsive-screen";
 import HomeFeed from "./screens/homeFeed";
 import { COLORS, FAMILLY, TEXT_SIZE } from "../utils/constants";
-import { BottomTabsIconActive_Chats, BottomTabsIconActive_Heart, BottomTabsIconActive_Home, BottomTabsIconActive_Learn, BottomTabsIconActive_Profile, BottomTabsIconInactive_Chats, BottomTabsIconInactive_Heart, BottomTabsIconInactive_Home, BottomTabsIconInactive_Learn, BottomTabsIconInactive_Profile } from "./components/vectors";
-import {View,Text,TouchableOpacity} from "react-native"
+import { BottomTabsIconActive_Chats, BottomTabsIconActive_Heart, BottomTabsIconActive_Home, BottomTabsIconActive_Learn, BottomTabsIconActive_Profile, BottomTabsIconInactive_Chats, BottomTabsIconInactive_Heart, BottomTabsIconInactive_Home, BottomTabsIconInactive_Learn, BottomTabsIconInactive_Profile, ProfileScreenBars } from "./components/vectors";
+import {View,Text,TouchableOpacity, Image} from "react-native"
 import { MatchScreenAdress, MatchScreenAdressWithBox, MatchScreenDownArrow, MatchScreenFilters, MatchScreenGridCards, MatchScreenSideCards } from "./components/vectors"
 import TopTabs from "./_topTabs"
 import MatchScreen from "./screens/match";
 import Chat from "./screens/chat/chat";
-import { CustomSemiBoldPoppingText } from "./components/text";
+import { CustomRegularPoppingText, CustomSemiBoldPoppingText } from "./components/text";
+import MatchScreenSide from "./screens/dating/matchScreenSide";
+import CustomMatchHeader from "./components/customMatchHeader";
+import ProfileScreen from "./screens/profileScreen";
+import CustomProfileScreenHeader from "./components/customProfileScreenHeader";
 
 const Tab = createBottomTabNavigator();
 
@@ -28,6 +32,7 @@ export default function HomeTabs() {
                         height: hp("7.5%"),
                         paddingBottom: hp("1%"),
                         paddingTop: hp("1%"),
+                       
                       },
                       tabBarLabelStyle: {
                         fontFamily: FAMILLY.regular,
@@ -47,7 +52,7 @@ export default function HomeTabs() {
                                     fontFamily: FAMILLY.regular,
                                   },
                                   header:({navigation}) => {
-                                    return <View style={{height:70,backgroundColor:"white" }}></View>
+                                    return <View style={{height:20,backgroundColor:"white" }}></View>
                                   }
                                 }}
                               />
@@ -56,33 +61,14 @@ export default function HomeTabs() {
                                 name="Match"
                                 component={MatchScreen}
                                 options={{
-                                  // header:({navigation}) => {
-                                  //   return <View style={{backgroundColor:"white",padding:20}}>
-                                  //               <View style={{height:50 }}></View>
-                                  //               <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between"}}>
-                                  //               <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-evenly"}}>
-                                  //                    <TouchableOpacity style={{marginRight:10}}><MatchScreenAdress/></TouchableOpacity>
-                                  //                    <Text style={{color:COLORS.black,fontFamily:FAMILLY.medium,textTransform:"capitalize"}}>Chicago</Text>
-                                  //                    <TouchableOpacity style={{ marginLeft:5}}><MatchScreenDownArrow/></TouchableOpacity>
-                                  //               </View>
-                                      
-                                  //               <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-evenly"}}>
-                                  //                    <TouchableOpacity style={{marginRight:10}}><MatchScreenSideCards stroke={"#D7A898"}/></TouchableOpacity>
-                                  //                    <TouchableOpacity style={{marginRight:5}}><MatchScreenGridCards/></TouchableOpacity>
-                                  //                    <TouchableOpacity style={{marginRight:10}}><MatchScreenAdressWithBox/></TouchableOpacity>
-                                  //                    <TouchableOpacity style={{marginRight:0}}><MatchScreenFilters/></TouchableOpacity>
-                                  //               </View>
-                                  //               </View>
-                                  //   </View>
-                                  // },
-                                  tabBarIcon:(({_,focused}) => (
+                                    tabBarIcon:(({_,focused}) => (
                                     focused == false ? <BottomTabsIconInactive_Heart/>:<BottomTabsIconActive_Heart/>
                                   )),
                                   tabBarLabelStyle: {
                                     fontFamily: FAMILLY.regular,
                                   },
+                                  // header:({navigation}) => <CustomMatchHeader navigation={navigation}/>
                                   headerShown:false
-                              
                                 }}
                               />
 
@@ -125,7 +111,7 @@ export default function HomeTabs() {
 
                                <Tab.Screen
                                 name="Profile"
-                                component={HomeFeed}
+                                component={ProfileScreen}
                                 options={{
                                   tabBarIcon:(({color,focused}) => (
                                     focused == false ? <BottomTabsIconInactive_Profile/>:<BottomTabsIconActive_Profile/>
@@ -133,7 +119,9 @@ export default function HomeTabs() {
                                   tabBarLabelStyle: {
                                     fontFamily: FAMILLY.regular,
                                   },
-                                  headerShown: false,
+                                  header:({navigation}) => {
+                                    return <CustomProfileScreenHeader navigation={navigation}/>
+                                  }
                                 }}
                               />
                   

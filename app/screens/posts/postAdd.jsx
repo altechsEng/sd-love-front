@@ -1,70 +1,4 @@
-// import { PostScreenMediaCamera,PostScreenMediaGif,PostScreenMediaImage,PostScreenMediaVideo, PostScreenPlus } from '@/app/components/vectors'
-// import { COLORS } from '@/utils/constants'
-// import React, { useState } from 'react'
-// import MasonryList from "@react-native-seoul/masonry-list"
-// import {Text,View,TextInput,Dimensions, TouchableOpacity,Image, FlatList} from 'react-native'
-//    const {width:SCREEN_WIDTH,height:SCREEN_HEIGHT} = Dimensions.get('window')
-
-// const PostAdd = ({navigation}) => {
-
-//      const [images,setImages] = useState([
-//           {id:"imk1",img:require("../../../assets/images/match_pro1.jpg")},
-//           {id:"imk2",img:require("../../../assets/images/match_pro2.jpg")},
-//           {id:"imk3",img:require("../../../assets/images/match_pro3.jpg")},
-//      ])
-
-//      const renderImages = ({item}) => {
-//           return <View style={{overflow:"hidden",height:80,width:80,marginRight:5,marginBottom:5}}>
-//                <Image source={item.img} style={{height:"100%",width:"100%"}}/>
-//           </View>
-//      }
-
-//      return <View style={{flex:1,backgroundColor:"white"}}>
-//           <TextInput placeholder='Express your thoughts....' multiline={true} style={{flex:1,backgroundColor:"white",textAlignVertical:"top",paddingLeft:20}}/>
-  
-//   <View style={{backgroundColor:"white",marginVertical:20,paddingHorizontal:20}}>
-//   <FlatList
-//                keyExtractor={(item) => item.id}
-//                data={images}
-//                renderItem={renderImages}
-//                showsVerticalScrollIndicator={false}
-//                contentContainerStyle={{flexDirection:"row",alignItems:"center",flexWrap:"wrap"}}
-//                ListFooterComponent={() => (
-//                     <TouchableOpacity style={{height:80,width:80,borderStyle:"dashed",borderWidth:2,alignItems:"center",justifyContent:"center",borderColor:COLORS.light}}>
-//                     <PostScreenPlus/>
-//                     </TouchableOpacity>
-//                )}
-//                />
-
  
-//   </View>
-
-
-//      <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between",padding:10,backgroundColor:"white",borderTopWidth:2,borderColor:COLORS.light}}>
-//           <TouchableOpacity>
-//           <PostScreenMediaImage/>
-//           </TouchableOpacity>
-
-//           <TouchableOpacity>
-//           <PostScreenMediaGif/>
-//           </TouchableOpacity>
-
-//           <TouchableOpacity>
-//           <PostScreenMediaCamera/>
-//           </TouchableOpacity>
-         
-//           <TouchableOpacity>
-//           <PostScreenMediaVideo/>
-//           </TouchableOpacity>
-//      </View>
-//      </View>
-// }
-
-// export default PostAdd
-
-
-
-
  
 import { PostAddDeleteIcon, PostScreenMediaCamera, PostScreenMediaGif, PostScreenMediaImage, PostScreenMediaVideo, PostScreenPlus } from '../../components/vectors'
 import { COLORS } from '../../../utils/constants'
@@ -76,7 +10,11 @@ import { Video } from 'expo-av';
 import * as MediaLibrary from 'expo-media-library';
 import * as FileSystem from 'expo-file-system';
 import { useGlobalVariable } from '../../../app/context/global';
- 
+ import {
+     widthPercentageToDP as wp,
+     heightPercentageToDP as hp,
+   } from "react-native-responsive-screen";
+
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window')
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -96,6 +34,7 @@ const PostAdd = ({ navigation }) => {
   const {setPostAddData} = useGlobalVariable()
 
   useEffect(()=> {
+    
      setPostAddData((prev) => ({
           ...prev,
           text:thoughts,

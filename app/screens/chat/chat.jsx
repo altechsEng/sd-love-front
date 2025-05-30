@@ -3,6 +3,7 @@ import { ChatScreenDownArrow, ChatScreenUpArrow } from '../../components/vectors
 import { COLORS, TEXT_SIZE } from '../../../utils/constants'
 import React, { useState } from 'react'
 import {View,Text,TouchableOpacity,Image,FlatList} from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
  const Chat = ({navigation}) => {
     const [showDesingaged,setShowDesingaged] = useState(false)
@@ -38,9 +39,10 @@ import {View,Text,TouchableOpacity,Image,FlatList} from 'react-native'
     }
 
 
-     return <View style={{backgroundColor:"white",flex:1}}>
+     return <SafeAreaView style={{backgroundColor:"white",flex:1}}>
+        <View style={{backgroundColor:"white",flex:1}}>
 
-        <View  style={{flex:1,paddingHorizontal:20,flexDirection:"row",alignItems:"center",justifyContent:"space-between"}}>
+        <View  style={{paddingHorizontal:20,flexDirection:"row",alignItems:"center",justifyContent:"space-between"}}>
 
         <TouchableOpacity onPress={()=> navigation.navigate("chatDiscussion")} style={{position:"relative"}}>
         <View style={{height:50,width:50,borderRadius:50,overflow:"hidden"}}>
@@ -90,6 +92,7 @@ import {View,Text,TouchableOpacity,Image,FlatList} from 'react-native'
 
  
      </View>
+        </SafeAreaView>
 }
 
 

@@ -48,7 +48,7 @@ const CountryPickerModal = ({ visible, onSelect, onClose,title,type,check }) => 
  
             </View>
 
-            <View style={{ borderRadius:50,paddingVertical:10,paddingHorizontal:36, backgroundColor:"rgba(181, 181, 181, 0.12)"}}>
+            <View style={{ borderRadius:50,paddingVertical:0,paddingHorizontal:36, backgroundColor:"rgba(181, 181, 181, 0.12)"}}>
             <CustomTextInput  name="search" placeHolder="Search" LeftIcon={"search"} LeftIconStyles={{position:"absolute",top:15,left:18}} RightIcon={null} RightIconStyles={null} setState={setSearchText} state={searchText}/>
             </View>
 

@@ -1,22 +1,24 @@
-import { Text, View, TouchableOpacity, Image,SafeAreaView, StatusBar } from "react-native";
- 
+import { Text, View, TouchableOpacity, Image, StatusBar } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Logo,WelcomeImg } from "./components/vectors.js";
  
 import {FAMILLY,COLORS,TEXT_SIZE} from "../utils/constants.js"
 import Home_overlay from "../assets/images/home_overlay.svg"
+import { useNavigation } from "@react-navigation/native";
+import { useEffect } from "react";
 
-const  Welcome = () => ({navigation}) => {
+const  Welcome = () => {
 
+  const navigation = useNavigation()
 
  
-
   return (
  
         <SafeAreaView style={{flex:1,flexDirection:"column"}}>
     <StatusBar backgroundColor="transparent" translucent={true}/>
  
    <View style={{flex:2,alignItems:"center",position:"relative",justifyContent:"center",backgroundColor:"white",paddingBottom:100}}>
-  <View style={{position:"absolute",zIndex:9,top:-150}}>
+  <View style={{position:"absolute",zIndex:9,top:-159}}>
     <Home_overlay/>
   </View>
    <Image

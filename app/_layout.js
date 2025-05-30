@@ -1,6 +1,6 @@
 import React,{useEffect,useState} from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import Welcome from './welcome.js';
+import Welcome from './welcome';
 import "./global.css"
 import * as Font from "expo-font";
 import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
@@ -9,7 +9,7 @@ import Register from './screens/register';
 import RegisterStep2 from './screens/registerStep2';
 import SelectPlan from './screens/selectPlan';
 import { TouchableOpacity,View,Text } from 'react-native';
-import { HeaderBackArrowBlack,HeaderBackArrow, PostScreenXMark, PostScreenMediaVideo, ChatScreenCall, ChatScreenVideo } from './components/vectors.js';
+import { HeaderBackArrowBlack,HeaderBackArrow, PostScreenXMark, PostScreenMediaVideo, ChatScreenCall, ChatScreenVideo } from './components/vectors';
 import { COLORS, FAMILLY, TEXT_SIZE } from '../utils/constants';
 import HomeTabs from './_bottomTabs';
 import {Questionaire,Questionaire2} from './screens/questionareStep';
@@ -31,10 +31,27 @@ import ChatDiscussionOptions from './screens/chat/chatDiscussionOptions';
 import NotificationsScreen from './screens/notifications/notifications';
 import PostAddHeader from './components/postAddHeader';
 import { NavigationContainer } from '@react-navigation/native';
+import axios from "axios"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import CustomMatchHeader from './components/customMatchHeader';
+import MatchScreenGrid from './screens/dating/matchScreenGrid';
+import MatchScreenBox from './screens/dating/matchScreenBox';
+
+axios.defaults.baseURL = "https://sdlove-api.altechs.africa";
+axios.defaults.headers.post["Accept"] = "application/json";
+axios.defaults.headers.post["Content-Type"] = "application/json";
+axios.defaults.headers.post["Content-Type"] = "multipart/form-data";
+
+axios.defaults.withCredentials = true;
+axios.defaults.withXSRFToken = true;
+
+const queryClient = new QueryClient();
 
 const Stack = createStackNavigator();
 
-const  Application = () =>  {
+
+
+export default function Application() {
   const {questionnaireProgress,questioniareLevel,setQuestionaireLevel} = useGlobalVariable()
  
 
@@ -80,7 +97,8 @@ const  Application = () =>  {
   return (
  <NavigationContainer>
 <PaperProvider theme={theme}>
-<GlobalVariableProvider>
+<GlobalVariableProvider >
+<QueryClientProvider client={queryClient}>
 <Stack.Navigator initialRouteName='Home' screenOptions={{
          
         headerStyle:{
@@ -162,7 +180,22 @@ const  Application = () =>  {
           header:({navigation}) => <View style={{height:50,backgroundColor:"white"}}></View>
         }}  name="MatchProfile" component={MatchProfile}  />
 
+        <Stack.Screen
+         options={{
+          header:({navigation}) => <CustomMatchHeader navigation={navigation}/>
+         }}
+         name="MatchGrid"
+         component={MatchScreenGrid}
+        />
 
+
+        <Stack.Screen
+         options={{
+          header:({navigation}) => <CustomMatchHeader navigation={navigation}/>
+         }}
+         name="MatchBox"
+         component={MatchScreenBox}
+        />
 
 
         <Stack.Screen  options={{
@@ -183,7 +216,7 @@ const  Application = () =>  {
 
         <Stack.Screen name="chatDiscussion" component={ChatDiscussion} options={{
           header:({navigation}) => {
-            return   <View   style={{paddingHorizontal:20,paddingBottom:10,height:100,backgroundColor:"white",flexDirection:"row",alignItems:"flex-end",justifyContent:"space-between"}}>
+            return   <View   style={{paddingHorizontal:20,paddingBottom:10,height:80,backgroundColor:"white",flexDirection:"row",alignItems:"flex-end",justifyContent:"space-between",height:100}}>
 
             
             <TouchableOpacity onPress={()=> navigation.navigate("ChatDiscussionOptions")} style={{height:50,width:50,borderRadius:50,overflow:"hidden"}}>
@@ -222,9 +255,9 @@ const  Application = () =>  {
 
         <Stack.Screen component={NotificationsScreen} name="Notifications" options={{
           header:({navigation}) => {
-            return <View style={{backgroundColor:"white",justifyContent:"center",padding:10,borderBottomColor:COLORS.light,borderBottomWidth:2}}>
-             <View style={{height:20}}></View>
-             <View style={{flexDirection:"row",alignItems:"center",marginTop:20}}>
+            return <View style={{backgroundColor:"white",justifyContent:"flex-end",padding:10,borderBottomColor:COLORS.light,borderBottomWidth:2,height:100}}>
+              
+             <View style={{flexDirection:"row",alignItems:"center"}}>
              <TouchableOpacity onPress={() => navigation.goBack()} style={{marginBottom:5}}><HeaderBackArrowBlack/></TouchableOpacity>
              <CustomSemiBoldPoppingText style={{marginLeft:20}} color={"black"} fontSize={TEXT_SIZE.title} value="Notifications"/>
              </View>
@@ -234,12 +267,9 @@ const  Application = () =>  {
         }} />
 
       </Stack.Navigator>
+</QueryClientProvider>
 </GlobalVariableProvider>
   </PaperProvider>
 </NavigationContainer>
   );
 }
-
-
-
-export default Application

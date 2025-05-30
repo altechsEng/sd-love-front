@@ -12,25 +12,30 @@ import axios from "axios";
 
  
 
-  //  type GLobalContextType = {
-  //   user:any,
-  //   setUser:(user:any) => void,
-  //   questioniareLevel:string,
-  //   setQuestionaireLevel:(level: string) => void,
-  //   questionnaireProgress:number,
-  //   setQuestionnaireProgress: (progress: number)=> void,
-  //   registrationData:{},
-  //   setRegistrationData:(data:{}) => void,
-  //   questionnaireData: {},
-  //   setQuestionnaireData: (value: {}) => void,
-  //   err:string,
-  //   setErr:(value:string) => void,
-  //   handleSubmitAddPost:() => void,
-  //   postAddData:{text:"",media:[]},
-  //   setPostAddData:(value:{}) => void
-  //  }
+  
 
-   const GlobalVariableContext = createContext({})
+  export const GlobalVariableContext = createContext({
+    
+    user : "",
+    setUser:(user) => {},
+    questioniareLevel:"",
+    setQuestionaireLevel:(level) => {},
+    questionnaireProgress:0,
+    setQuestionnaireProgress: (progress)=> {},
+    registrationData:{},
+    setRegistrationData:(data) => {},
+    questionnaireData: {},
+    setQuestionnaireData: (value) => {},
+    err:"",
+    setErr:(value) => {},
+    handleSubmitAddPost:() => {},
+    postAddData:{text:"",media:[]},
+    setPostAddData:(value) => {},
+    activeScreen:"side",
+    setActiveScreen:(value) => {} ,
+     activeSubCat:"About" ,setActiveSubCat: (value) => {}
+   
+   })
 
    
    export const useGlobalVariable = () => {
@@ -134,6 +139,8 @@ const [postAddData,setPostAddData] = useState({
   media:[]
 })
 
+const [activeSubCat ,setActiveSubCat] = useState('About')
+const [activeScreen,setActiveScreen] = useState("side")
 
 
 
@@ -156,7 +163,10 @@ const [postAddData,setPostAddData] = useState({
         setErr,
         postAddData,
         setPostAddData,
-     
+        activeScreen,
+        setActiveScreen,
+       
+        activeSubCat ,setActiveSubCat
           }}
        >
          {children}
