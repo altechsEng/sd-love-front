@@ -8,16 +8,22 @@ import { useGlobalVariable } from "../context/global";
 import { COLORS,FAMILLY,TEXT_SIZE } from "../../utils/constants";
 import { CustomRegularPoppingText, CustomSemiBoldPoppingText } from "./text";
 import { ProfileScreenBars } from "./vectors";
-import { useState } from "react";
+import { useState,useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CustomProfileScreenHeader = ({navigation}) => {
      const [isProfileMenuAcitve,setIsProfileMenuActive] = useState(false)
+  
+     const {setActiveSubCat,activeSubCat,image,userData} = useGlobalVariable()
+  
 
-const {setActiveSubCat,activeSubCat} = useGlobalVariable()
-     return <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between",borderBottomWidth:2,backgroundColor:"white",padding:20,borderColor:COLORS.light,paddingTop:40}}>
+
+     
+
+     return <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between",borderBottomWidth:2,backgroundColor:"white",padding:20,borderColor:COLORS.light,paddingTop:60}}>
                 <View style={{flexDirection:"row",alignItems:"center"}}>
                              <View style={{overflow:"hidden",height:50,width:50,borderRadius:50,marginRight:10}}>
-           <Image source={require("../../assets/images/match_con1.jpg.jpg")} style={{height:"100%",width:"100%"}}/>
+           <Image source={image ? {uri:`${image}`}:require("../../assets/images/match_con1.jpg.jpg")} style={{height:"100%",width:"100%"}}/>
           </View>
 
 

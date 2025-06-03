@@ -7,18 +7,22 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { ScrollView } from "react-native-gesture-handler";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PostAddIcon,MatchProfileArrowBack, MatchProfileBirthDay, MatchProfileEducation, MatchProfileFaithChurch, MatchProfileFaithIcon1, MatchProfileFaithOccupation, MatchProfileHome, MatchProfileLang, MatchProfilePlus, MatchProfileSexIcon, MatchProfileSmallHeart, MatchProfleSmallFace, PostScreenBookMark, ProfileScreenBookMark, ProfileScreenAddPost, PostScreenDots, ProfileScreenPostEdit, ProfileScreenPostDelete, ProfileScreenManageProfile, ProfileScreenAccountSecurity, ProfileScreenTheme, ProfileScreenGlobe, ProfileScreenPermissions, ProfileScreenQuestionMark, ProfileSCreenExclamation, ProfileScreenPrivacyPolicy, ProfileScreenLogOut  } from "../components/vectors";
 import { COLORS, FAMILLY, TEXT_SIZE } from "../../utils/constants";
 import { useGlobalVariable } from "../context/global";
+import AsyncStorage from "@react-native-async-storage/async-storage";
  
 
 const {width:SCREEN_WIDTH,height:SCREEN_HEIGHT} = Dimensions.get('window')
 
 
 const ProfileScreen = ({navigation}) => {
+     
      const [modalVisible,setModalVisible] = useState(false)
   
+
+
   const {isProfileMenuAcitve,activeSubCat,setActiveSubCat} = useGlobalVariable()
 
             const [posts,setPosts] = useState([

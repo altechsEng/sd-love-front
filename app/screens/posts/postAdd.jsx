@@ -1,7 +1,7 @@
  
  
 import { PostAddDeleteIcon, PostScreenMediaCamera, PostScreenMediaGif, PostScreenMediaImage, PostScreenMediaVideo, PostScreenPlus } from '../../components/vectors'
-import { COLORS } from '../../../utils/constants'
+import { COLORS,TEXT_SIZE } from '../../../utils/constants'
 import React, { useEffect, useState } from 'react'
 import { Text, View, TextInput, Dimensions, TouchableOpacity, Image, FlatList, Platform, ActivityIndicator, Alert } from 'react-native'
 import * as ImagePicker from 'expo-image-picker';
@@ -14,7 +14,8 @@ import { useGlobalVariable } from '../../../app/context/global';
      widthPercentageToDP as wp,
      heightPercentageToDP as hp,
    } from "react-native-responsive-screen";
-
+import {CustomRegularPoppingText} from "../../components/text"
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window')
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -22,6 +23,7 @@ const MAX_VIDEO_DURATION = 30; // 30 seconds
 
 const PostAdd = ({ navigation }) => {
 
+   
   const [thoughts,setThoughts] = useState("")
   const [images, setImages] = useState([
     { id: "imk1", img: require("../../../assets/images/match_pro1.jpg") },
@@ -31,7 +33,8 @@ const PostAdd = ({ navigation }) => {
   const [cameraPermission, requestCameraPermission] = Camera.useCameraPermissions();
   const [mediaPermission, requestMediaPermission] = MediaLibrary.usePermissions();
   const [isProcessing, setIsProcessing] = useState(false);
-  const {setPostAddData} = useGlobalVariable()
+  const {setPostAddData,isLoading} = useGlobalVariable()
+
 
   useEffect(()=> {
     
@@ -288,7 +291,11 @@ if (isValidSize) {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "white" }}>
+<>
+    {isLoading ? <View style={{flex:1,backgroundColor:"white",alignItems:"center",justifyContent:"center"}}>
+      <ActivityIndicator size={34} color={COLORS.primary}/>
+      <CustomRegularPoppingText style={{}} color={COLORS.black} fontSize={TEXT_SIZE.primary} value="Loading please wait..."/>
+    </View> :     <View style={{ flex: 1, backgroundColor: "white" }}>
       <TextInput
         placeholder='Express your thoughts....'
         multiline={true}
@@ -344,7 +351,8 @@ if (isValidSize) {
           <PostScreenMediaVideo fill={isProcessing ? COLORS.light : COLORS.dark} />
         </TouchableOpacity>
       </View>
-    </View>
+    </View>}
+</>
   )
 }
 

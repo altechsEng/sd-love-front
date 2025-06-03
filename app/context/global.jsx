@@ -5,10 +5,12 @@
 import React, {
      createContext,
      useContext,
+     useEffect,
      useState,
    } from "react";
 import { getEmojiFlag } from "countries-list";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
  
 
@@ -33,7 +35,13 @@ import axios from "axios";
     setPostAddData:(value) => {},
     activeScreen:"side",
     setActiveScreen:(value) => {} ,
-     activeSubCat:"About" ,setActiveSubCat: (value) => {}
+    activeSubCat:"About" ,setActiveSubCat: (value) => {},
+    isLoading:false,setIsLoading:(val) => {},
+    updateSettingData:"",setUpdateSettingData:(val) => {},
+    settingType:"",setSettingType:(val) => {},
+    userData:{},setUserData:(val) => {},
+    image:"",setImage:(val) => {},
+    refreshUserData:null,setRefreshUserData:(val) => {}
    
    })
 
@@ -141,9 +149,52 @@ const [postAddData,setPostAddData] = useState({
 
 const [activeSubCat ,setActiveSubCat] = useState('About')
 const [activeScreen,setActiveScreen] = useState("side")
+const [isLoading,setIsLoading] = useState(false)
+const [refreshUserData,setRefreshUserData] = useState(null)
+const [settingType,setSettingType] = useState(null)
 
 
+const [image,setImage] = useState(null)
+const [userData,setUserData] = useState({}) // load it here once 
+  
+const loadData = async() => {
+    try {
+         let result = await AsyncStorage.getItem("user_data")
+         let data = await JSON.parse(result)
+          
+         setUserData({...data?.user,dob:data?.user_info[0]?.qP2})
+        
+      
+         if(data?.user_image) setImage(data?.user_image)
+         else setImage(null)
 
+       
+ 
+    } catch(err) {
+         console.log(err,"Eror")
+         throw(err)
+    }
+         
+    }
+  
+  useEffect(() => {
+  loadData()
+  },[])
+
+
+//for updating
+const [updateSettingData,setUpdateSettingData] = useState({
+            settingType :"",
+            firstname:"",
+            lastname :"",
+            dob :new Date(),
+            country :"Cameroon",
+            city:"",
+            address:"",
+            phone_code :"",
+            phone :"",
+            email :""
+})
  
    
      return (
@@ -165,8 +216,12 @@ const [activeScreen,setActiveScreen] = useState("side")
         setPostAddData,
         activeScreen,
         setActiveScreen,
-       
-        activeSubCat ,setActiveSubCat
+        isLoading,setIsLoading,
+        activeSubCat ,setActiveSubCat,
+        updateSettingData,setUpdateSettingData,
+        settingType,setSettingType,
+        image,setImage,userData,setUserData,
+        refreshUserData,setRefreshUserData,loadData
           }}
        >
          {children}

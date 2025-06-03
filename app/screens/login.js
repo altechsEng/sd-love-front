@@ -60,9 +60,10 @@ const  Login = ({navigation}) => {
         .post(`/api/login/en`, data)
         .then(async(res) => {
 
-          setIsLoading(false)
+          
       if(res.data.error || res.data.status == 500 || res.data.status === 401) {
         setErr(res.data.message)
+        setIsLoading(false)
      
       } else if  (res.data.status === 200) {
             
@@ -75,7 +76,7 @@ const  Login = ({navigation}) => {
             await AsyncStorage.setItem("user_token", res.data?.user_token);
             let info = JSON.stringify({
               user:res.data?.user_data?.user,
-              // user_info:res.data?.user_data?.user_info,
+              user_info:res.data?.user_data?.user_info,
               user_image:`https://sdlove-api.altechs.africa/storage/app/private/public/user_images/${res.data?.user_image}` || null
             })
            await AsyncStorage.setItem("user_data",info)
@@ -83,12 +84,13 @@ const  Login = ({navigation}) => {
              
 
           navigation.navigate("BottomTabsHome")
-            
+            setIsLoading(false)
           }  
         })
         .catch(function (error) {
           console.log(error.message,error," in login",error.response,Object.keys(error))
           setErr(error.message)
+          setIsLoading(false)
           
         });
     });
@@ -175,7 +177,7 @@ const  Login = ({navigation}) => {
      {err!==""? <CustomRegularPoppingText style={{alignSelf:'center',marginTop:10,width:"85%"}} fontSize={TEXT_SIZE.small} color={COLORS.red} value={err}/>:null}
 
      <TouchableOpacity onPress={() =>handleSubmission()} style={{backgroundColor:COLORS.primary, paddingVertical:10,marginTop:20,paddingHorizontal:20,width:"80%", borderRadius:100}}>
-     {isLoading? <ActivityIndicator color="white"/>:      <Text style={{color:"white",textAlign:"center",fontFamily:FAMILLY.regular}} >Login</Text>}
+     {isLoading === true? <ActivityIndicator color="white"/>:      <Text style={{color:"white",textAlign:"center",fontFamily:FAMILLY.regular}} >Login</Text>}
      </TouchableOpacity>
 
 

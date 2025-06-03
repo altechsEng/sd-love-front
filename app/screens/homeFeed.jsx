@@ -14,6 +14,8 @@ import {useInfiniteQuery} from "@tanstack/react-query"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime"
+import CustomPostLoader from "../components/customPostLoader.jsx";
+import CustomMatchLoader from "../components/customMatchLoader.jsx";
 
 dayjs.extend(relativeTime)
 
@@ -100,7 +102,7 @@ export default function HomeFeed({navigation}) {
                 };
             }
         } catch(err) {
-            console.log(err.message, "in getAllPost");
+            console.log(err.message, "in getAllPost",Object.keys(err),err?.request);
             isSearching.current = false;
             throw err; // Important for React Query error handling
         }
@@ -144,6 +146,13 @@ export default function HomeFeed({navigation}) {
 
      const renderMatches = ({item,index}) => {
         
+          if(isFetching){
+               return <CustomMatchLoader/>
+          }
+
+               
+
+
                return (
                     <TouchableOpacity style={{flex:1,position:"relative",alignItems:"center",justifyContent:"center",marginRight:10,borderRadius:20,width:130,overflow:"hidden",marginVertical:10}} key={item.key}>
                           
@@ -169,8 +178,15 @@ export default function HomeFeed({navigation}) {
      }
 
      const renderPosts = ({item,index}) => {
-          console.log(item,"in render posts")
+
+          if(isFetching){
+           return <CustomPostLoader/>
+          }
+           
+
+           
           return (
+
                <View key={item?.key} style={{flex:1,marginVertical:10,marginRight:20,width:wp(80),flexDirection:"column"}}>
                     <View style={{flexDirection:"row",justifyContent:"space-evenly",alignItems:"center"}}>
                     <View style={{flex:2,flexDirection:"row"}}>
@@ -190,7 +206,7 @@ export default function HomeFeed({navigation}) {
                     </View> 
 
                     <TouchableOpacity onPress={()=> navigation.navigate("Post",{item})} style={{height:200,margin:0,padding:0,overflow:"hidden",borderRadius:20}}>
-                         <Image source={ item?.media?.length > 0 ? {uri:`https://sdlove-api.altechs.africa/storage/app/private/public/post_images/${item?.media[0]?.url}`}   : require("../../assets/images/blog_test.jpg")  } resizeMode="cover" style={{width:"100%",height:"100%"}}/>
+                         <Image source={ item?.media?.length > 0 ? {uri:`https://sdlove-api.altechs.africa/storage/app/private/public/post_media/${item?.media[0]?.url}`}   : require("../../assets/images/blog_test.jpg")  } resizeMode="cover" style={{width:"100%",height:"100%"}}/>
                     </TouchableOpacity>
 
                     {/* <FlatList
@@ -209,24 +225,24 @@ export default function HomeFeed({navigation}) {
                          <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between"}} >
 
                          <View style={{marginRight:10,flexDirection:"row",alignItems:"center",justifyContent:"center"}}>
-                         <TouchableOpacity><HomeFeedHeart/></TouchableOpacity>
+                         <TouchableOpacity><HomeFeedHeart stroke={"#2E2E2E"} fill={"white"}/></TouchableOpacity>
                          <Text style={{fontFamily:FAMILLY.light,marginLeft:5}}>{item?.likes_count || 0}</Text>
                          </View>
 
                          <View style={{marginRight:10,flexDirection:"row",alignItems:"center",justifyContent:"center"}}>
-                         <TouchableOpacity onPress={() => navigation.navigate("Post",{item})}><HomeFeedComment/></TouchableOpacity>
+                         <TouchableOpacity onPress={() => navigation.navigate("Post",{item})}><HomeFeedComment stroke={"#2E2E2E"} fill={"white"}/></TouchableOpacity>
                          <Text style={{fontFamily:FAMILLY.light,marginLeft:5}}>0</Text>
                          </View>
 
                          <View style={{marginRight:10,flexDirection:"row",alignItems:"center",justifyContent:"center"}}>
-                              <TouchableOpacity><HomeFeedShare/></TouchableOpacity>
+                              <TouchableOpacity><HomeFeedShare fill={"#2E2E2E"}/></TouchableOpacity>
                               <Text style={{fontFamily:FAMILLY.light,marginLeft:5}}>825</Text>
                          </View>
 
                          </View>
 
                          <View>
-                              <TouchableOpacity><HomeFeedThreeDots/></TouchableOpacity>
+                              <TouchableOpacity><HomeFeedThreeDots fill={"#5E5E5E"}/></TouchableOpacity>
                          </View>
 
                     </View>

@@ -1,4 +1,4 @@
-import React,{useState} from 'react'
+import React,{useState,useEffect} from 'react'
 import {View,Text,TouchableOpacity,Image,Dimensions,FlatList,KeyboardAvoidingView,Platform, ToastAndroid} from 'react-native'
 import {useRoute} from '@react-navigation/native'
 import { COLORS, FAMILLY, TEXT_SIZE } from "../../../utils/constants";
@@ -22,12 +22,19 @@ dayjs.extend(relativeTime)
 
 
 const PostScreen = ({navigation}) => {
- let {item} = useRoute().params
+
+const [mainItem,setMainItem] = useState(null)
+let {item} = useRoute().params
+
+ useEffect(()=> {
+     setMainItem(item)
+ },[item])
+
  const [comment,setComment]  = useState("")
  const [showComment,setShowComment] = useState(false)
  const [data,setData]= useState([
      {
-          key:"post122",
+          key:"post122-98",
           img:require("../../../assets/images/test_match1.jpg"),
           comment:"Lorem ipsum dolor sit amet consectetur. Commodo sapien metus et a vitae a nec. Enim blandit mauris habitasse mattis justo. Tellus lorem massa auctor.",
           name:"Maggy McLeen",
@@ -35,7 +42,7 @@ const PostScreen = ({navigation}) => {
   
      },
      {
-          key:"post102",
+          key:"post102-35",
           img:require("../../../assets/images/test_match1.jpg"),
           comment:"Lorem ipsum dolor sit amet consectetur. Commodo sapien metus et a vitae a nec. Enim blandit mauris habitasse mattis justo.",
           name:"Maggy McLeen",
@@ -89,7 +96,7 @@ const handleBookMark = async(postId) => {
 }
 
  const RenderData = ({item}) => {
-    
+     
      return <View style={{borderBottomWidth:2,borderColor:COLORS.light,paddingVertical:10,backgroundColor:"white"}}>
           <View style={{flexDirection:"row",width:"80%"}}>
               <View style={{overflow:"hidden",height:50,width:50,borderRadius:50,marginRight:10}}>
@@ -196,6 +203,7 @@ const handleBookMark = async(postId) => {
      </View>
  }
 
+
      return (
          
  
@@ -207,10 +215,10 @@ const handleBookMark = async(postId) => {
      <View style={{paddingHorizontal:20}}>
      <View style={{flexDirection:"row",justifyContent:"space-evenly",alignItems:"center"}}>
      <View style={{flex:2,flexDirection:"row"}}>
-     <TouchableOpacity style={{borderRadius:50,height:50,width:50,overflow:"hidden",alignItems:"center"}}><Image source={item?.img || require("../../../assets/images/test_person1.png")} resizeMode="cover" style={{height:"100%",width:"100%"}}/></TouchableOpacity>
+     <TouchableOpacity style={{borderRadius:50,height:50,width:50,overflow:"hidden",alignItems:"center"}}><Image source={mainItem?.img || require("../../../assets/images/test_person1.png")} resizeMode="cover" style={{height:"100%",width:"100%"}}/></TouchableOpacity>
      <View style={{flexDirection:"column",justifyContent:"center",marginLeft:10}}>
-     <Text style={{color:COLORS.black,fontSize:TEXT_SIZE.primary,fontFamily:FAMILLY.semibold}}>{item?.user?.firstname || "Johno orlan"}</Text>
-     <Text style={{color:COLORS.gray,fontSize:TEXT_SIZE.small,fontFamily:FAMILLY.light}}>{dayjs(item?.created_at).fromNow() || "12 hours ago"}</Text>
+     <Text style={{color:COLORS.black,fontSize:TEXT_SIZE.primary,fontFamily:FAMILLY.semibold}}>{mainItem?.user?.firstname || "Johno orlan"}</Text>
+     <Text style={{color:COLORS.gray,fontSize:TEXT_SIZE.small,fontFamily:FAMILLY.light}}>{dayjs(mainItem?.created_at).fromNow() || "12 hours ago"}</Text>
      </View>
      </View>
 
@@ -221,7 +229,7 @@ const handleBookMark = async(postId) => {
 
      <View style={{marginVertical:10}}>
           <Text style={{color:COLORS.black,fontSize:TEXT_SIZE.secondary,fontFamily:FAMILLY.light}}>
-         {item?.text || " Lorem ipsum dolor sit amet consectetur. Lorem varius quisque odio nisl tempor sit bibendum pulvinar sed. pharetra sed magnis vitae."}
+         {mainItem?.text || " Lorem ipsum dolor sit amet consectetur. Lorem varius quisque odio nisl tempor sit bibendum pulvinar sed. pharetra sed magnis vitae."}
           </Text>
      </View> 
 
@@ -230,27 +238,43 @@ const handleBookMark = async(postId) => {
 
 
 
-     <TouchableOpacity style={{height:200,margin:0,padding:0,width:"100%"}}>
-          {/* <Image source={item.postImg} resizeMode="cover" style={{width:"100%",height:"100%"}}/> */}
-          <Image source={item?.media[0]?.url ? {uri:`https://sdlove-api.altechs.africa/storage/app/private/public/post_images/${item?.media[0]?.url}`} : require("../../../assets/images/post_1.jpg")} resizeMode="cover" style={{width:"100%",height:"100%"}}/>
-     </TouchableOpacity> 
+     <View style={{height:200,margin:0,padding:0,width:"100%"}}>
+            
+            {mainItem?.media?.length ===1 ?  <Image source={{uri:`https://sdlove-api.altechs.africa/storage/app/private/public/post_media/${mainItem?.media[0]?.url}`}} resizeMode="cover" style={{width:"100%",height:"100%"}}/> : null}
+        {mainItem?.media.length>1 ?   <FlatList
+        data={mainItem?.media}
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        renderItem={({item}) => {
+          console.log(item,"poppppppp-------",mainItem)
+          return <View style={{flex:1,width:200,height:200,marginRight:10}}>
+        
+          <Image source={{uri:`https://sdlove-api.altechs.africa/storage/app/private/public/post_media/${item?.url}`}} resizeMode="cover" style={{width:"100%",height:"100%"}}/>
+        </View>
+        }}
+
+        />: null }
+
+        {mainItem?.media?.length === 0 ? <Image source={require("../../../assets/images/match_con1.jpg.jpg")} resizeMode="cover" style={{width:"100%",height:"100%"}}/>:null}
+     </View> 
+
 
      <View style={{paddingHorizontal:20,height:30,flexDirection:"row",alignItems:"center",justifyContent:"space-between",marginTop:10}}>
 
           <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between"}} >
 
           <View style={{marginRight:10,flexDirection:"row",alignItems:"center",justifyContent:"center"}}>
-          <TouchableOpacity><HomeFeedHeart/></TouchableOpacity>
+          <TouchableOpacity><HomeFeedHeart stroke={"#2E2E2E"} fill={"white"}/></TouchableOpacity>
           <Text style={{fontFamily:FAMILLY.light,marginLeft:5}}>0</Text>
           </View>
 
           <View style={{marginRight:10,flexDirection:"row",alignItems:"center",justifyContent:"center"}}>
-          <TouchableOpacity onPress={() => setShowComment(!showComment)}><HomeFeedComment/></TouchableOpacity>
+          <TouchableOpacity onPress={() => setShowComment(!showComment)}><HomeFeedComment stroke={"#2E2E2E"} fill={"white"}/></TouchableOpacity>
           <Text style={{fontFamily:FAMILLY.light,marginLeft:5}}>0</Text>
           </View>
 
           <View style={{marginRight:10,flexDirection:"row",alignItems:"center",justifyContent:"center"}}>
-               <TouchableOpacity><HomeFeedShare/></TouchableOpacity>
+               <TouchableOpacity><HomeFeedShare fill={"#2E2E2E"}/></TouchableOpacity>
                <Text style={{fontFamily:FAMILLY.light,marginLeft:5}}>825</Text>
           </View>
 
@@ -274,7 +298,7 @@ renderItem={RenderData}
 showsVerticalScrollIndicator={false}
 showsHorizontalScrollIndicator={false}
 initialNumToRender={10}
-
+ 
 />
 </View> : <View style={{alignItems:"center",flexDirection:"column",justifyContent:"center"}}>
 <PostScreenBigComment/>

@@ -10,29 +10,21 @@ import { useEffect,useState} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from 'expo-image-picker';
 import axios from "axios";
+import { useGlobalVariable } from "../../context/global";
+import dayjs from "dayjs";
 
 const EditProfileScreen = ({navigation}) => {
-const [userData,setUserData] = useState(null)
+ 
 const [loading, setLoading] = useState(false);
 const [uploading, setUploading] = useState(false);
-const [image, setImage] = useState(null);
+const {userData,image,loadData,setImage} = useGlobalVariable()
+ 
+useEffect(() => {
+  loadData()
+  
+},[])
 
-
-
-const loadData = async() => {
-try {
-     let result = await AsyncStorage.getItem("user_data")
-     let data = await JSON.parse(result)
-     setUserData(data?.user)
-   
-    console.log(data?.user_image,"Ssss")
-     if(data?.user_image) setImage(data?.user_image)
-     else setImage(null)
-} catch(err) {
-     console.log(err,"Eror")
-}
-     
-}
+ 
 
 
   const uploadImage = async (uri) => {
@@ -95,9 +87,7 @@ try {
     }
   };
 
-     useEffect(() => {
-          loadData()
-     },[])
+     
 
      return <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{backgroundColor:"white",position:"relative",padding:20,flex:1}}>
           <TouchableOpacity onPress={() => pickImage()} style={{height:hp("10%"),width:hp("10%"),borderRadius:100,position:"relative"}}>
@@ -133,10 +123,10 @@ try {
                     <View style={{ marginTop:20,flexDirection:"row",alignItems:"center",justifyContent:"space-between"}}>
                          <View style={{}}>
                          <CustomRegularPoppingText value={"Date of birth"} fontSize={TEXT_SIZE.small} style={{}} color={"#A0A7AE"}/>
-                         <CustomRegularPoppingText value={"10 June 1999"} fontSize={TEXT_SIZE.secondary} style={{}} color={COLORS.black}/>
+                         <CustomRegularPoppingText value={dayjs(userData?.dob).format('DD MMMM YYYY') || "10 June 1999"} fontSize={TEXT_SIZE.secondary} style={{}} color={COLORS.black}/>
                          </View>
 
-                         <TouchableOpacity style={{paddingHorizontal:12,paddingVertical:10,flexDirection:"row",alignItems:"center",justifyContent:"space-between",borderRadius:10,backgroundColor:COLORS.light}}>
+                         <TouchableOpacity onPress={() => navigation.navigate("CustomEditSetting",{type:"dob"})} style={{paddingHorizontal:12,paddingVertical:10,flexDirection:"row",alignItems:"center",justifyContent:"space-between",borderRadius:10,backgroundColor:COLORS.light}}>
                          <EditProfileScreenPen/>
                          <CustomRegularPoppingText value={"Edit"} fontSize={TEXT_SIZE.small} style={{marginLeft:10}} color={COLORS.black}/>
                          </TouchableOpacity>
@@ -146,10 +136,10 @@ try {
                     <View style={{ marginTop:20,flexDirection:"row",alignItems:"center",justifyContent:"space-between"}}>
                          <View style={{}}>
                          <CustomRegularPoppingText value={"Address"} fontSize={TEXT_SIZE.small} style={{}} color={"#A0A7AE"}/>
-                         <CustomRegularPoppingText value={`${userData?.country}-${userData?.city}-${userData?.address}` || "409 Konopelski Row, Otisworth, Belg..."} fontSize={TEXT_SIZE.secondary} style={{}} color={COLORS.black}/>
+                         <CustomRegularPoppingText value={`${userData?.country}-${userData?.city}-${userData?.address}`.length>30 ? `${userData?.country}-${userData?.city}-${userData?.address}`.slice(0,20)+"...":`${userData?.country}-${userData?.city}-${userData?.address}` || "409 Konopelski Row, Otisworth, Belg..."} fontSize={TEXT_SIZE.secondary} style={{}} color={COLORS.black}/>
                          </View>
 
-                         <TouchableOpacity style={{paddingHorizontal:12,paddingVertical:10,flexDirection:"row",alignItems:"center",justifyContent:"space-between",borderRadius:10,backgroundColor:COLORS.light}}>
+                         <TouchableOpacity onPress={() => navigation.navigate("CustomEditSetting",{type:"address"})} style={{paddingHorizontal:12,paddingVertical:10,flexDirection:"row",alignItems:"center",justifyContent:"space-between",borderRadius:10,backgroundColor:COLORS.light}}>
                          <EditProfileScreenPen/>
                          <CustomRegularPoppingText value={"Edit"} fontSize={TEXT_SIZE.small} style={{marginLeft:10}} color={COLORS.black}/>
                          </TouchableOpacity>
@@ -163,7 +153,7 @@ try {
                          <CustomRegularPoppingText value={`${userData?.phone_code} ${userData?.phone}` || "957-552-1432 x3638"} fontSize={TEXT_SIZE.secondary} style={{}} color={COLORS.black}/>
                          </View>
 
-                         <TouchableOpacity style={{paddingHorizontal:12,paddingVertical:10,flexDirection:"row",alignItems:"center",justifyContent:"space-between",borderRadius:10,backgroundColor:COLORS.light}}>
+                         <TouchableOpacity onPress={() => navigation.navigate("CustomEditSetting",{type:"tel"})} style={{paddingHorizontal:12,paddingVertical:10,flexDirection:"row",alignItems:"center",justifyContent:"space-between",borderRadius:10,backgroundColor:COLORS.light}}>
                          <EditProfileScreenPen/>
                          <CustomRegularPoppingText value={"Edit"} fontSize={TEXT_SIZE.small} style={{marginLeft:10}} color={COLORS.black}/>
                          </TouchableOpacity>
@@ -178,7 +168,7 @@ try {
                          <CustomRegularPoppingText value={"Not specified"} fontSize={TEXT_SIZE.secondary} style={{}} color={COLORS.black}/>
                          </View>
 
-                         <TouchableOpacity style={{paddingHorizontal:12,paddingVertical:10,flexDirection:"row",alignItems:"center",justifyContent:"space-between",borderRadius:10,backgroundColor:COLORS.light}}>
+                         <TouchableOpacity  style={{paddingHorizontal:12,paddingVertical:10,flexDirection:"row",alignItems:"center",justifyContent:"space-between",borderRadius:10,backgroundColor:COLORS.light}}>
                          <EditProfileScreenPen/>
                          <CustomRegularPoppingText value={"Edit"} fontSize={TEXT_SIZE.small} style={{marginLeft:10}} color={COLORS.black}/>
                          </TouchableOpacity>

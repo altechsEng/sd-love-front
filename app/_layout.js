@@ -38,6 +38,8 @@ import CustomMatchHeader from './components/customMatchHeader';
 import MatchScreenGrid from './screens/dating/matchScreenGrid';
 import MatchScreenBox from './screens/dating/matchScreenBox';
 import CustomEditSetting from './components/customEditSetting';
+import CustomEditScreenHeader from "./components/customEditScreenHeader"
+import CustomSucessScreen from './components/CustomSucessScreen';
 
 axios.defaults.baseURL = "https://sdlove-api.altechs.africa";
 axios.defaults.headers.post["Accept"] = "application/json";
@@ -259,7 +261,7 @@ export default function Application() {
           header:({navigation}) => <View style={{backgroundColor:"white",justifyContent:"flex-end",padding:10,borderBottomColor:COLORS.light,borderBottomWidth:2,height:100}}>
               
              <View style={{flexDirection:"row",alignItems:"center"}}>
-             <TouchableOpacity onPress={() => navigation.goBack()} style={{marginBottom:5}}><HeaderBackArrowBlack/></TouchableOpacity>
+             <TouchableOpacity onPress={() => navigation.navigate("BottomTabsHome",{screen:"Profile"})} style={{marginBottom:5}}><HeaderBackArrowBlack/></TouchableOpacity>
              <CustomSemiBoldPoppingText style={{marginLeft:20}} color={"black"} fontSize={TEXT_SIZE.title} value="Manage Profile info"/>
              </View>
             
@@ -269,25 +271,11 @@ export default function Application() {
 
 
         <Stack.Screen component={CustomEditSetting} name="CustomEditSetting" options={{
-          header:({navigation}) => {
-            return <View style={{backgroundColor:"white",justifyContent:"space-between",alignItems:"center",flexDirection:"row",padding:20,borderBottomColor:COLORS.light,borderBottomWidth:2,height:100}}>
-              
-              
-             <TouchableOpacity onPress={() => navigation.goBack()} style={{alignSelf:"flex-end"}}>
-              <HeaderBackArrowBlack/>
-              </TouchableOpacity>
-              
+          header:({navigation}) => <CustomEditScreenHeader navigation={navigation}/>
+        }}/>
 
-
-             <TouchableOpacity style={{alignSelf:"flex-end",flexDirection:"row",justifyContent:"center",alignItems:"center"}} onPress={() =>{}}>
-              <View style={{height:15}}>
-                <CustomEditScreenTick/>
-              </View>
-              <CustomRegularPoppingText style={{marginLeft:10}} color={COLORS.red} fontSize={TEXT_SIZE.primary} value="Save"/>
-             </TouchableOpacity>
-            
-            </View>
-          }
+        <Stack.Screen component={CustomSucessScreen} name="CustomSucessScreen" options={{
+          headerShown:false
         }}/>
 
         <Stack.Screen component={NotificationsScreen} name="Notifications" options={{

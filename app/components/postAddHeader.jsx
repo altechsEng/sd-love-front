@@ -1,5 +1,5 @@
 import axios from "axios"
-import {View,Text,TouchableOpacity,Image, ToastAndroid} from "react-native"
+import {View,Text,TouchableOpacity,Image, ToastAndroid, ActivityIndicator} from "react-native"
 import { CustomSemiBoldPoppingText } from "./text";
 import { PostScreenXMark } from "./vectors";
 import { COLORS, FAMILLY, TEXT_SIZE } from '../../utils/constants';
@@ -9,64 +9,84 @@ import {
      heightPercentageToDP as hp,
    } from "react-native-responsive-screen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useState,useEffect } from "react";
  
 
 
 const PostAddHeader = ({navigation}) => { 
 
-  const {postAddData} = useGlobalVariable()
+  const {postAddData,isLoading,setIsLoading,userData,image} = useGlobalVariable()
 
-const handleSubmitAddPost = async() => {
-  console.log("in function -- called")
 
-try{
+
+
+ 
+const createPost = async() => {
+  setIsLoading(true)
+  try {
+    let token = await AsyncStorage.getItem("user_token")
+    let postId = await axios.post("/api/create-post",{text:postAddData?.text},{
+      headers:{
+    'Content-Type': 'multipart/form-data',
+    'Authorization':`Bearer ${token}`
+      }
+    }).then((res) => {
+
    
-    const formData = new FormData();
+  return res.data?.post?.id
+}).catch(err => {
+  setIsLoading(false)
+  console.log(err,"a problem occured post add")
+})
 
+    return {
+      token,
+      postId
+    }
 
+  
 
-  // Append text
-  formData.append("text", postAddData.text);
-
-  // Append media (fixed syntax)
-  // if (postAddData.media?.length > 0) {
-  //   formData.append("media", {  // <-- "media" as string literal
-  //     uri: postAddData.media[0].img.uri,
-  //     type: postAddData.media[0].img.type || "image/jpeg", // Fallback MIME type
-  //     name: postAddData.media[0].img.fileName || "upload.jpg", // Fallback filename
-  //   } );  
-  // }
-
- 
-
-     console.log(formData,"ssss")
-  let token = await AsyncStorage.getItem("user_token")
-    await axios.post(
-      "/api/new-post",
-       formData,
-      {headers:{
-        "Accept":"application/json",
-        "Content-Type":"application/json",
-        "Content-Type":"multipart/form-data",
-         "Authorization":`Bearer ${token}` 
-      }}
-    ).then((res) => {
-      console.log(res.data) 
-      ToastAndroid.show(res.data.message,1000)
-      navigation.navigate("BottomTabsHome",{screen:"Feeds"})
-    }).catch(err => {
-     console.log(err.request,"skk")
-    console.log( err?.response?.data,"okayy lets see",Object.keys(err))
-    })
-    
-} catch(err) {
-  console.log(err)
+  } catch(err) {
+    console.log(err,"in create post")
+    throw(err)
+  }
 }
+const handleSubmitAddPost = async() => {
+ let {postId,token} =  await createPost()
+
+const formData = new FormData();
+formData.append('post_id', postId)
 
  
+postAddData?.media?.map((data) => {
+   console.log(data,"foram data--dasingle")
+    formData.append('media[]', {
+    uri: data?.img?.uri,
+    name: "uploadImg.jpg",
+    type:  "image/jpeg"
+  })
+})
 
+console.log(formData,"Form data")
  
-};
+await axios.post('/api/upload-post-images', formData, {
+  headers: {
+    'Content-Type': 'multipart/form-data',
+    'Authorization':`Bearer ${token}`
+  }
+}).then((res) => {
+  console.log(res.data,"post images uploaded")
+  setIsLoading(false)
+  ToastAndroid.show("Post created sucessfully",1000)
+  navigation.goBack()
+}).catch(err => {
+  setIsLoading(false)
+  console.log(err,"a problem occured upading post images",err.request,Object.keys(err))
+})
+
+
+
+}
 
 return <View style={{backgroundColor:"white",paddingHorizontal:20}}>
               <View style={{height:50}}></View> 
@@ -78,15 +98,15 @@ return <View style={{backgroundColor:"white",paddingHorizontal:20}}>
               <PostScreenXMark/>
             </TouchableOpacity>
             <View style={{overflow:"hidden",height:50,width:50,borderRadius:50,marginHorizontal:10}}>
-                <Image source={require("../../assets/images/test_match1.jpg")} style={{height:"100%",width:"100%"}}/>
+                <Image source={image?{uri:`${image}`} : require("../../assets/images/test_match1.jpg")} style={{height:"100%",width:"100%"}}/>
                 </View>
 
-            <CustomSemiBoldPoppingText style={{}} fontSize={TEXT_SIZE.primary } color={"black"}   value={'Sam Orlan'}/>
+            <CustomSemiBoldPoppingText style={{}} fontSize={TEXT_SIZE.primary } color={"black"}   value={`${userData?.firstname} ${userData?.lastname}` || 'Sam Orlan'}/>
             
               </View>
             
             <TouchableOpacity onPress={()=> handleSubmitAddPost()} style={{marginLeft:20,flexDirection:"row",padding:3,alignItems:"center",justifyContent:"center",borderRadius:20,height:hp(4),width:wp(18),backgroundColor:COLORS.primary}}>
-                <Text style={{fontSize:TEXT_SIZE.small,color:"white",textAlign:"center"}}>Post</Text>
+               {isLoading?<ActivityIndicator color={"white"}/>:  <Text style={{fontSize:TEXT_SIZE.small,color:"white",textAlign:"center"}}>Post</Text>}
               </TouchableOpacity>
             
             
