@@ -58,26 +58,31 @@ const  Login = ({navigation}) => {
       await axios.get("/sanctum/csrf-cookie").then((response) => {
       axios
         .post(`/api/login/en`, data)
-        .then((res) => {
+        .then(async(res) => {
 
           setIsLoading(false)
       if(res.data.error || res.data.status == 500 || res.data.status === 401) {
         setErr(res.data.message)
      
       } else if  (res.data.status === 200) {
-             
-            AsyncStorage.setItem("user_id", JSON.stringify(res.data.user_id));
-            AsyncStorage.setItem(
+            
+           await AsyncStorage.setItem("user_id", JSON.stringify(res.data?.user_id));
+           let id = JSON.stringify(res.data?.device_id)
+           await AsyncStorage.setItem(
               "device_id",
-              JSON.stringify(res.data.device_id)
+              id || ""
             );
-            AsyncStorage.setItem("user_token", res.data.user_token);
-            if (res.data.userImage !== null) {
-              AsyncStorage.setItem("userImage", res.data.userImage);
-            }
+            await AsyncStorage.setItem("user_token", res.data?.user_token);
+            let info = JSON.stringify({
+              user:res.data?.user_data?.user,
+              // user_info:res.data?.user_data?.user_info,
+              user_image:`https://sdlove-api.altechs.africa/storage/app/private/public/user_images/${res.data?.user_image}` || null
+            })
+           await AsyncStorage.setItem("user_data",info)
+            
              
 
-               navigation.navigate("BottomTabsHome")
+          navigation.navigate("BottomTabsHome")
             
           }  
         })

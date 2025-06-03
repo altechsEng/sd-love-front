@@ -52,7 +52,7 @@ export default function HomeTabs() {
                                     fontFamily: FAMILLY.regular,
                                   },
                                   header:({navigation}) => {
-                                    return <View style={{height:20,backgroundColor:"white" }}></View>
+                                    return <View style={{height:hp("6%"),backgroundColor:"white" }}></View>
                                   }
                                 }}
                               />

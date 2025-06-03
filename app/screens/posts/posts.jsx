@@ -13,6 +13,10 @@ import {
 import MessageSender from '../../../app/components/messageSender.jsx';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime"
+
+dayjs.extend(relativeTime)
 
    const {width:SCREEN_WIDTH,height:SCREEN_HEIGHT} = Dimensions.get('window')
 
@@ -89,7 +93,7 @@ const handleBookMark = async(postId) => {
      return <View style={{borderBottomWidth:2,borderColor:COLORS.light,paddingVertical:10,backgroundColor:"white"}}>
           <View style={{flexDirection:"row",width:"80%"}}>
               <View style={{overflow:"hidden",height:50,width:50,borderRadius:50,marginRight:10}}>
-               <Image source={item.img} style={{height:"100%",width:"100%"}}/>
+               <Image source={item?.img || require("../../../assets/images/test_person1.png")} style={{height:"100%",width:"100%"}}/>
                </View>
                
 
@@ -101,7 +105,7 @@ const handleBookMark = async(postId) => {
                <View style={{backgroundColor:"white",height:25,alignItems:"center",justifyContent:"center"}}> 
                <View style={{height:5,marginBottom:2,width:5,backgroundColor:"black",borderRadius:50,borderColor:"black",borderWidth:0,marginRight:5}}></View>
                </View>
-               <CustomRegularPoppingText style={{marginRight:5}} fontSize={TEXT_SIZE.small} color={"#A0A7AE"}   value={`${item.time}`}/>
+               <CustomRegularPoppingText style={{marginRight:5}} fontSize={TEXT_SIZE.small} color={"#A0A7AE"}   value={`${dayjs(item?.created_at).fromNow()}` || "23 hours ago"}/>
                
                </View>
 
@@ -195,17 +199,18 @@ const handleBookMark = async(postId) => {
      return (
          
  
-<View style={{backgroundColor:"white",flex:1}}>
+<ScrollView style={{backgroundColor:"white"}}>
+     <View style={{backgroundColor:"white",flex:1}}>
 
                 
 <View style={{flexDirection:"column",paddingVertical:10,borderBottomWidth:2,borderTopWidth:2,borderColor:COLORS.light}}>
      <View style={{paddingHorizontal:20}}>
      <View style={{flexDirection:"row",justifyContent:"space-evenly",alignItems:"center"}}>
      <View style={{flex:2,flexDirection:"row"}}>
-     <TouchableOpacity style={{borderRadius:50,height:50,width:50,overflow:"hidden",alignItems:"center"}}><Image source={item.img} resizeMode="cover" style={{height:"100%",width:"100%"}}/></TouchableOpacity>
+     <TouchableOpacity style={{borderRadius:50,height:50,width:50,overflow:"hidden",alignItems:"center"}}><Image source={item?.img || require("../../../assets/images/test_person1.png")} resizeMode="cover" style={{height:"100%",width:"100%"}}/></TouchableOpacity>
      <View style={{flexDirection:"column",justifyContent:"center",marginLeft:10}}>
-     <Text style={{color:COLORS.black,fontSize:TEXT_SIZE.primary,fontFamily:FAMILLY.semibold}}>{item.name}</Text>
-     <Text style={{color:COLORS.gray,fontSize:TEXT_SIZE.small,fontFamily:FAMILLY.light}}>{item.time}</Text>
+     <Text style={{color:COLORS.black,fontSize:TEXT_SIZE.primary,fontFamily:FAMILLY.semibold}}>{item?.user?.firstname || "Johno orlan"}</Text>
+     <Text style={{color:COLORS.gray,fontSize:TEXT_SIZE.small,fontFamily:FAMILLY.light}}>{dayjs(item?.created_at).fromNow() || "12 hours ago"}</Text>
      </View>
      </View>
 
@@ -216,7 +221,7 @@ const handleBookMark = async(postId) => {
 
      <View style={{marginVertical:10}}>
           <Text style={{color:COLORS.black,fontSize:TEXT_SIZE.secondary,fontFamily:FAMILLY.light}}>
-          Lorem ipsum dolor sit amet consectetur. Lorem varius quisque odio nisl tempor sit bibendum pulvinar sed. pharetra sed magnis vitae.
+         {item?.text || " Lorem ipsum dolor sit amet consectetur. Lorem varius quisque odio nisl tempor sit bibendum pulvinar sed. pharetra sed magnis vitae."}
           </Text>
      </View> 
 
@@ -227,7 +232,7 @@ const handleBookMark = async(postId) => {
 
      <TouchableOpacity style={{height:200,margin:0,padding:0,width:"100%"}}>
           {/* <Image source={item.postImg} resizeMode="cover" style={{width:"100%",height:"100%"}}/> */}
-          <Image source={require("../../../assets/images/post_1.jpg")} resizeMode="cover" style={{width:"100%",height:"100%"}}/>
+          <Image source={item?.media[0]?.url ? {uri:`https://sdlove-api.altechs.africa/storage/app/private/public/post_images/${item?.media[0]?.url}`} : require("../../../assets/images/post_1.jpg")} resizeMode="cover" style={{width:"100%",height:"100%"}}/>
      </TouchableOpacity> 
 
      <View style={{paddingHorizontal:20,height:30,flexDirection:"row",alignItems:"center",justifyContent:"space-between",marginTop:10}}>
@@ -281,6 +286,7 @@ initialNumToRender={10}
 <MessageSender placeHolder={"Add a comment"} action={() => null} state={comment} setState={setComment}/>
  
 </View>
+</ScrollView>
 
 
  

@@ -341,7 +341,7 @@ const ProfileScreen = ({navigation}) => {
 
      {activeSubCat === "account" && (
           <View style={{marginVertical:20}}>
-               <TouchableOpacity style={{flexDirection:"row",alignItems:"center",marginTop:10}}>
+               <TouchableOpacity onPress={() => navigation.navigate("EditProfileScreen")} style={{flexDirection:"row",alignItems:"center",marginTop:10}}>
                     <View style={{alignItems:"center",marginRight:20,justifyContent:"center",height:35,width:35,borderRadius:30,backgroundColor:COLORS.light}}>
                          <ProfileScreenManageProfile/>
                     </View>

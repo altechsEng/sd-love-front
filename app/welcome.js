@@ -1,7 +1,10 @@
 import { Text, View, TouchableOpacity, Image, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Logo,WelcomeImg } from "./components/vectors.js";
- 
+ import {
+   widthPercentageToDP as wp,
+   heightPercentageToDP as hp,
+ } from "react-native-responsive-screen";
 import {FAMILLY,COLORS,TEXT_SIZE} from "../utils/constants.js"
 import Home_overlay from "../assets/images/home_overlay.svg"
 import { useNavigation } from "@react-navigation/native";
@@ -18,7 +21,7 @@ const  Welcome = () => {
     <StatusBar backgroundColor="transparent" translucent={true}/>
  
    <View style={{flex:2,alignItems:"center",position:"relative",justifyContent:"center",backgroundColor:"white",paddingBottom:100}}>
-  <View style={{position:"absolute",zIndex:9,top:-159}}>
+  <View style={{position:"absolute",zIndex:9,top:hp("-22%")}}>
     <Home_overlay/>
   </View>
    <Image

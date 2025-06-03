@@ -9,7 +9,7 @@ import Register from './screens/register';
 import RegisterStep2 from './screens/registerStep2';
 import SelectPlan from './screens/selectPlan';
 import { TouchableOpacity,View,Text } from 'react-native';
-import { HeaderBackArrowBlack,HeaderBackArrow, PostScreenXMark, PostScreenMediaVideo, ChatScreenCall, ChatScreenVideo } from './components/vectors';
+import { HeaderBackArrowBlack,HeaderBackArrow, PostScreenXMark, PostScreenMediaVideo, ChatScreenCall, ChatScreenVideo, CustomEditScreenTick } from './components/vectors';
 import { COLORS, FAMILLY, TEXT_SIZE } from '../utils/constants';
 import HomeTabs from './_bottomTabs';
 import {Questionaire,Questionaire2} from './screens/questionareStep';
@@ -19,6 +19,7 @@ import MatchConnection from './screens/dating/matchConnection';
 import MatchProfile from './screens/dating/matchProfile';
 import { QuestionaireHeader } from './components/questionaireHeader';
 import PostScreen from './screens/posts/posts' 
+import EditProfileScreen from "./screens/settings/editProfileScreen"
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -36,6 +37,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import CustomMatchHeader from './components/customMatchHeader';
 import MatchScreenGrid from './screens/dating/matchScreenGrid';
 import MatchScreenBox from './screens/dating/matchScreenBox';
+import CustomEditSetting from './components/customEditSetting';
 
 axios.defaults.baseURL = "https://sdlove-api.altechs.africa";
 axios.defaults.headers.post["Accept"] = "application/json";
@@ -250,6 +252,41 @@ export default function Application() {
         <Stack.Screen component={ChatDiscussionOptions} name="ChatDiscussionOptions" options={{
           header:({navigation}) => {
             return <View style={{height:25,backgroundColor:"white"}}></View>
+          }
+        }}/>
+
+        <Stack.Screen component={EditProfileScreen} name="EditProfileScreen" options={{
+          header:({navigation}) => <View style={{backgroundColor:"white",justifyContent:"flex-end",padding:10,borderBottomColor:COLORS.light,borderBottomWidth:2,height:100}}>
+              
+             <View style={{flexDirection:"row",alignItems:"center"}}>
+             <TouchableOpacity onPress={() => navigation.goBack()} style={{marginBottom:5}}><HeaderBackArrowBlack/></TouchableOpacity>
+             <CustomSemiBoldPoppingText style={{marginLeft:20}} color={"black"} fontSize={TEXT_SIZE.title} value="Manage Profile info"/>
+             </View>
+            
+            </View>
+        }} />
+
+
+
+        <Stack.Screen component={CustomEditSetting} name="CustomEditSetting" options={{
+          header:({navigation}) => {
+            return <View style={{backgroundColor:"white",justifyContent:"space-between",alignItems:"center",flexDirection:"row",padding:20,borderBottomColor:COLORS.light,borderBottomWidth:2,height:100}}>
+              
+              
+             <TouchableOpacity onPress={() => navigation.goBack()} style={{alignSelf:"flex-end"}}>
+              <HeaderBackArrowBlack/>
+              </TouchableOpacity>
+              
+
+
+             <TouchableOpacity style={{alignSelf:"flex-end",flexDirection:"row",justifyContent:"center",alignItems:"center"}} onPress={() =>{}}>
+              <View style={{height:15}}>
+                <CustomEditScreenTick/>
+              </View>
+              <CustomRegularPoppingText style={{marginLeft:10}} color={COLORS.red} fontSize={TEXT_SIZE.primary} value="Save"/>
+             </TouchableOpacity>
+            
+            </View>
           }
         }}/>
 
