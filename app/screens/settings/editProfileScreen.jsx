@@ -208,7 +208,7 @@ useEffect(() => {
       </View>
 
 
-                     <TouchableOpacity style={{flexDirection:"row",marginTop:20}} onPress={() => {}}>
+              <TouchableOpacity style={{flexDirection:"row",marginTop:20}} onPress={() => {}}>
                     <EditProfileScreenButtonRed/>
                     <CustomRegularPoppingText value={"Edit advanced profile info"} style={{marginLeft:10}} color={"#E55E6F"} />
                </TouchableOpacity>

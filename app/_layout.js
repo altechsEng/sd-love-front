@@ -40,7 +40,10 @@ import MatchScreenBox from './screens/dating/matchScreenBox';
 import CustomEditSetting from './components/customEditSetting';
 import CustomEditScreenHeader from "./components/customEditScreenHeader"
 import CustomSucessScreen from './components/CustomSucessScreen';
-
+import AccountSecurityScreen from './screens/settings/accountSecurity';
+ 
+import HolderComponent from './components/holder';
+ 
 axios.defaults.baseURL = "https://sdlove-api.altechs.africa";
 axios.defaults.headers.post["Accept"] = "application/json";
 axios.defaults.headers.post["Content-Type"] = "application/json";
@@ -268,6 +271,33 @@ export default function Application() {
             </View>
         }} />
 
+
+ 
+        <Stack.Screen component={AccountSecurityScreen} name="AccountSecurityScreen" options={{
+          header:({navigation}) => <View style={{backgroundColor:"white",justifyContent:"flex-end",padding:10,borderBottomColor:COLORS.light,borderBottomWidth:2,height:100}}>
+              
+             <View style={{flexDirection:"row",alignItems:"center"}}>
+             <TouchableOpacity onPress={() => navigation.goBack()} style={{marginBottom:5}}><HeaderBackArrowBlack/></TouchableOpacity>
+             <CustomSemiBoldPoppingText style={{marginLeft:20}} color={"black"} fontSize={TEXT_SIZE.title} value="Account & Security"/>
+             </View>
+            
+            </View>
+        }}/>
+
+
+
+        <Stack.Screen component={HolderComponent} name="Holder" options={{
+          header:({navigation}) => {
+            return <View style={{backgroundColor:"white",justifyContent:"flex-end",padding:10,borderBottomColor:COLORS.light,borderBottomWidth:2,height:100}}>
+              
+             <View style={{flexDirection:"row",alignItems:"center"}}>
+             <TouchableOpacity onPress={() => navigation.goBack()} style={{marginBottom:5}}><HeaderBackArrowBlack/></TouchableOpacity>
+              
+             </View>
+            
+            </View>
+          }
+        }} />
 
 
         <Stack.Screen component={CustomEditSetting} name="CustomEditSetting" options={{

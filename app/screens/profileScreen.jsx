@@ -352,11 +352,11 @@ const ProfileScreen = ({navigation}) => {
                     <CustomSemiBoldPoppingText fontSize={TEXT_SIZE.secondary} style={{}} color={"black"} value={"Manage profile info"}/>
                </TouchableOpacity>
 
-               <TouchableOpacity style={{flexDirection:"row",alignItems:"center",marginTop:10}}>
+               <TouchableOpacity onPress={()=> navigation.navigate("AccountSecurityScreen")} style={{flexDirection:"row",alignItems:"center",marginTop:10}}>
                <View style={{alignItems:"center",marginRight:20,justifyContent:"center",height:35,width:35,borderRadius:30,backgroundColor:COLORS.light}}>
                <ProfileScreenAccountSecurity/>
                </View>
-               <CustomSemiBoldPoppingText fontSize={TEXT_SIZE.secondary} style={{}} color={"black"} value={"Account & Secirity"}/>
+               <CustomSemiBoldPoppingText fontSize={TEXT_SIZE.secondary} style={{}} color={"black"} value={"Account & Security"}/>
                </TouchableOpacity>
 
 

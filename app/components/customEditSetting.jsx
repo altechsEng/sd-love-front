@@ -19,14 +19,14 @@ import CountryPickerModal from "./modalPicker"
 
 const CustomEditSetting = ({navigation}) => {
    let {type} = useRoute().params
-   const [isLoading,setLoading] = useState(false)
+   
    const [show, setShow] = useState(false);
    const [visible,setVisible] = useState(false)
    const [visibleCity,setVisibleCity] = useState(false)
    const [date, setDate] = useState(new Date());
   
    
-   const {updateSettingData,setUpdateSettingData,setSettingType} = useGlobalVariable()
+   const {updateSettingData,setUpdateSettingData,setSettingType,userData,isLoading,setIsLoading,} = useGlobalVariable()
    const [country,setCountry] = useState({
        flag:getEmojiFlag('CM'),
          name:"Cameroon",
@@ -175,6 +175,42 @@ const CustomEditSetting = ({navigation}) => {
           </View>
      
 </View>:null}
+
+
+{type=="email"  ? <View style={{flex:5}}>
+     <CustomRegularPoppingText value={"Your actual email address"} style={{}} color={"black"} fontSize={TEXT_SIZE.primary}/>
+     <CustomRegularPoppingText value={userData?.email || "Joseph.orlan@gmail.com"} style={{marginTop:8}} color={"#808A94"} fontSize={TEXT_SIZE.secondary}/>
+
+     <CustomRegularPoppingText style={{marginTop:20}} color={"black"} fontSize={TEXT_SIZE.primary} value={"Enter your new email address in the form below"}/>
+
+     <View style={{marginTop:8,position:"relative",borderRadius:10,paddingVertical:0,paddingHorizontal:36,width:"100%", backgroundColor:"#F5F6FC",}}>
+       <CustomTextInput RightIconStyles={null} name="email" placeHolder="test@gmail.com" LeftIcon={"email"} LeftIconStyles={{position:"absolute",top:15,left:18}} RightIcon={null}   setState={(text) => setUpdateSettingData((prev) => ({...prev,email:text}))} state={updateSettingData.email}/>
+     </View>
+
+</View>:null}
+
+
+{type == "password" ? <View style={{flex:5}}>
+     <CustomRegularPoppingText value={"Enter password reset token we sent to your email, then press on Next."} style={{}} color={"black"} fontSize={TEXT_SIZE.primary}/>
+
+     <View style={{marginTop:10,position:"relative",borderRadius:10,paddingVertical:0,paddingHorizontal:36,width:"100%", backgroundColor:"#F5F6FC",}}>
+       <CustomTextInput RightIconStyles={null} name="pass" placeHolder="" LeftIcon={"key"} LeftIconStyles={{position:"absolute",top:15,left:18}} RightIcon={null}   setState={(text) => setUpdateSettingData((prev) => ({...prev,password:text}))} state={updateSettingData.password}/>
+     </View>
+
+     <CustomRegularPoppingText style={{marginTop:20}} color={"#808A94"} fontSize={TEXT_SIZE.small} value={"For security reason, before you get to change your password, we always send you a token via email to fight against account deft."}/>
+
+</View>:null}
+
+{type == "email" ?      <TouchableOpacity onPress={() => navigation.navigate("Holder",{type:"email"})} style={{borderRadius:10,alignItems:'center',justifyContent:"center",backgroundColor:COLORS.primary,paddingVertical:10,paddingHorizontal:20}}>
+         {isLoading ? <ActivityIndicator color="white"/>:
+          <CustomRegularPoppingText color={"white"} fontSize={TEXT_SIZE.primary} value="Next"/> }
+     </TouchableOpacity>:null}
+
+{type == "password" ?      <TouchableOpacity onPress={() => navigation.navigate("Holder",{type:"password"})} style={{borderRadius:10,alignItems:'center',justifyContent:"center",backgroundColor:COLORS.red,paddingVertical:10,paddingHorizontal:20}}>
+         {isLoading ? <ActivityIndicator color="white"/>:
+          <CustomRegularPoppingText color={"white"} fontSize={TEXT_SIZE.primary} value="Next"/> }
+     </TouchableOpacity>:null}
+
      </View>
 }
 

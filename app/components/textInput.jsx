@@ -1,6 +1,6 @@
 import React from "react"
 import {View,TouchableOpacity,TextInput} from "react-native"
-import { PostScreenEmojiPicker,TextInputAddress, TextInputCity, TextInputEmail, TextInputEye,TextInputLock, TextInputPerson, TextInputPhone,TextInputArrowDownCircle, TextInputSearch } from "./vectors"
+import { PostScreenEmojiPicker,TextInputAddress, TextInputCity, TextInputEmail, TextInputEye,TextInputLock, TextInputPerson, TextInputPhone,TextInputArrowDownCircle, TextInputSearch, AccountSecurityScreenKey } from "./vectors"
 import { FAMILLY, TEXT_SIZE } from "../../utils/constants"
 
 export default function CustomTextInput ({name,directState,placeHolder,setState,state,LeftIcon,RightIcon,LeftIconStyles,RightIconStyles,rightIconAction}){
@@ -16,7 +16,8 @@ export default function CustomTextInput ({name,directState,placeHolder,setState,
        {LeftIcon == "person" && <TouchableOpacity style={{...LeftIconStyles}}><TextInputPerson/></TouchableOpacity>}
        {LeftIcon == "lock" && <TouchableOpacity style={{...LeftIconStyles}}><TextInputLock/></TouchableOpacity>}
        {LeftIcon == "phone" && <TouchableOpacity style={{...LeftIconStyles}}><TextInputPhone/></TouchableOpacity>}
-         {RightIcon == "eye" && <TouchableOpacity style={{...RightIconStyles}}><TextInputEye/></TouchableOpacity>}
+       {LeftIcon == "key" && <TouchableOpacity style={{...LeftIconStyles}}><AccountSecurityScreenKey/></TouchableOpacity>}
+        {RightIcon == "eye" && <TouchableOpacity style={{...RightIconStyles}}><TextInputEye/></TouchableOpacity>}
        
           <TextInput
             style={{

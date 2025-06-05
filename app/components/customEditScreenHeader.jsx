@@ -1,10 +1,14 @@
 import axios from "axios"
 import { TEXT_SIZE,COLORS,FAMILLY } from "../../utils/constants"
 import { useGlobalVariable } from "../context/global"
-import { CustomRegularPoppingText } from "./text"
+import { CustomRegularPoppingText, CustomSemiBoldPoppingText } from "./text"
 import { CustomEditScreenTick, HeaderBackArrowBlack } from "./vectors"
 import {View,TouchableOpacity, ActivityIndicator, ToastAndroid} from "react-native"
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 const CustomProfileScreenHeader = ({navigation}) => {
 
@@ -54,23 +58,35 @@ const CustomProfileScreenHeader = ({navigation}) => {
   }
 
 
-     return  <View style={{backgroundColor:"white",justifyContent:"space-between",alignItems:"center",flexDirection:"row",padding:20,borderBottomColor:COLORS.light,borderBottomWidth:2,height:100}}>
+     return  <View  >
+          { 
+               settingType!=="email" && settingType!== "password" ? <View style={{backgroundColor:"white",justifyContent:"space-between",alignItems:"center",flexDirection:"row",padding:20,borderBottomColor:COLORS.light,borderBottomWidth:2,height:100}}>
               
               
              <TouchableOpacity onPress={() => navigation.goBack()} style={{alignSelf:"flex-end"}}>
               <HeaderBackArrowBlack/>
               </TouchableOpacity>
-              
 
-
-             <TouchableOpacity onPress={() => handleSubmission()} style={{alignSelf:"flex-end",flexDirection:"row",justifyContent:"center",alignItems:"center"}}  >
+          <TouchableOpacity onPress={() => handleSubmission()} style={{alignSelf:"flex-end",flexDirection:"row",justifyContent:"center",alignItems:"center"}}  >
                {isLoading?<ActivityIndicator color={COLORS.primary}/> :               <View style={{height:15}}>
                 <CustomEditScreenTick/>
               </View>}
               <CustomRegularPoppingText style={{marginLeft:10}} color={COLORS.red} fontSize={TEXT_SIZE.primary} value="Save"/>
-             </TouchableOpacity>
+             </TouchableOpacity> 
             
+            </View>: <View style={{backgroundColor:"white",alignItems:"center",flexDirection:"row",padding:20,borderBottomColor:COLORS.light,borderBottomWidth:2,height:100}}>
+               <View style={{flexDirection:"row",alignSelf:"flex-end"}}>
+                    <TouchableOpacity onPress={() => navigation.goBack()} style={{}}>
+              <HeaderBackArrowBlack/>
+              </TouchableOpacity>
+              <CustomSemiBoldPoppingText style={{marginLeft:10}} color={"black"} fontSize={TEXT_SIZE.primary} value={settingType=="email" ? "Change email address": settingType=="password"?"Change password":null}/>
+
+               </View>
             </View>
+          }
+
+          
+     </View>
           
 }
 
