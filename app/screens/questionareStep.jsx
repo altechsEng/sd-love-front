@@ -5,7 +5,7 @@ import { Pressable, ScrollView } from "react-native-gesture-handler";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Platform } from "react-native";
 import { RedTick, TextInputArrowDownCircle, TextInputDate } from "../components/vectors";
-import { CustomRegularPoppingText } from "../components/text";
+import { CustomRegularPoppingText, CustomSemiBoldPoppingText } from "../components/text";
 import dayjs from 'dayjs'
 import CustomTextInput from "../components/textInput";
 import { useGlobalVariable } from "../context/global";
@@ -162,19 +162,23 @@ export function Questionaire({ navigation }) {
 		if (direction == "column") {
 			firstStyles = { flexDirection: direction, alignItems: "flex-start", justifyContent: "center" }
 		} else {
-			firstStyles = { flexDirection: direction, alignItems: "center", justifyContent: "space-between" }
+			firstStyles = { flexDirection: direction, alignItems: "center" }
 		}
 		return (<View>
 			<View style={{ ...firstStyles, marginTop: 10 }}>
 				{answers.map((an) => {
-					return (<View key={`${an}`} style={{ marginBottom: direction == "column" ? 10 : 0, flexDirection: "row", alignItems: "center", justifyContent: "flex-start" }}>
-						<TouchableOpacity onPress={async () => {
+					return (<TouchableOpacity key={`${an}`} style={{ marginBottom: direction == "column" ? 10 : 0, flexDirection: "row", alignItems: "center", justifyContent: "flex-start" }}
+						onPress={async () => {
 							onSelect(an)
-
-
-						}} style={{ alignItems: "center", justifyContent: "center", marginRight: 10, padding: 1, borderColor: COLORS.primary, borderWidth: 2, borderRadius: 50 }}><View style={{ height: 13, width: 13, backgroundColor: currentValue == an ? COLORS.primary : "white", borderRadius: 50 }}></View></TouchableOpacity>
-						<Text style={{ fontFamily: FAMILLY.regular, fontSize: TEXT_SIZE.small, marginTop: 2, paddingRight: 20 }}>{an}</Text>
-					</View>)
+						}}>
+						<View className={'flex'} style={{ alignItems: "center", justifyContent: "center", marginRight: 10, height: 20, width: 20, borderColor: COLORS.primary, backgroundColor: currentValue == an ? COLORS.primary : 'transparent', borderWidth: 2, borderRadius: 50 }}>
+							{/* <View style={{ height: 13, width: 13, backgroundColor: currentValue == an ? COLORS.primary : "white", borderRadius: 50 }}></View> */}
+							{currentValue == an && (
+								<Text style={{ color: 'white', fontSize: 12 }}>✓</Text>
+							)}
+						</View>
+						<Text className={'text-gray-400'} style={{ fontFamily: FAMILLY.regular, fontSize: TEXT_SIZE.medium, marginTop: 2, paddingRight: 20 }}>{an}</Text>
+					</TouchableOpacity>)
 				})}
 			</View>
 		</View>)
@@ -222,9 +226,9 @@ export function Questionaire({ navigation }) {
 								backgroundColor: selectedHobbies.includes(hobby)
 									? '#F5F6FC'
 									: '#F5F6FC',
-								paddingVertical: 8,
+								paddingVertical: 5,
 								paddingHorizontal: 12,
-								borderRadius: 5,
+								borderRadius: 10,
 								marginRight: 8,
 								marginBottom: 8,
 								borderWidth: 2,
@@ -333,7 +337,7 @@ export function Questionaire({ navigation }) {
 									<Text style={{ color: 'white', fontSize: 12 }}>✓</Text>
 								)}
 							</View>
-							<Text style={{ fontFamily: FAMILLY.regular, fontSize: TEXT_SIZE.small }}>
+							<Text className={'text-gray-400'} style={{ fontFamily: FAMILLY.regular, fontSize: TEXT_SIZE.medium }}>
 								{answer}
 							</Text>
 						</TouchableOpacity>
@@ -353,237 +357,231 @@ export function Questionaire({ navigation }) {
 	}
 
 	return (
-	<View>
+		<View>
 
-		<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ backgroundColor: "white" }}>
-			<View style={{ height: 50 }}></View>
+			<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ backgroundColor: "white" }}>
+				<View style={{ height: 50 }}></View>
 
-			<View style={{ marginVertical: 10, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText value="Quel est ton sexe :" color={'black'} fontSize={TEXT_SIZE.primary} />
-				<CustomQuestionDisplayer answers={["Homme", "Femme"]} direction={"row"} currentValue={questionnaireData.answers.qP1} onSelect={(value) => updateAnswer("qP1", value)} />
-			</View>
+				<View style={{ marginVertical: 10, paddingHorizontal: 20 }}>
+					<CustomRegularPoppingText value="Quel est ton sexe :" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomQuestionDisplayer answers={["Homme", "Femme"]} direction={"row"} currentValue={questionnaireData.answers.qP1} onSelect={(value) => updateAnswer("qP1", value)} />
+				</View>
+
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
+
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<Text style={{ fontFamily: FAMILLY.regular, fontSize: TEXT_SIZE.primary, marginBottom: 10 }}>Quel est ta date de naissance ?</Text>
+					<View style={{ paddingVertical: 10, paddingHorizontal: 10, width: "100%", backgroundColor: "#F3F3F3", borderRadius: 10, flexDirection: "row", alignItems: "center" }}>
+						<TouchableOpacity onPress={() => setShow(true)} style={{ alignSelf: "flex-start" }}><TextInputDate /></TouchableOpacity>
+						<View style={{ marginTop: 2, marginLeft: 5 }}>
+							<CustomRegularPoppingText value={dayjs(date).format('DD MMMM YYYY')} color={'black'} fontSize={TEXT_SIZE.primary} />
+						</View>
+					</View>
+					{show && (
+						<DateTimePicker
+							value={date}
+							mode="date"
+							display="default"
+							onChange={handleChange}
+						/>
+					)}
+				</View>
+
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
+
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<CustomRegularPoppingText value="Quel est ton état civil :" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomQuestionDisplayer answers={["Célibataire", "Divorcé(e)", "Veuf(ve)"]} direction={"row"} currentValue={questionnaireData.answers.qP3} onSelect={(value) => updateAnswer("qP3", value)} />
+				</View>
 
 
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
 
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<Text style={{ fontFamily: FAMILLY.regular, fontSize: TEXT_SIZE.primary, marginBottom: 10 }}>Quel est ta date de naissance ?</Text>
-				<View style={{ paddingVertical: 10, paddingHorizontal: 10, width: "100%", backgroundColor: "#F3F3F3", borderRadius: 20, flexDirection: "row", alignItems: "center" }}>
-					<TouchableOpacity onPress={() => setShow(true)} style={{ alignSelf: "flex-start" }}><TextInputDate /></TouchableOpacity>
-					<View style={{ marginTop: 2, marginLeft: 5 }}>
-						<CustomRegularPoppingText value={dayjs(date).format('DD MMMM YYYY')} color={'black'} fontSize={TEXT_SIZE.primary} />
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
+
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<CustomRegularPoppingText value="As-tu un ou des enfants :" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomQuestionDisplayer answers={["oui", "non"]} direction={"row"} currentValue={questionnaireData.answers.qP4} onSelect={(value) => updateAnswer("qP4", value)} />
+				</View>
+
+
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
+
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<View className={'flex flex-row mb-4'}>
+						<View className={'bg-gray-100 rounded-lg py-1 px-2'}>
+							<CustomSemiBoldPoppingText value="Question facultative" color={null} fontSize={TEXT_SIZE.small} />
+						</View>
+					</View>
+					<CustomRegularPoppingText value={`Es-tu à l’aise à rencontrer un partenaire qui a un ou des enfant(s) ?`} color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomQuestionDisplayer answers={["oui", "non", "ça dépend"]} direction={"row"} currentValue={questionnaireData.answers.qP5} onSelect={(value) => updateAnswer("qP5", value)} />
+				</View>
+
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
+
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<CustomRegularPoppingText style={{ marginBottom: 10 }} value="Quelle est ta taille (En centimètres)" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<Pressable style={{ paddingVertical: 0, paddingHorizontal: 10, width: "100%", backgroundColor: "#F3F3F3", borderRadius: 20, flexDirection: "row", alignItems: "center" }}>
+						<CustomTextInput rightIconAction={null} name="height" placeHolder="180" LeftIcon={null} LeftIconStyles={null} RightIcon={null} RightIconStyles={null} directState={true} setState={(text) => updateAnswer("qP6", text)} state={questionnaireData.answers.qP6} />
+					</Pressable>
+				</View>
+
+
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
+
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<View className={'flex flex-row mb-4'}>
+						<View className={'bg-gray-100 rounded-lg py-1 px-2'}>
+							<CustomSemiBoldPoppingText value="Question facultative" color={null} fontSize={TEXT_SIZE.small} />
+						</View>
+					</View>
+					<CustomRegularPoppingText value="Es-tu ouvert(e) à rencontrer un partenaire qui a une plus petite taille que toi ?" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomQuestionDisplayer answers={["oui", "non", "ça dépend"]} direction={"row"} currentValue={questionnaireData.answers.qP7} onSelect={(value) => updateAnswer("qP7", value)} />
+				</View>
+
+
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
+
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<View className={'flex flex-row mb-4'}>
+						<View className={'bg-gray-100 rounded-lg py-1 px-2'}>
+							<CustomSemiBoldPoppingText value="Question facultative" color={null} fontSize={TEXT_SIZE.small} />
+						</View>
+					</View>
+					<CustomRegularPoppingText value="Quelle est ton origine ?" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomQuestionDisplayer answers={["Arabe", "Asiatique", "Hispanique/Latino", "Noire (Afrique/Antilles)", "Blanc caucasien", "Métissé(e)", "autre"]} direction={"column"} currentValue={questionnaireData.answers.qP8} onSelect={(value) => updateAnswer("qP8", value)} />
+				</View>
+
+
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
+
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<CustomRegularPoppingText style={{ marginBottom: 10 }} value="Quelle est ta nationalité ?" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<View style={{ position: "relative", borderRadius: 10, paddingVertical: 5, paddingHorizontal: 18, backgroundColor: "rgba(181, 181, 181, 0.12)", flexDirection: "row", alignItems: "center" }}>
+						{visible && <CountryPickerModal type={'country'} title="Select country" visible={visible} onSelect={onSelect} onClose={() => setVisible(false)} />
+						}
+						<Text style={{ color: COLORS.gray, fontSize: TEXT_SIZE.title, fontFamily: FAMILLY.regular, textAlign: "center", marginTop: 5 }}>{country.flag}</Text>
+						<Text style={{ paddingLeft: 12, fontSize: TEXT_SIZE.primary, color: COLORS.gray, fontFamily: FAMILLY.regular, textAlign: "center", marginTop: 5 }}>{country ? `${country?.name}` : "Cameroon"}</Text>
+
+						<TouchableOpacity onPress={() => setVisible(true)} style={{ position: "absolute", right: 16, top: 12 }}><TextInputArrowDownCircle /></TouchableOpacity>
 					</View>
 				</View>
-				{show && (
-					<DateTimePicker
-						value={date}
-						mode="date"
-						display="default"
-						onChange={handleChange}
-					/>
-				)}
-			</View>
 
 
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
 
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText value="Quel est ton état civil :" color={'black'} fontSize={TEXT_SIZE.primary} />
-				<CustomQuestionDisplayer answers={["Célibataire", "Divorcé(e)", "Veuf(ve)"]} direction={"row"} currentValue={questionnaireData.answers.qP3} onSelect={(value) => updateAnswer("qP3", value)} />
-			</View>
-
-
-
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
-
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText value="As-tu un ou des enfants :" color={'black'} fontSize={TEXT_SIZE.primary} />
-				<CustomQuestionDisplayer answers={["oui", "non"]} direction={"row"} currentValue={questionnaireData.answers.qP4} onSelect={(value) => updateAnswer("qP4", value)} />
-			</View>
-
-
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
-
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-
-				<CustomRegularPoppingText value={`Es-tu à l’aise à rencontrer un partenaire qui a un ou des enfant(s) ?`} color={'black'} fontSize={TEXT_SIZE.primary} />
-				<CustomQuestionDisplayer answers={["oui", "non", "ça dépend"]} direction={"row"} currentValue={questionnaireData.answers.qP5} onSelect={(value) => updateAnswer("qP5", value)} />
-			</View>
-
-
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
-
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText style={{ marginBottom: 10 }} value="Quelle est ta taille (En centimètres)" color={'black'} fontSize={TEXT_SIZE.primary} />
-				<Pressable style={{ paddingVertical: 0, paddingHorizontal: 10, width: "100%", backgroundColor: "#F3F3F3", borderRadius: 20, flexDirection: "row", alignItems: "center" }}>
-					<CustomTextInput rightIconAction={null} name="height" placeHolder="180" LeftIcon={null} LeftIconStyles={null} RightIcon={null} RightIconStyles={null} directState={true} setState={(text) => updateAnswer("qP6", text)} state={questionnaireData.answers.qP6} />
-				</Pressable>
-			</View>
-
-
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
-
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText value="Es-tu ouvert(e) à rencontrer un partenaire qui a une plus petite taille que toi ?" color={'black'} fontSize={TEXT_SIZE.primary} />
-				<CustomQuestionDisplayer answers={["oui", "non", "ça dépend"]} direction={"row"} currentValue={questionnaireData.answers.qP7} onSelect={(value) => updateAnswer("qP7", value)} />
-			</View>
-
-
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
-
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText value="Quelle est ton origine ?" color={'black'} fontSize={TEXT_SIZE.primary} />
-				<CustomQuestionDisplayer answers={["Arabe", "Asiatique", "Hispanique/Latino", "Noire (Afrique/Antilles)", "Blanc caucasien", "Métissé(e)", "autre"]} direction={"column"} currentValue={questionnaireData.answers.qP8} onSelect={(value) => updateAnswer("qP8", value)} />
-			</View>
-
-
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
-
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText style={{ marginBottom: 10 }} value="Quelle est ta nationalité ?" color={'black'} fontSize={TEXT_SIZE.primary} />
-				<View style={{ position: "relative", borderRadius: 50, paddingVertical: 5, paddingHorizontal: 21, backgroundColor: "rgba(181, 181, 181, 0.12)", flexDirection: "row", alignItems: "center" }}>
-					{visible && <CountryPickerModal type={'country'} title="Select country" visible={visible} onSelect={onSelect} onClose={() => setVisible(false)} />
-					}
-					<Text style={{ color: COLORS.gray, fontSize: TEXT_SIZE.title, fontFamily: FAMILLY.regular, textAlign: "center", marginTop: 5 }}>{country.flag}</Text>
-					<Text style={{ paddingLeft: 12, fontSize: TEXT_SIZE.primary, color: COLORS.gray, fontFamily: FAMILLY.regular, textAlign: "center", marginTop: 5 }}>{country ? `${country?.name}` : "Cameroon"}</Text>
-
-					<TouchableOpacity onPress={() => setVisible(true)} style={{ position: "absolute", right: 18, top: 12 }}><TextInputArrowDownCircle /></TouchableOpacity>
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<View className={'flex flex-row mb-4'}>
+						<View className={'bg-gray-100 rounded-lg py-1 px-2'}>
+							<CustomSemiBoldPoppingText value="Question facultative" color={null} fontSize={TEXT_SIZE.small} />
+						</View>
+					</View>
+					<CustomRegularPoppingText value="Es-tu ouvert(e) à rencontrer un partenaire qui a une nationalité différente de la tienne ?" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomQuestionDisplayer answers={["oui", "non", "ça dépend"]} direction={"row"} currentValue={questionnaireData.answers.qP10} onSelect={(value) => updateAnswer("qP10", value)} />
 				</View>
-			</View>
 
 
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
 
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText value="Es-tu ouvert(e) à rencontrer un partenaire qui a une nationalité différente de la tienne ?" color={'black'} fontSize={TEXT_SIZE.primary} />
-				<CustomQuestionDisplayer answers={["oui", "non", "ça dépend"]} direction={"row"} currentValue={questionnaireData.answers.qP10} onSelect={(value) => updateAnswer("qP10", value)} />
-			</View>
-
-
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
-
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText value="Quel est ton niveau d’études ?" color={'black'} fontSize={TEXT_SIZE.primary} />
-				<CustomQuestionDisplayer answers={["Collège", "Lycée", "Licence (Bachelor, Bac+3)", "Maitrise (Master)", "Doctorat", "autre"]} direction={"column"} currentValue={questionnaireData.answers.qP11} onSelect={(value) => updateAnswer("qP11", value)} />
-			</View>
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<View className={'flex flex-row mb-4'}>
+						<View className={'bg-gray-100 rounded-lg py-1 px-2'}>
+							<CustomSemiBoldPoppingText value="Question facultative" color={null} fontSize={TEXT_SIZE.small} />
+						</View>
+					</View>
+					<CustomRegularPoppingText value="Quel est ton niveau d’études ?" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomQuestionDisplayer answers={["Collège", "Lycée", "Licence (Bachelor, Bac+3)", "Maitrise (Master)", "Doctorat", "autre"]} direction={"column"} currentValue={questionnaireData.answers.qP11} onSelect={(value) => updateAnswer("qP11", value)} />
+				</View>
 
 
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
 
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText value="Es-tu à l’aise à rencontrer un partenaire qui a un niveau d’études inférieur au tien ?" color={'black'} fontSize={TEXT_SIZE.primary} />
-				<CustomQuestionDisplayer answers={["oui", "non", "ça dépend"]} direction={"row"} currentValue={questionnaireData.answers.qP12} onSelect={(value) => updateAnswer("qP12", value)} />
-			</View>
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<View className={'flex flex-row mb-4'}>
+						<View className={'bg-gray-100 rounded-lg py-1 px-2'}>
+							<CustomSemiBoldPoppingText value="Question facultative" color={null} fontSize={TEXT_SIZE.small} />
+						</View>
+					</View>
+					<CustomRegularPoppingText value="Es-tu à l’aise à rencontrer un partenaire qui a un niveau d’études inférieur au tien ?" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomQuestionDisplayer answers={["oui", "non", "ça dépend"]} direction={"row"} currentValue={questionnaireData.answers.qP12} onSelect={(value) => updateAnswer("qP12", value)} />
+				</View>
 
 
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
 
-			{/* <View style={{marginVertical:20,paddingHorizontal:20}}>
+				{/* <View style={{marginVertical:20,paddingHorizontal:20}}>
           <CustomRegularPoppingText value="Quels sont tes principaux langages d’amour ?(deux choix maximum) " color={'black'} fontSize={TEXT_SIZE.primary}/>          
           <CustomQuestionDisplayer answers={["Moment de qualité","Toucher physique","Paroles valorisantes","Services rendus","Cadeaux"]} direction={"column"} currentValue={questionnaireData.answers.qP13} onSelect={(value) => updateAnswer("qP13", value)}/>
           </View> */}
 
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText
-					value="Quels sont tes principaux langages d'amour ? (deux choix maximum)"
-					color={'black'}
-					fontSize={TEXT_SIZE.primary}
-				/>
-				<MultiSelectAnswer
-					questionKey="qP13"
-					answers={["Moment de qualité", "Toucher physique", "Paroles valorisantes", "Services rendus", "Cadeaux"]}
-					direction="column"
-					selectedValues={questionnaireData.answers.qP13}
-					maxSelections={2}
-					onSelect={handleMultiSelect}
-				/>
-			</View>
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<CustomRegularPoppingText
+						value="Quels sont tes principaux langages d'amour ? (deux choix maximum)"
+						color={'black'}
+						fontSize={TEXT_SIZE.primary}
+					/>
+					<MultiSelectAnswer
+						questionKey="qP13"
+						answers={["Moment de qualité", "Toucher physique", "Paroles valorisantes", "Services rendus", "Cadeaux"]}
+						direction="column"
+						selectedValues={questionnaireData.answers.qP13}
+						maxSelections={2}
+						onSelect={handleMultiSelect}
+					/>
+				</View>
 
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
 
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<CustomRegularPoppingText value="Quel est ton tempérament dominant ?" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomQuestionDisplayer answers={["Rouge (fonceur, indépendant, exigeant, factuel, positif…)", "Bleu (prudent, analytique, réservé, distant, organisé…)", "Vert (patient, fiable, calme, attentionné, protecteur…)", "Jaune (démonstratif, sociable, dynamique, enthousiaste, optimiste…)"]} direction={"column"} currentValue={questionnaireData.answers.qP14} onSelect={(value) => updateAnswer("qP14", value)} />
+				</View>
 
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText value="Quel est ton tempérament dominant ?" color={'black'} fontSize={TEXT_SIZE.primary} />
-				<CustomQuestionDisplayer answers={["Rouge (fonceur, indépendant, exigeant, factuel, positif…)", "Bleu (prudent, analytique, réservé, distant, organisé…)", "Vert (patient, fiable, calme, attentionné, protecteur…)", "Jaune (démonstratif, sociable, dynamique, enthousiaste, optimiste…)"]} direction={"column"} currentValue={questionnaireData.answers.qP14} onSelect={(value) => updateAnswer("qP14", value)} />
-			</View>
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
 
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<CustomRegularPoppingText
+						value="Nomme les 5 choses les plus importantes pour toi dans une relation amoureuse :"
+						color={'black'}
+						fontSize={TEXT_SIZE.primary}
+					/>
+					<MultiSelectAnswer
+						questionKey="qP15"
+						answers={["Attirance physique", "Compatibilité sexuelle", "Avoir des discussions intellectuelles", "Le service pour Dieu", "Avoir les mêmes croyances spirituelles", "La tolérance de la foi de l’autre", "La sagesse", "La bienveillance"]}
+						direction="column"
+						selectedValues={questionnaireData.answers.qP15}
+						maxSelections={5}
+						onSelect={handleMultiSelect}
+					/>
+				</View>
 
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
 
+				<View className={'gap-4'} style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<CustomRegularPoppingText
+						value="Mes centres d'intérêts (5 minimum)"
+						color={'black'}
+						fontSize={TEXT_SIZE.primary}
+					/>
 
+					<HobbiesSelect
+						hobbies={hobies} // Your hobbies array
+						selectedHobbies={questionnaireData.answers.qP16}
+						onSelect={handleHobbiesChange}
+						minSelections={5}
+					/>
+				</View>
 
+				<View style={{ height: 1, backgroundColor: "#F3F3F3", marginVertical: 10 }}></View>
 
-
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText
-					value="Nomme les 5 choses les plus importantes pour toi dans une relation amoureuse :"
-					color={'black'}
-					fontSize={TEXT_SIZE.primary}
-				/>
-				<MultiSelectAnswer
-					questionKey="qP15"
-					answers={["Attirance physique", "Compatibilité sexuelle", "Avoir des discussions intellectuelles", "Le service pour Dieu", "Avoir les mêmes croyances spirituelles", "La tolérance de la foi de l’autre", "La sagesse", "La bienveillance"]}
-					direction="column"
-					selectedValues={questionnaireData.answers.qP15}
-					maxSelections={5}
-					onSelect={handleMultiSelect}
-				/>
-			</View>
-
-
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
-
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText
-					value="Mes centres d'intérêts (5 minimum)"
-					color={'black'}
-					fontSize={TEXT_SIZE.primary}
-				/>
-
-				<HobbiesSelect
-					hobbies={hobies} // Your hobbies array
-					selectedHobbies={questionnaireData.answers.qP16}
-					onSelect={handleHobbiesChange}
-					minSelections={5}
-				/>
-			</View>
-
-
-			<View style={{ height: 1, backgroundColor: "#F3F3F3", marginVertical: 10 }}></View>
-
-			<View style={{ height: 50, paddingHorizontal: 20 }}>
-				<TouchableOpacity onPress={() => navigation.navigate("Questionaire2")} style={{ borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: COLORS.primary, paddingVertical: 10, paddingHorizontal: 20 }}>
-					<CustomRegularPoppingText color={"white"} fontSize={TEXT_SIZE.primary} value="Suivant" />
-				</TouchableOpacity>
-			</View>
-			<View style={{ height: 20 }}></View>
-
-
-
-
-
-
-
-
-
-
-
-
-
-		</ScrollView>
-
-
-
-	</View>)
+				<View style={{ height: 50, paddingHorizontal: 20 }}>
+					<TouchableOpacity onPress={() => navigation.navigate("Questionaire2")} style={{ borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: COLORS.primary, paddingVertical: 10, paddingHorizontal: 20 }}>
+						<CustomRegularPoppingText color={"white"} fontSize={TEXT_SIZE.primary} value="Suivant" />
+					</TouchableOpacity>
+				</View>
+				<View style={{ height: 20 }}></View>
+			</ScrollView>
+		</View>)
 }
-
-
-
-
-
-
-
-
 
 export function Questionaire2({ navigation }) {
 
@@ -688,7 +686,7 @@ export function Questionaire2({ navigation }) {
 									<Text style={{ color: 'white', fontSize: 12 }}>✓</Text>
 								)}
 							</View>
-							<Text style={{ fontFamily: FAMILLY.regular, fontSize: TEXT_SIZE.small }}>
+							<Text className={'text-gray-400'} style={{ fontFamily: FAMILLY.regular, fontSize: TEXT_SIZE.medium }}>
 								{answer}
 							</Text>
 						</TouchableOpacity>
@@ -749,11 +747,6 @@ export function Questionaire2({ navigation }) {
 		});
 	};
 
-
-
-
-
-
 	const [country, setCountry] = useState({
 		flag: getEmojiFlag('CM'),
 		name: "Cameroon",
@@ -801,159 +794,193 @@ export function Questionaire2({ navigation }) {
 		if (direction == "column") {
 			firstStyles = { flexDirection: direction, alignItems: "flex-start", justifyContent: "center" }
 		} else {
-			firstStyles = { flexDirection: direction, alignItems: "center", justifyContent: "space-between" }
+			firstStyles = { flexDirection: direction, alignItems: "center" }
 		}
 		return (<View>
 			<View style={{ ...firstStyles, marginTop: 10 }}>
 				{answers.map((an) => {
-					return (<View key={`${an}`} style={{ marginBottom: direction == "column" ? 10 : 0, flexDirection: "row", alignItems: "center", justifyContent: "flex-start" }}>
-						<TouchableOpacity onPress={async () => {
+					return (<TouchableOpacity key={`${an}`} style={{ marginBottom: direction == "column" ? 10 : 0, flexDirection: "row", alignItems: "center", justifyContent: "flex-start" }}
+						onPress={async () => {
 							onSelect(an)
-
-
-						}} style={{ alignItems: "center", justifyContent: "center", marginRight: 10, padding: 1, borderColor: COLORS.primary, borderWidth: 2, borderRadius: 50 }}><View style={{ height: 13, width: 13, backgroundColor: currentValue == an ? COLORS.primary : "white", borderRadius: 50 }}></View></TouchableOpacity>
-						<Text style={{ fontFamily: FAMILLY.regular, fontSize: TEXT_SIZE.small, marginTop: 2, paddingRight: 20 }}>{an}</Text>
-					</View>)
+						}}>
+						<View className={'flex'} style={{ alignItems: "center", justifyContent: "center", marginRight: 10, height: 20, width: 20, borderColor: COLORS.primary, backgroundColor: currentValue == an ? COLORS.primary : 'transparent', borderWidth: 2, borderRadius: 50 }}>
+							{/* <View style={{ height: 13, width: 13, backgroundColor: currentValue == an ? COLORS.primary : "white", borderRadius: 50 }}></View> */}
+							{currentValue == an && (
+								<Text style={{ color: 'white', fontSize: 12 }}>✓</Text>
+							)}
+						</View>
+						<Text className={'text-gray-400'} style={{ fontFamily: FAMILLY.regular, fontSize: TEXT_SIZE.medium, marginTop: 2, paddingRight: 20 }}>{an}</Text>
+					</TouchableOpacity>)
 				})}
 			</View>
 		</View>)
 	}
 
+	return (
+		<View>
+
+			<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ backgroundColor: "white" }}>
+				<View style={{ height: 50 }}></View>
+
+				<View className={'gap-3'} style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<CustomRegularPoppingText value="En quelques mots, comment décrirais-tu ta relation avec Dieu (Ce que Jésus représente pour toi, le type d’église que tu fréquentes…) ?" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomRegularPoppingText value="C’est l’une des premières choses que les gens liront sur ton profil. Tu auras l’occasion d’en dire plus par la suite" color={null} fontSize={TEXT_SIZE.small} />
+
+					<Pressable style={{ paddingVertical: 0, marginVertical: 0, borderRadius: 10, paddingHorizontal: 15, backgroundColor: "rgba(181, 181, 181, 0.12)" }}>
+						<CustomTextInput rightIconAction={null} name="height" placeHolder="Ex: Gagner les âmes, mon combat" LeftIcon={null} LeftIconStyles={null} RightIcon={null} RightIconStyles={null} directState={true} setState={(text) => updateAnswer("qS1", text)} state={questionnaireData.answers.qS1} />
+					</Pressable>
+				</View>
+
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
+
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<CustomRegularPoppingText value="Depuis combien de temps estimes tu que tu marches pleinement, de tout ton cœur avec le Seigneur ?" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomQuestionDisplayer answers={["Moins d’un an", "1 à 2 ans", "2 à 5 ans", "5 à 10 ans", "10 à 20 ans", "Plus de 20 ans"]} direction={"column"} currentValue={questionnaireData.answers.qS2} onSelect={(value) => updateAnswer("qS2", value)} />
+				</View>
+
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
+
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<CustomRegularPoppingText value="Quelle est ta dénomination religieuse ?" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomQuestionDisplayer answers={["Catholique", "Calviniste", "Évangélique", "Charismatique", "Méthodiste", "Chrétien non pratiquant", "Non croyant"]} direction={"column"} currentValue={questionnaireData.answers.qS3} onSelect={(value) => updateAnswer("qS3", value)} />
+				</View>
+
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
+
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<View className={'flex flex-row mb-4'}>
+						<View className={'bg-gray-100 rounded-lg py-1 px-2'}>
+							<CustomSemiBoldPoppingText value="Question facultative" color={null} fontSize={TEXT_SIZE.small} />
+						</View>
+					</View>
+					<CustomRegularPoppingText value="Es-tu ouvert(e) à rencontrer un partenaire qui a une dénomination religieuse différente de la tienne ?" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomQuestionDisplayer answers={["oui", "non", "ça dépend"]} direction={"row"} currentValue={questionnaireData.answers.qS4} onSelect={(value) => updateAnswer("qS4", value)} />
+				</View>
+
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
+
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<CustomRegularPoppingText value="Es-tu baptisé(e) d’eau ?" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomQuestionDisplayer answers={["Oui, par immersion", "Oui, par aspersion mais sans confirmation", "Oui, par aspersion et avec confirmation", "non"]} direction={"column"} currentValue={questionnaireData.answers.qS5} onSelect={(value) => updateAnswer("qS5", value)} />
+				</View>
+
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
+
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<CustomRegularPoppingText value="Es-tu baptisé(e) du Saint Esprit ?" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomQuestionDisplayer answers={["Oui et je parle en langues", "Oui, mais je ne parle pas en langues", "Je ne crois pas au baptême du Saint Esprit", "Je ne sais pas ce que cela veut dire", "non"]} direction={"column"} currentValue={questionnaireData.answers.qS6} onSelect={(value) => updateAnswer("qS6", value)} />
+				</View>
+
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
+
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<View className={'flex flex-row mb-4'}>
+						<View className={'bg-gray-100 rounded-lg py-1 px-2'}>
+							<CustomSemiBoldPoppingText value="Question facultative" color={null} fontSize={TEXT_SIZE.small} />
+						</View>
+					</View>
+					<CustomRegularPoppingText value="Es-tu un membre régulier d’une église locale, paroisse ou communauté ?" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomQuestionDisplayer answers={["Oui", "Non"]} direction={"row"} currentValue={questionnaireData.answers.qS7} onSelect={(value) => updateAnswer("qS7", value)} />
+				</View>
+
+				{
+					questionnaireData.answers.qS7 === "Oui" && (
+						<View>
+							<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
+
+							<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+								<View className={'flex flex-row mb-4'}>
+									<View className={'bg-gray-100 rounded-lg py-1 px-2'}>
+										<CustomSemiBoldPoppingText value="Question facultative" color={null} fontSize={TEXT_SIZE.small} />
+									</View>
+								</View>
+								<CustomRegularPoppingText value="Si tu as répondu non à la question précédente, peux-tu donner la raison ?" color={'black'} fontSize={TEXT_SIZE.primary} />
+								<CustomQuestionDisplayer answers={["Je recherche une église ", "Je préfère vivre ma foi à la maison", "Je fréquente plusieurs assemblées chrétiennes", "Autre"]} direction={"column"} currentValue={questionnaireData.answers.qS8} onSelect={(value) => updateAnswer("qS8", value)} />
+								<Pressable style={{ paddingVertical: 0, marginVertical: 0, borderRadius: 10, paddingHorizontal: 15, backgroundColor: "rgba(181, 181, 181, 0.12)" }}>
+									<CustomTextInput rightIconAction={null} name="height" placeHolder="Ta réponse ici" LeftIcon={null} LeftIconStyles={null} RightIcon={null} RightIconStyles={null} directState={true} setState={(text) => updateAnswer("qS8", text)} state={questionnaireData.answers.qS8} />
+								</Pressable>
+							</View>
+						</View>
+					)
+				}
+
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<View className={'flex flex-row mb-4'}>
+						<View className={'bg-gray-100 rounded-lg py-1 px-2'}>
+							<CustomSemiBoldPoppingText value="Question facultative" color={null} fontSize={TEXT_SIZE.small} />
+						</View>
+					</View>
+					<CustomRegularPoppingText value="Combien de fois par mois assistes tu généralement à un programme (culte, messe, ateliers, prières…) de l'église :" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomQuestionDisplayer answers={["Rarement : 1 fois", "Occasionnel : 2 fois", "Régulier : Plus de 4 fois", "Je ne vais pas aux programmes de l'église", "Ça dépend"]} direction={"column"} currentValue={questionnaireData.answers.qS9} onSelect={(value) => updateAnswer("qS9", value)} />
+				</View>
+
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
+
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<CustomRegularPoppingText
+						value="Comment aimes-tu servir au sein de l’église locale ? (trois choix maximum)"
+						color={'black'}
+						fontSize={TEXT_SIZE.primary}
+					/>
+					<MultiSelectAnswer
+						questionKey="qS10"
+						answers={["Administration", "Addiction", "Art.", "Communication et Médias", "Sonorisation", "Éclairage", "Bébés et enfants"]}
+						direction="column"
+						selectedValues={questionnaireData.answers.qS10}
+						maxSelections={3}
+						onSelect={handleMultiSelect}
+					/>
+				</View>
+
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
+
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<CustomRegularPoppingText value="Crois-tu en l’abstinence sexuelle avant le mariage ?" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomQuestionDisplayer answers={["Oui, et je compte fermement la respecter", "Non, j’ai mon avis sur ce sujet et je préfère en parler en privé avec la personne concernée", "Ça dépend"]} direction={"column"} currentValue={questionnaireData.answers.qS11} onSelect={(value) => updateAnswer("qS11", value)} />
+				</View>
+
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
 
 
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<View className={'flex flex-row mb-4'}>
+						<View className={'bg-gray-100 rounded-lg py-1 px-2'}>
+							<CustomSemiBoldPoppingText value="Question facultative" color={null} fontSize={TEXT_SIZE.small} />
+						</View>
+					</View>
+					<CustomRegularPoppingText value="Crois-tu au principe de la dîme (10% des revenus) qui est donnée à l’église ?" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomQuestionDisplayer answers={["Oui, je la donne systématiquement à l’église", "Oui, je la donne occasionnellement à l’église", "Non, je ne crois pas en la dîme", "Ça dépend"]} direction={"column"} currentValue={questionnaireData.answers.qS12} onSelect={(value) => updateAnswer("qS12", value)} />
+				</View>
 
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
 
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<View className={'flex flex-row mb-4'}>
+						<View className={'bg-gray-100 rounded-lg py-1 px-2'}>
+							<CustomSemiBoldPoppingText value="Question facultative" color={null} fontSize={TEXT_SIZE.small} />
+						</View>
+					</View>
+					<CustomRegularPoppingText value="Quelle sera la place de la vie spirituelle du couple dans ton mariage (prier ensemble, méditer ensemble, servir ensemble…) ?" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomQuestionDisplayer answers={["Primordial, je ne m’imagine pas un seul instant avec un partenaire qui ne fait pas ces choses avec moi dans le mariage.", "Nécessaire, c’est l’idéal à atteindre mais dans les faits ce n’est pas possible. Je suis ouvert(e) aux concessions.", "Utile, le faire à deux c’est mieux mais le plus important c’est d’avoir ma liberté de le faire de mon côté.", "Au besoin, je n’imposerais jamais ma foi à l’autre."]} direction={"column"} currentValue={questionnaireData.answers.qS13} onSelect={(value) => updateAnswer("qS13", value)} />
+				</View>
 
+				<View style={{ height: 1, backgroundColor: "#F3F3F3", marginVertical: 10 }}></View>
 
-	return (<View>
+				{err !== "" ? <CustomRegularPoppingText style={{ alignSelf: 'center', marginTop: 10 }} fontSize={TEXT_SIZE.small} color={COLORS.red} value={err} /> : null}
 
-		<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ backgroundColor: "white" }}>
-			<View style={{ height: 50 }}></View>
+				<View style={{ height: 50, paddingHorizontal: 20 }}>
 
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText value="En quelques mots, comment décrirais-tu ta relation avec Dieu (Ce que Jésus représente pour toi, le type d’église que tu fréquentes…) ?" color={'black'} fontSize={TEXT_SIZE.primary} />
-				<CustomRegularPoppingText value="C’est l’une des premières choses que les gens liront sur ton profil. Tu auras l’occasion d’en dire plus par la suite" color={null} fontSize={TEXT_SIZE.small} />
+					<TouchableOpacity onPress={() => handleSubmission()} style={{ borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: COLORS.primary, paddingVertical: 10, paddingHorizontal: 20 }}>
+						{isLoading ? <ActivityIndicator color="white" /> :
+							<CustomRegularPoppingText color={"white"} fontSize={TEXT_SIZE.primary} value="Suivant" />}
+					</TouchableOpacity>
+				</View>
+				<View style={{ height: 20 }}></View>
 
-				<Pressable style={{ paddingVertical: 0, marginVertical: 0, borderRadius: 10, paddingHorizontal: 15, backgroundColor: "rgba(181, 181, 181, 0.12)" }}>
-					<CustomTextInput rightIconAction={null} name="height" placeHolder="Ex: Gagner les âmes, mon combat" LeftIcon={null} LeftIconStyles={null} RightIcon={null} RightIconStyles={null} directState={true} setState={(text) => updateAnswer("qS1", text)} state={questionnaireData.answers.qS1} />
-				</Pressable>
-			</View>
+			</ScrollView>
 
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
-
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText value="Depuis combien de temps estimes tu que tu marches pleinement, de tout ton cœur avec le Seigneur ?" color={'black'} fontSize={TEXT_SIZE.primary} />
-				<CustomQuestionDisplayer answers={["Moins d’un an", "1 à 2 ans", "2 à 5 ans", "5 à 10 ans", "10 à 20 ans", "Plus de 20 ans"]} direction={"column"} currentValue={questionnaireData.answers.qS2} onSelect={(value) => updateAnswer("qS2", value)} />
-			</View>
-
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
-
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText value="Quelle est ta dénomination religieuse ?" color={'black'} fontSize={TEXT_SIZE.primary} />
-				<CustomQuestionDisplayer answers={["Catholique", "Calviniste", "Évangélique", "Charismatique", "Méthodiste", "Chrétien non pratiquant", "Non croyant"]} direction={"column"} currentValue={questionnaireData.answers.qS3} onSelect={(value) => updateAnswer("qS3", value)} />
-			</View>
-
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
-
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText value="Es-tu ouvert(e) à rencontrer un partenaire qui a une dénomination religieuse différente de la tienne ?" color={'black'} fontSize={TEXT_SIZE.primary} />
-				<CustomQuestionDisplayer answers={["oui", "non", "ça dépend"]} direction={"row"} currentValue={questionnaireData.answers.qS4} onSelect={(value) => updateAnswer("qS4", value)} />
-			</View>
-
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
-
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText value="Es-tu baptisé(e) d’eau ?" color={'black'} fontSize={TEXT_SIZE.primary} />
-				<CustomQuestionDisplayer answers={["Oui, par immersion", "Oui, par aspersion mais sans confirmation", "Oui, par aspersion et avec confirmation", "non"]} direction={"column"} currentValue={questionnaireData.answers.qS5} onSelect={(value) => updateAnswer("qS5", value)} />
-			</View>
-
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
-
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText value="Es-tu baptisé(e) du Saint Esprit ?" color={'black'} fontSize={TEXT_SIZE.primary} />
-				<CustomQuestionDisplayer answers={["Oui et je parle en langues", "Oui, mais je ne parle pas en langues", "Je ne crois pas au baptême du Saint Esprit", "Je ne sais pas ce que cela veut dire", "non"]} direction={"column"} currentValue={questionnaireData.answers.qS6} onSelect={(value) => updateAnswer("qS6", value)} />
-			</View>
-
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
-
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText value="Es-tu un membre régulier d’une église locale, paroisse ou communauté ?" color={'black'} fontSize={TEXT_SIZE.primary} />
-				<CustomQuestionDisplayer answers={["Oui", "Non"]} direction={"row"} currentValue={questionnaireData.answers.qS7} onSelect={(value) => updateAnswer("qS7", value)} />
-			</View>
-
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
-
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText value="Quel est ton tempérament dominant ?" color={'black'} fontSize={TEXT_SIZE.primary} />
-				<CustomQuestionDisplayer answers={["Rouge (fonceur, indépendant, exigeant, factuel, positif…)", "Bleu (prudent, analytique, réservé, distant, organisé…)", "Vert (patient, fiable, calme, attentionné, protecteur…)", "Jaune (démonstratif, sociable, dynamique, enthousiaste, optimiste…)"]} direction={"column"} currentValue={questionnaireData.answers.qS8} onSelect={(value) => updateAnswer("qS8", value)} />
-			</View>
-
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
-
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText value=" Si tu as répondu non à la question précédente, peux-tu donner la raison ?" color={'black'} fontSize={TEXT_SIZE.primary} />
-				<CustomQuestionDisplayer answers={["Je recherche une église ", "Je préfère vivre ma foi à la maison", "Je fréquente plusieurs assemblées chrétiennes", "Autre"]} direction={"column"} currentValue={questionnaireData.answers.qS9} onSelect={(value) => updateAnswer("qS9", value)} />
-				<Pressable style={{ paddingVertical: 0, marginVertical: 0, borderRadius: 10, paddingHorizontal: 15, backgroundColor: "rgba(181, 181, 181, 0.12)" }}>
-					<CustomTextInput rightIconAction={null} name="height" placeHolder="Ta réponse ici" LeftIcon={null} LeftIconStyles={null} RightIcon={null} RightIconStyles={null} directState={true} setState={(text) => updateAnswer("qS9", text)} state={questionnaireData.answers.qS9} />
-				</Pressable>
-			</View>
-
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
-
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText
-					value="Comment aimes-tu servir au sein de l’église locale ? (trois choix maximum)"
-					color={'black'}
-					fontSize={TEXT_SIZE.primary}
-				/>
-				<MultiSelectAnswer
-					questionKey="qS10"
-					answers={["Administration", "Addiction", "Art.", "Communication et Médias", "Sonorisation", "Éclairage", "Bébés et enfants"]}
-					direction="column"
-					selectedValues={questionnaireData.answers.qS10}
-					maxSelections={3}
-					onSelect={handleMultiSelect}
-				/>
-			</View>
-
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
-
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText value="Crois-tu en l’abstinence sexuelle avant le mariage ?" color={'black'} fontSize={TEXT_SIZE.primary} />
-				<CustomQuestionDisplayer answers={["Oui, et je compte fermement la respecter", "Non, j’ai mon avis sur ce sujet et je préfère en parler en privé avec la personne concernée", "Ça dépend"]} direction={"column"} currentValue={questionnaireData.answers.qS11} onSelect={(value) => updateAnswer("qS11", value)} />
-			</View>
-
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
-
-
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText value="Crois-tu au principe de la dîme (10% des revenus) qui est donnée à l’église ?" color={'black'} fontSize={TEXT_SIZE.primary} />
-				<CustomQuestionDisplayer answers={["Oui, je la donne systématiquement à l’église", "Oui, je la donne occasionnellement à l’église", "Non, je ne crois pas en la dîme", "Ça dépend"]} direction={"column"} currentValue={questionnaireData.answers.qS12} onSelect={(value) => updateAnswer("qS12", value)} />
-			</View>
-
-			<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
-
-			<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-				<CustomRegularPoppingText value="Quelle sera la place de la vie spirituelle du couple dans ton mariage (prier ensemble, méditer ensemble, servir ensemble…) ?" color={'black'} fontSize={TEXT_SIZE.primary} />
-				<CustomQuestionDisplayer answers={["Primordial, je ne m’imagine pas un seul instant avec un partenaire qui ne fait pas ces choses avec moi dans le mariage.", "Nécessaire, c’est l’idéal à atteindre mais dans les faits ce n’est pas possible. Je suis ouvert(e) aux concessions.", "Utile, le faire à deux c’est mieux mais le plus important c’est d’avoir ma liberté de le faire de mon côté.", "Au besoin, je n’imposerais jamais ma foi à l’autre."]} direction={"column"} currentValue={questionnaireData.answers.qS13} onSelect={(value) => updateAnswer("qS13", value)} />
-			</View>
-
-			<View style={{ height: 1, backgroundColor: "#F3F3F3", marginVertical: 10 }}></View>
-
-			{err !== "" ? <CustomRegularPoppingText style={{ alignSelf: 'center', marginTop: 10 }} fontSize={TEXT_SIZE.small} color={COLORS.red} value={err} /> : null}
-
-			<View style={{ height: 50, paddingHorizontal: 20 }}>
-
-				<TouchableOpacity onPress={() => handleSubmission()} style={{ borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: COLORS.primary, paddingVertical: 10, paddingHorizontal: 20 }}>
-					{isLoading ? <ActivityIndicator color="white" /> :
-						<CustomRegularPoppingText color={"white"} fontSize={TEXT_SIZE.primary} value="Suivant" />}
-				</TouchableOpacity>
-			</View>
-			<View style={{ height: 20 }}></View>
-
-		</ScrollView>
-
-	</View>
+		</View>
 	);
 }
 

@@ -11,7 +11,6 @@ const Tab = createMaterialTopTabNavigator();
  
 export default function TopTabs() {
   return (
-    
       <Tab.Navigator 
       initialRouteName='side-cards'
       sceneContainerStyle={{ backgroundColor: "white" }}

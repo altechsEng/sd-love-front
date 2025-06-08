@@ -60,7 +60,7 @@ export default function RegisterStep2({ navigation }) {
 
 
 	return (
-		<View  className={'flex-1 bg-white'}>
+		<SafeAreaView  className={'flex-1 bg-white'}>
 
 			<View style={{ alignItems: "center", flexDirection: "row", justifyContent: "center", position: "relative" }}>
 				<View style={{ borderRadius: 50, height: 50, width: 50, backgroundColor: COLORS.primary, alignItems: "center", justifyContent: "center" }}>
@@ -106,7 +106,7 @@ export default function RegisterStep2({ navigation }) {
 				</TouchableOpacity>
 
 				<View style={{ flex: 3, height: hp(5), justifyContent: "flex-end" }}>
-					<View style={{ alignItems: "center", justifyContent: "center", flexDirection: "row" }}>
+					<View className={'pb-8'} style={{ alignItems: "center", justifyContent: "center", flexDirection: "row" }}>
 						<Text style={{ fontSize: TEXT_SIZE.secondary, color: COLORS.gray, fontFamily: FAMILLY.regular }}>Have an account ? </Text>
 						<TouchableOpacity style={{ marginTop: 1 }} onPress={() => navigation.navigate("Login")}>
 							<Text style={{ fontSize: TEXT_SIZE.secondary, color: COLORS.primary, fontFamily: FAMILLY.regular }}>Sign in</Text>
@@ -116,6 +116,6 @@ export default function RegisterStep2({ navigation }) {
 
 			</View>
 
-		</View>
+		</SafeAreaView>
 	);
 }

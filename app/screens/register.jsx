@@ -61,7 +61,7 @@ export default function Register({ navigation }) {
 
 	return (
 
-		<View className={'flex-1 bg-white'}>
+		<SafeAreaView className={'flex-1 bg-white'}>
 
 			{/* <View style={{ flex: 2, height: 70 }}></View> */}
 			{visible && <CountryPickerModal type={'country'} title="Select country code" visible={visible} onSelect={onSelect} onClose={() => setVisible(false)} />
@@ -113,7 +113,7 @@ export default function Register({ navigation }) {
 				</TouchableOpacity>
 
 				<View style={{ flex: 3, height: hp(5), justifyContent: "flex-end" }}>
-					<View style={{ alignItems: "center", justifyContent: "center", flexDirection: "row" }}>
+					<View className={'pb-8'} style={{ alignItems: "center", justifyContent: "center", flexDirection: "row" }}>
 						<Text style={{ fontSize: TEXT_SIZE.secondary, color: COLORS.gray, fontFamily: FAMILLY.regular }}>Have an account ? </Text>
 						<TouchableOpacity style={{ marginTop: 1 }} onPress={() => navigation.navigate("Login")}>
 							<Text style={{ fontSize: TEXT_SIZE.secondary, color: COLORS.primary, fontFamily: FAMILLY.regular }}>Sign in</Text>
@@ -122,7 +122,7 @@ export default function Register({ navigation }) {
 				</View>
 			</View>
 
-		</View>
+		</SafeAreaView>
 
 	);
 }

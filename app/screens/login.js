@@ -98,9 +98,8 @@ const Login = ({ navigation }) => {
 	}
 
 	return (
-
-		<View className={'flex-1 bg-white'}>
-
+		<SafeAreaView className={'flex-1 bg-white'}>
+			<StatusBar style="light" />
 			<View style={{ flex: 2, height: 70 }}></View>
 
 			<View className={'relative'} style={{ alignItems: "center" }}>
@@ -114,7 +113,7 @@ const Login = ({ navigation }) => {
 					{/* <View style={{position:"absolute",top:15,left:18}}>
             	<TextInputPerson/>
 					</View> */}
-							{/* <TextInput
+					{/* <TextInput
 						style={{ 
 						marginTop:3,
 						height:25,
@@ -128,7 +127,7 @@ const Login = ({ navigation }) => {
 						onChangeText={(text) => setEmail(text)}
 						name="email">
 					</TextInput> */}
-					</View>
+				</View>
 
 				<View style={{ position: "relative", marginVertical: 15, borderRadius: 50, paddingVertical: 0, paddingHorizontal: 36, width: "80%", backgroundColor: "rgba(181, 181, 181, 0.12)", }}>
 					<CustomTextInput secure={true} name="password" placeHolder="Password" LeftIcon={"lock"} LeftIconStyles={{ position: "absolute", top: 15, left: 18 }} RightIcon={"eye"} RightIconStyles={{ position: "absolute", top: 12, right: 18 }} setState={setPassword} state={password} />
@@ -174,7 +173,7 @@ const Login = ({ navigation }) => {
 			<View className={''} style={{ flex: 3, height: 118, justifyContent: "flex-end" }}>
 
 
-				<View style={{ alignItems: "center", justifyContent: "center", flexDirection: "row" }}>
+				<View className={'pb-8'} style={{ alignItems: "center", justifyContent: "center", flexDirection: "row" }}>
 					<Text style={{ fontSize: TEXT_SIZE.secondary, color: COLORS.gray, fontFamily: FAMILLY.regular }}>Don't have an account ? </Text>
 					<TouchableOpacity style={{ marginTop: 1 }} onPress={() => navigation.navigate("Register")}>
 						<Text style={{ fontSize: TEXT_SIZE.secondary, color: COLORS.primary, fontFamily: FAMILLY.regular }}>Sign up here</Text>
@@ -182,7 +181,7 @@ const Login = ({ navigation }) => {
 				</View>
 			</View>
 
-		</View>
+		</SafeAreaView>
 
 	);
 }
