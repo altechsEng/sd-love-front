@@ -1,16 +1,20 @@
-import * as Device from 'expo-device';
-const getDeviceName = async () => {
-     try {
-       const deviceName = await Device.deviceName;
-       console.log('Device name:', deviceName);
-       return deviceName;
-     } catch (error) {
-       console.error('Error getting device name:', error);
-       return null;
-     }
-   };
+ 
    
-   
-const DeviceName = await getDeviceName();
+ 
 
-export DeviceName;
+
+
+export   const calculateAge = (birthDateString) => {
+  const today = new Date();
+  const birthDate = new Date(birthDateString);
+
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  const dayDiff = today.getDate() - birthDate.getDate();
+
+  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+    age--;
+  }
+
+  return age;
+};
