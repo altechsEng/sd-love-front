@@ -1,18 +1,21 @@
 import { CustomMeduimPoppingText, CustomRegularPoppingText, CustomSemiBoldPoppingText } from "../../../app/components/text";
 import { MatchProfileArrowBack, MatchProfileBirthDay, MatchProfileEducation, MatchProfileFaithChurch, MatchProfileFaithIcon1, MatchProfileFaithOccupation, MatchProfileHome, MatchProfileLang, MatchProfilePlus, MatchProfileSexIcon, MatchProfileSmallHeart, MatchProfleSmallFace } from "../../components/vectors";
-import { COLORS, TEXT_SIZE,FAMILLY } from "../../../utils/constants";
-import React, { useState } from "react"
+import { COLORS, TEXT_SIZE,FAMILLY, BaseImageUrl } from "../../../utils/constants";
+import React, { useEffect, useState } from "react"
 import {View,Text,Image,TouchableOpacity, Dimensions,ScrollView,FlatList} from "react-native"
  
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { useRoute } from "@react-navigation/native";
 
 const {width:SCREEN_WIDTH,height:SCREEN_HEIGHT} = Dimensions.get('window')
 
 
-export default function MatchProfile({navigation}) {
+ export default function MatchProfile({navigation}) {
+     const {item} = useRoute().params
+     const interest = item?.match_user?.user_infos[0]?.qP16 || ["Travel","Music","Fishing","Gym","Bible","Dance"]
      const [activeSubCat ,setActiveSubCat] = useState('About')
 
           const [posts,setPosts] = useState([
@@ -54,7 +57,7 @@ export default function MatchProfile({navigation}) {
                )
           }
 
-
+        
      return (<ScrollView showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false} style={{backgroundColor:"white",padding:20}}>
           
           
@@ -62,9 +65,9 @@ export default function MatchProfile({navigation}) {
           <TouchableOpacity onPress={()=> navigation.goBack()} style={{top:10,position:"absolute",left:15,zIndex:10}}>
               <MatchProfileArrowBack/>
               </TouchableOpacity>
-              <Image style={{height:"100%",width:"100%"}} resizeMode="cover" source={require('../../../assets/images/test_match1.jpg')}/>
+              <Image style={{height:"100%",width:"100%"}} resizeMode="cover" source={{uri:`${BaseImageUrl}/${item?.match_user?.user_image}`} || require('../../../assets/images/test_match1.jpg')}/>
           </View>
-          <CustomSemiBoldPoppingText value="Magy McLeen" color="black" fontSize={TEXT_SIZE.title+3} style={{textAlign:"left",marginTop:20}}/>
+          <CustomSemiBoldPoppingText value={`${item?.match_user?.firstname} ${item?.match_user?.lastname}` || "Magy McLeen"} color="black" fontSize={TEXT_SIZE.title+3} style={{textAlign:"left",marginTop:20}}/>
           <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-between"}}>
                <View>
                <CustomRegularPoppingText style={{}} color={null} fontSize={TEXT_SIZE.secondary} value="Revelation Church, Los Angeles"/>
@@ -108,7 +111,7 @@ export default function MatchProfile({navigation}) {
      <View style={{marginTop:30}}>
           <CustomRegularPoppingText style={{}} color={null} fontSize={TEXT_SIZE.primary} value="Interests"/>
           <View style={{flexDirection:"row",flexWrap:"wrap"}}>
-          {["Travel","Music","Fishing","Gym","Bible","Dance"].map((d) => (
+          { interest.map((d) => (
                <View key={d} style={{marginRight:10,marginBottom:5,paddingHorizontal:6,borderRadius:10,backgroundColor:COLORS.light}}>
                  <CustomRegularPoppingText fontSize={TEXT_SIZE.small} color={null} style={{}} value={d}/>
                </View>
@@ -125,7 +128,7 @@ export default function MatchProfile({navigation}) {
           <View style={{marginRight:20,backgroundColor:COLORS.light,height:30,width:30,alignItems:"center",borderRadius:20,justifyContent:"center"}}><MatchProfileSexIcon/></View>
            <View>
                <CustomRegularPoppingText style={{lineHieght:8}} color={null} fontSize={TEXT_SIZE.small} value="Gender"/>
-               <CustomRegularPoppingText style={{lineHeight:15}} color={null} fontSize={TEXT_SIZE.secondary+1} value="Female"/>
+               <CustomRegularPoppingText style={{lineHeight:15}} color={null} fontSize={TEXT_SIZE.secondary+1} value={item?.match_user?.user_infos[0]?.qP1 || "Not specified"}/>
            </View>
      </View>
 
@@ -133,7 +136,7 @@ export default function MatchProfile({navigation}) {
           <View style={{marginRight:20,backgroundColor:COLORS.light,height:30,width:30,alignItems:"center",borderRadius:20,justifyContent:"center"}}><MatchProfileBirthDay/></View>
            <View>
                <CustomRegularPoppingText style={{lineHieght:8}} color={null} fontSize={TEXT_SIZE.small} value="Birthday"/>
-               <CustomRegularPoppingText style={{lineHeight:15}} color={null} fontSize={TEXT_SIZE.secondary+1} value="8 June 1998"/>
+               <CustomRegularPoppingText style={{lineHeight:15}} color={null} fontSize={TEXT_SIZE.secondary+1} value={item?.match_user?.user_infos[0]?.qP2 || "Not specified"}/>
            </View>
      </View>
 
@@ -142,7 +145,7 @@ export default function MatchProfile({navigation}) {
           <View style={{marginRight:20,backgroundColor:COLORS.light,height:30,width:30,alignItems:"center",borderRadius:20,justifyContent:"center"}}><MatchProfileHome/></View>
            <View>
                <CustomRegularPoppingText style={{lineHieght:8}} color={null} fontSize={TEXT_SIZE.small} value="Home"/>
-               <CustomRegularPoppingText style={{lineHeight:15}} color={null} fontSize={TEXT_SIZE.secondary+1} value="Los Angeles, USA"/>
+          <CustomRegularPoppingText style={{lineHeight:15}} color={null} fontSize={TEXT_SIZE.secondary+1} value={`${item?.match_user?.country} - ${item?.match_user?.city} - ${item?.match_user?.addresse}` || "Not specified"}/>
            </View>
      </View>
 
@@ -166,7 +169,7 @@ export default function MatchProfile({navigation}) {
           <View style={{marginRight:20,backgroundColor:COLORS.light,height:30,width:30,alignItems:"center",borderRadius:20,justifyContent:"center"}}><MatchProfileFaithIcon1/></View>
            <View>
                <CustomRegularPoppingText style={{lineHieght:8}} color={null} fontSize={TEXT_SIZE.small} value="Gave my life to God"/>
-               <CustomRegularPoppingText style={{lineHeight:15}} color={null} fontSize={TEXT_SIZE.secondary+1} value="Since April 2017"/>
+               <CustomRegularPoppingText style={{lineHeight:15}} color={null} fontSize={TEXT_SIZE.secondary+1} value={item?.match_user?.user_infos[0]?.qS2 || "Not specified"}/>
            </View>
      </View>
 

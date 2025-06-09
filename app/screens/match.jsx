@@ -1,15 +1,19 @@
 
-import React, { useState,useEffect } from "react"
-import {FlatList, ScrollView} from "react-native-gesture-handler"
-import {View,Text, TouchableOpacity,Image, Dimensions,  PermissionsAndroid } from "react-native"
+import React, { useState,useEffect, useRef } from "react"
+ 
+import {View,Text, TouchableOpacity,Image,FlatList, Dimensions,  PermissionsAndroid, ActivityIndicator } from "react-native"
 import { MatchScreenAdress, MatchScreenAdressWithBox, MatchScreenDownArrow,MatchScreenFakeLayers, MatchScreenFilters, MatchScreenGridCards, MatchScreenSideCards,MatchScreenFace,MatchScreenXmark,MatchScreenHeartWhite } from "../components/vectors"
-import { COLORS, FAMILLY,TEXT_SIZE } from "../../utils/constants"
+import { BaseImageUrl, COLORS, FAMILLY,POST_LIMIT,TEXT_SIZE } from "../../utils/constants"
 import { LinearGradient } from "react-native-linear-gradient";
 import MapView, { Marker, Circle, PROVIDER_GOOGLE } from "react-native-maps";
  
 import MasonryList from "@react-native-seoul/masonry-list"
 import * as Location from "expo-location"
 import { SafeAreaView } from "react-native-safe-area-context"
+import axios from "axios"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import { useInfiniteQuery } from "@tanstack/react-query"
+import CustomMatchLoader from "../components/customMatchLoader";
 
 const {width:SCREEN_WIDTH,height:SCREEN_HEIGHT} = Dimensions.get('window')
 
@@ -18,7 +22,71 @@ const {width:SCREEN_WIDTH,height:SCREEN_HEIGHT} = Dimensions.get('window')
 
 const  MatchScreen = ({navigation}) => {
      const [userLocation, setUserLocation] = useState();
+     const [lastItemId,setLastItemId] = useState(null)
     
+
+    
+
+          const isSearching = useRef(false);
+           const getAllMatches = async({pageParam = 0}) => {
+             try {
+                 isSearching.current = true;
+                 let url = '/api/show-matches';
+                 let token = await AsyncStorage.getItem("user_token");
+                 
+                 if(token) {
+                     const response = await axios.post(
+                         url,
+                         {offset: pageParam, limit: POST_LIMIT},
+                         {headers: {"Authorization": `Bearer ${token}`}}
+                     );
+     
+                      
+                     isSearching.current = false;
+                     return {
+                         matches: response?.data?.matches,
+                         nextOffset: response?.data?.next_offset,
+                     };
+                 }
+             } catch(err) {
+                 console.log(err.message, "in getAllMatches",Object.keys(err),err?.request);
+                 isSearching.current = false;
+                 throw err; // Important for React Query error handling
+             }
+         };
+     
+         const { 
+             data, 
+             fetchNextPage, 
+             hasNextPage,
+             isFetchingNextPage,
+             isFetching 
+         } = useInfiniteQuery({
+             queryKey: ["matches"],
+             queryFn: getAllMatches,
+             getNextPageParam: (lastPage) => lastPage?.nextOffset ?? undefined,
+              
+         });
+     
+         // FLATTEN ALL PAGES INTO SINGLE ARRAY
+         const allMatches = data?.pages.flatMap(page => {
+            console.log(page)
+            return page?.matches
+         }) ?? [];
+     
+         const loadMoreItem = () => {
+             if (hasNextPage && !isFetchingNextPage) {
+                 fetchNextPage();
+             }  
+         };
+     
+         const renderLoader = () => {
+             return isFetchingNextPage ? (
+                 <ActivityIndicator size="large" color={COLORS.blue} />
+             ) : null;
+         };
+
+
      const getDistance = (lat1, lon1, lat2, lon2) => {
           const R = 6371; // Earth radius in km
           const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -65,7 +133,7 @@ useEffect(() => {
     if(activeScreen == "box")  requestLocationPermission();
  }, [activeScreen]);
 
-     const [activeScreen,setActiveScreen] = useState('side')
+     const [activeScreen,setActiveScreen] = useState('grid')
 
      const [mapRegion, setMapRegion] = useState({
          latitude: 37.78825,
@@ -135,24 +203,59 @@ useEffect(() => {
      }])
 
   
-     const renderProfile = ({item})=> (
-          <View key={item.key} style={{borderRadius:20,overflow:"hidden",marginBottom:10,height:200,marginRight:10}}>
+     const calculateAge = (birthDateString) => {
+  const today = new Date();
+  const birthDate = new Date(birthDateString);
+
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  const dayDiff = today.getDate() - birthDate.getDate();
+
+  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+    age--;
+  }
+
+  return age;
+};
+
+     const renderProfile = ({item})=> {
+        console.log(calculateAge(item?.match_user?.user_infos[0]?.qP2),"item...", item?.match_user?.user_infos[0]?.qP2)
+        let age =calculateAge(item?.match_user?.user_infos[0]?.qP2)
+        if(isFetching) {
+            return  <View   style={{marginTop:10,borderRadius:20,overflow:"hidden",backgroundColor:COLORS.light,marginBottom:10,height:200,marginRight:10,flex:1}}>
+                                        <LinearGradient colors={["rgba(215, 168, 152, 0)","white"]} start={{x:0,y:0}} end={{x:0,y:1}} style={{height:50,alignSelf:"flex-start",position:"absolute",zIndex:10,bottom:-5,width:"100%"}} >
+                                        <View style={{flexDirection:"column",marginLeft:10}}>
+                                        <View style={{ height:19,flexDirection:"row",alignItems:"center"}}>
+                                        <Text style={{fontSize:TEXT_SIZE.primary,fontFamily:FAMILLY.semibold,color:"white"}}> </Text>
+                                        <Text style={{fontSize:TEXT_SIZE.primary -3,margin:0,padding:0,fontFamily:FAMILLY.light,color:"white",marginLeft:10,marginTop:3,textAlign:"center",textAlignVertical:"center",width:25,backgroundColor:COLORS.light}}> </Text>
+                                        </View>
+                                         <View style={{}}>
+                                         <Text style={{fontSize:TEXT_SIZE.small-2,fontFamily:FAMILLY.light,color:"white"}}> </Text>
+                                         </View>
+                                        </View>         
+                                        </LinearGradient>
+ 
+          </View>
+        }
+ 
+        return  <View   style={{marginTop:10,borderRadius:20,overflow:"hidden",marginBottom:10,height:200,marginRight:10,flex:1}}>
           <LinearGradient colors={["rgba(215, 168, 152, 0)","rgba(215, 168, 152, 1)"]} start={{x:0,y:0}} end={{x:0,y:1}} style={{height:55,alignSelf:"flex-start",position:"absolute",zIndex:10,bottom:0,width:"100%"}} >
           <View style={{flexDirection:"column",marginLeft:10}}>
           <View style={{ height:19, flexDirection:"row",alignItems:"center"}}>
-          <Text style={{fontSize:TEXT_SIZE.secondary,fontFamily:FAMILLY.semibold,color:"white"}}>{item.name}, </Text>
-          <Text style={{fontSize:TEXT_SIZE.secondary ,margin:0,padding:0,fontFamily:FAMILLY.light,color:"white",marginLeft:10,marginTop:3,textAlign:"center",textAlignVertical:"center"}}>{item.age} ans</Text>
+          <Text style={{fontSize:TEXT_SIZE.secondary,fontFamily:FAMILLY.semibold,color:"white"}}>{`${item?.match_user?.firstname} ${item?.match_user?.lastname}` || item?.name}, </Text>
+          <Text style={{fontSize:TEXT_SIZE.secondary ,margin:0,padding:0,fontFamily:FAMILLY.light,color:"white",lineHeight:19,marginLeft:10,textAlign:"center",textAlignVertical:"center"}}>{ age ||item?.age || 25} ans</Text>
           </View>
           <View style={{}}>
-          <Text style={{fontSize:TEXT_SIZE.small,fontFamily:FAMILLY.light,color:"white"}}>{item.location}</Text>
+          <Text style={{fontSize:TEXT_SIZE.small,fontFamily:FAMILLY.light,color:"white"}}>{ item?.match_user?.city ||item?.location}</Text>
           </View>
           </View>         
           </LinearGradient>
-         <TouchableOpacity> 
-          <Image source={item.image} resizeMode="cover" style={{height:"100%",width:"100%"}}/>
+         <TouchableOpacity onPress={()=>navigation.navigate("MatchConnection",{item})}> 
+          <Image source={ {uri:`${BaseImageUrl}/${item?.match_user?.user_image}`} ||item?.image} resizeMode="cover" style={{height:"100%",width:"100%"}}/>
           </TouchableOpacity>
           </View>
-     )
+     
+     }
 
      return  (<SafeAreaView style={{flex:1,backgroundColor:"white"}}>
         <View style={{backgroundColor:"white",paddingTop:20,paddingHorizontal:20,position:"relative",flex:1}}>
@@ -212,9 +315,9 @@ useEffect(() => {
 
           {activeScreen == 'grid' &&
          
-               <MasonryList
-               keyExtractor={(item) => item.key}
-               data={profiles}
+               <FlatList
+               keyExtractor={(item,index) => item?.key+""+index}
+               data={allMatches.length>0?allMatches:profiles}
                renderItem={renderProfile}
                numColumns={2}
                showsVerticalScrollIndicator={false}

@@ -915,8 +915,8 @@ export function Questionaire2({navigation}) {
 
 
 <View style={{marginVertical:20,paddingHorizontal:20}}>
-<CustomRegularPoppingText value="Quel est ton tempérament dominant ?" color={'black'} fontSize={TEXT_SIZE.primary}/>          
-<CustomQuestionDisplayer answers={["Rouge (fonceur, indépendant, exigeant, factuel, positif…)","Bleu (prudent, analytique, réservé, distant, organisé…)","Vert (patient, fiable, calme, attentionné, protecteur…)","Jaune (démonstratif, sociable, dynamique, enthousiaste, optimiste…)"]} direction={"column"} currentValue={questionnaireData.answers.qS8} onSelect={(value) => updateAnswer("qS8", value)}/>
+<CustomRegularPoppingText value="Combien de fois par mois assistes tu généralement à un programme (culte, messe, ateliers, prières…) de l’église :" color={'black'} fontSize={TEXT_SIZE.primary}/>          
+<CustomQuestionDisplayer answers={["Rarement : 1 fois","Occasionnel : 2 fois","Régulier : Plus de 4 fois","Je ne vais pas aux programmes de l’église","Ça dépend"]} direction={"column"} currentValue={questionnaireData.answers.qS8} onSelect={(value) => updateAnswer("qS8", value)}/>
 </View>
 
 <View style={{height:1,backgroundColor:"#F3F3F3"}}></View>
