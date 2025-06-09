@@ -229,7 +229,7 @@ export default function HomeFeed({ navigation }) {
 	}
 
 	return (
-		<View clasName={'bg-green-100'} style={{ flex: 1, backgroundColor: "green" }}>
+		<View clasName={'bg-green-100'} style={{ flex: 1}}>
 			<View clasName={'flex flex-row items-center justify-between py-4'} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical:10, backgroundColor: "white", position: "relative", borderBottomWidth: 0, borderColor: COLORS.light }}>
 				<View style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "flex-start", paddingLeft: 20 }}>
 					<LogoSmall />
@@ -248,7 +248,6 @@ export default function HomeFeed({ navigation }) {
 				<View style={{ flexDirection: "row", height: 40, alignContent: "center", alignItems: "center", justifyContent: "space-between", marginVertical: 0, paddingHorizontal: 20 }}>
 					<View ><Text style={{ fontSize: TEXT_SIZE.title, color: COLORS.gray, fontWeight: "bold", fontFamily: FAMILLY.semibold }}>New Matches</Text></View>
 					<TouchableOpacity style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
-
 						<Text onPress={() => navigation.navigate("Match")} style={{ fontSize: TEXT_SIZE.mediam, fontFamily: FAMILLY.regular, color: COLORS.primary, marginRight: 15, textAlignVertical: "center" }}>see all</Text>
 						<View style={{ marginTop: 1 }}><HomeFeedSmallArrowRight /></View>
 					</TouchableOpacity>

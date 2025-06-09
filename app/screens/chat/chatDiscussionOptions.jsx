@@ -28,6 +28,7 @@ import {
 } from "react-native"
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { ScrollView } from 'react-native-gesture-handler';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -85,179 +86,181 @@ const ChatDiscussionOptions = ({ navigation }) => {
 	};
 
 	return (
-		<ScrollView
-			showsVerticalScrollIndicator={false}
-			style={styles.container}
-		>
-			{/* Profile Image Section */}
-			<View style={styles.profileImageContainer}>
-				<TouchableOpacity
-					onPress={() => navigation.goBack()}
-					style={styles.backButton}
-				>
-					<MatchProfileArrowBack />
-				</TouchableOpacity>
-				<Image
-					style={styles.profileImage}
-					resizeMode="cover"
-					source={require('../../../assets/images/test_match1.jpg')}
+		<SafeAreaView className={'flex-1 bg-white'}>
+			<ScrollView
+				showsVerticalScrollIndicator={false}
+				style={styles.container}
+			>
+				{/* Profile Image Section */}
+				<View style={styles.profileImageContainer}>
+					<TouchableOpacity
+						onPress={() => navigation.goBack()}
+						style={styles.backButton}
+					>
+						<MatchProfileArrowBack />
+					</TouchableOpacity>
+					<Image
+						style={styles.profileImage}
+						resizeMode="cover"
+						source={require('../../../assets/images/test_match1.jpg')}
+					/>
+				</View>
+
+				{/* Profile Info */}
+				<CustomSemiBoldPoppingText
+					value="Magy McLeen"
+					color="black"
+					fontSize={TEXT_SIZE.title + 3}
+					style={styles.name}
 				/>
-			</View>
 
-			{/* Profile Info */}
-			<CustomSemiBoldPoppingText
-				value="Magy McLeen"
-				color="black"
-				fontSize={TEXT_SIZE.title + 3}
-				style={styles.name}
-			/>
+				<View style={styles.profileInfo}>
+					<View>
+						<CustomSemiBoldPoppingText
+							color={COLORS.black}
+							fontSize={TEXT_SIZE.primary}
+							value="Revelation Church, Los Angeles"
+						/>
+						<CustomRegularPoppingText
+							color={COLORS.gray}
+							fontSize={TEXT_SIZE.secondary}
+							value="Choir Leader"
+						/>
+					</View>
+				</View>
 
-			<View style={styles.profileInfo}>
-				<View>
+
+				{/* Action Buttons - Perfect Grid */}
+				<View style={styles.actionButtonsContainer}>
+					<View style={styles.actionButtonsRow}>
+						<TouchableOpacity style={styles.actionButton}>
+							<View style={styles.iconWrapper}>
+								<ChatDiscussionOptionPhone width={24} height={24} />
+							</View>
+							<CustomRegularPoppingText
+								value="Voice call"
+								fontSize={TEXT_SIZE.small}
+								color={COLORS.black}
+								style={styles.actionButtonText}
+							/>
+						</TouchableOpacity>
+
+						<TouchableOpacity className={'mx-4'} style={styles.actionButton}>
+							<View style={styles.iconWrapper}>
+								<ChatDiscussionOptionsVideo width={24} height={24} />
+							</View>
+							<CustomRegularPoppingText
+								value="Video call"
+								fontSize={TEXT_SIZE.small}
+								color={COLORS.black}
+								style={styles.actionButtonText}
+							/>
+						</TouchableOpacity>
+
+						<TouchableOpacity style={styles.actionButton}>
+							<View style={styles.iconWrapper}>
+								<ChatDiscussionOptionsPeople width={24} height={24} />
+							</View>
+							<CustomRegularPoppingText
+								value="View profile"
+								fontSize={TEXT_SIZE.small}
+								color={COLORS.black}
+								style={styles.actionButtonText}
+							/>
+						</TouchableOpacity>
+
+					</View>
+				</View>
+
+				{/* Media Gallery */}
+				<View style={styles.mediaSection}>
 					<CustomSemiBoldPoppingText
-						color={COLORS.black}
+						value="Media"
 						fontSize={TEXT_SIZE.primary}
-						value="Revelation Church, Los Angeles"
+						color={COLORS.darkGray}
+						style={styles.sectionTitle}
 					/>
-					<CustomRegularPoppingText
-						color={COLORS.gray}
-						fontSize={TEXT_SIZE.secondary}
-						value="Choir Leader"
-					/>
-				</View>
-			</View>
 
-
-			{/* Action Buttons - Perfect Grid */}
-			<View style={styles.actionButtonsContainer}>
-				<View style={styles.actionButtonsRow}>
-					<TouchableOpacity style={styles.actionButton}>
-						<View style={styles.iconWrapper}>
-							<ChatDiscussionOptionPhone width={24} height={24} />
-						</View>
-						<CustomRegularPoppingText
-							value="Voice call"
-							fontSize={TEXT_SIZE.small}
-							color={COLORS.black}
-							style={styles.actionButtonText}
-						/>
-					</TouchableOpacity>
-
-					<TouchableOpacity className={'mx-4'} style={styles.actionButton}>
-						<View style={styles.iconWrapper}>
-							<ChatDiscussionOptionsVideo width={24} height={24} />
-						</View>
-						<CustomRegularPoppingText
-							value="Video call"
-							fontSize={TEXT_SIZE.small}
-							color={COLORS.black}
-							style={styles.actionButtonText}
-						/>
-					</TouchableOpacity>
-
-					<TouchableOpacity style={styles.actionButton}>
-						<View style={styles.iconWrapper}>
-							<ChatDiscussionOptionsPeople width={24} height={24} />
-						</View>
-						<CustomRegularPoppingText
-							value="View profile"
-							fontSize={TEXT_SIZE.small}
-							color={COLORS.black}
-							style={styles.actionButtonText}
-						/>
-					</TouchableOpacity>
-
-				</View>
-			</View>
-
-			{/* Media Gallery */}
-			<View style={styles.mediaSection}>
-				<CustomSemiBoldPoppingText
-					value="Media"
-					fontSize={TEXT_SIZE.primary}
-					color={COLORS.darkGray}
-					style={styles.sectionTitle}
-				/>
-
-				<FlatList
-					data={allImages.slice(0, visibleCount)}
-					horizontal
-					showsHorizontalScrollIndicator={false}
-					keyExtractor={(item, index) => index.toString()}
-					renderItem={renderImages}
-					contentContainerStyle={styles.galleryContainer}
-				/>
-			</View>
-
-			{/* Options Section */}
-			<View style={styles.optionsSection}>
-				<CustomSemiBoldPoppingText
-					value="Options"
-					fontSize={TEXT_SIZE.primary}
-					color={COLORS.darkGray}
-					style={styles.sectionTitle}
-				/>
-
-				{/* Notification with Toggle */}
-				<View style={styles.optionItem}>
-					<View style={styles.optionContent}>
-						<ChatDiscussionOptionsBell width={20} height={20} />
-						<CustomRegularPoppingText
-							color={COLORS.black}
-							value="Notifications"
-							style={styles.optionText}
-							fontSize={TEXT_SIZE.medium}
-						/>
-					</View>
-					<Switch
-						value={notificationsEnabled}
-						onValueChange={setNotificationsEnabled}
-						trackColor={{ false: COLORS.light, true: COLORS.black }}
-						thumbColor="white"
+					<FlatList
+						data={allImages.slice(0, visibleCount)}
+						horizontal
+						showsHorizontalScrollIndicator={false}
+						keyExtractor={(item, index) => index.toString()}
+						renderItem={renderImages}
+						contentContainerStyle={styles.galleryContainer}
 					/>
 				</View>
 
-				<TouchableOpacity style={styles.optionItem}>
-					<View style={styles.optionContent}>
-						<ChatDiscussionOptionsPersonCancel width={20} height={20} />
-						<CustomRegularPoppingText
-							color={COLORS.red}
-							value="Report user"
-							style={styles.optionText}
-							fontSize={TEXT_SIZE.medium}
+				{/* Options Section */}
+				<View style={styles.optionsSection}>
+					<CustomSemiBoldPoppingText
+						value="Options"
+						fontSize={TEXT_SIZE.primary}
+						color={COLORS.darkGray}
+						style={styles.sectionTitle}
+					/>
+
+					{/* Notification with Toggle */}
+					<View style={styles.optionItem}>
+						<View style={styles.optionContent}>
+							<ChatDiscussionOptionsBell width={20} height={20} />
+							<CustomRegularPoppingText
+								color={COLORS.black}
+								value="Notifications"
+								style={styles.optionText}
+								fontSize={TEXT_SIZE.medium}
+							/>
+						</View>
+						<Switch
+							value={notificationsEnabled}
+							onValueChange={setNotificationsEnabled}
+							trackColor={{ false: COLORS.light, true: COLORS.black }}
+							thumbColor="white"
 						/>
 					</View>
-				</TouchableOpacity>
 
-				<TouchableOpacity style={styles.optionItem}>
-					<View style={styles.optionContent}>
-						<ChatDiscussionOptionsDelete width={20} height={20} />
-						<CustomRegularPoppingText
-							color={COLORS.red}
-							value="Delete messages"
-							style={styles.optionText}
-							fontSize={TEXT_SIZE.medium}
-						/>
-					</View>
-				</TouchableOpacity>
+					<TouchableOpacity style={styles.optionItem}>
+						<View style={styles.optionContent}>
+							<ChatDiscussionOptionsPersonCancel width={20} height={20} />
+							<CustomRegularPoppingText
+								color={COLORS.red}
+								value="Report user"
+								style={styles.optionText}
+								fontSize={TEXT_SIZE.medium}
+							/>
+						</View>
+					</TouchableOpacity>
+
+					<TouchableOpacity style={styles.optionItem}>
+						<View style={styles.optionContent}>
+							<ChatDiscussionOptionsDelete width={20} height={20} />
+							<CustomRegularPoppingText
+								color={COLORS.red}
+								value="Delete messages"
+								style={styles.optionText}
+								fontSize={TEXT_SIZE.medium}
+							/>
+						</View>
+					</TouchableOpacity>
 
 
-				<TouchableOpacity style={styles.optionItem}>
-					<View style={styles.optionContent}>
-						<ChatDiscussionOptionsDesingaged width={20} height={20} />
-						<CustomRegularPoppingText
-							color={COLORS.red}
-							value="Disengage with Rosie"
-							style={styles.optionText}
-							fontSize={TEXT_SIZE.medium}
-						/>
-					</View>
-				</TouchableOpacity>
-			</View>
+					<TouchableOpacity style={styles.optionItem}>
+						<View style={styles.optionContent}>
+							<ChatDiscussionOptionsDesingaged width={20} height={20} />
+							<CustomRegularPoppingText
+								color={COLORS.red}
+								value="Disengage with Rosie"
+								style={styles.optionText}
+								fontSize={TEXT_SIZE.medium}
+							/>
+						</View>
+					</TouchableOpacity>
+				</View>
 
-			{/* Bottom Spacer */}
-			<View style={{ height: 50 }} />
-		</ScrollView>
+				{/* Bottom Spacer */}
+				<View style={{ height: 50 }} />
+			</ScrollView>
+		</SafeAreaView>
 	);
 }
 
@@ -300,7 +303,7 @@ const styles = StyleSheet.create({
 		marginBottom: 10,
 	},
 	actionButton: {
-		flex:1,
+		flex: 1,
 		width: 100,
 		height: 80,
 		backgroundColor: "#EBEBEB",

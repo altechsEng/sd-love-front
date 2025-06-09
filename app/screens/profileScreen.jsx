@@ -12,16 +12,19 @@ import { PostAddIcon, MatchProfileArrowBack, MatchProfileBirthDay, MatchProfileE
 import { COLORS, FAMILLY, TEXT_SIZE } from "../../utils/constants";
 import { useGlobalVariable } from "../context/global";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import dayjs from "dayjs";
 
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window')
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 
 const ProfileScreen = ({ navigation }) => {
 
 	const [modalVisible, setModalVisible] = useState(false)
 
-	const { isProfileMenuAcitve, activeSubCat, setActiveSubCat } = useGlobalVariable()
+	const { isProfileMenuAcitve, activeSubCat, setActiveSubCat, userData } = useGlobalVariable()
+
+	const leisures = JSON.parse(userData.leisures);
 
 	const [posts, setPosts] = useState([
 		{
@@ -141,7 +144,7 @@ const ProfileScreen = ({ navigation }) => {
 					<View style={{ marginTop: 20, marginBottom: 10 }}>
 						<CustomSemiBoldPoppingText style={{}} color={null} fontSize={TEXT_SIZE.primary} value="Interests" />
 						<View className={'mt-2'} style={{ flexDirection: "row", flexWrap: "wrap" }}>
-							{["Travel", "Music", "Fishing", "Gym", "Bible", "Dance"].map((d) => (
+							{leisures.map((d) => (
 								<View className={'py-2'} key={d} style={{ marginRight: 10, marginBottom: 5, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, backgroundColor: COLORS.light }}>
 									<CustomRegularPoppingText fontSize={TEXT_SIZE.small} color={null} style={{}} value={d} />
 								</View>
@@ -156,7 +159,7 @@ const ProfileScreen = ({ navigation }) => {
 							<View style={{ marginRight: 20, backgroundColor: COLORS.light, height: 30, width: 30, alignItems: "center", borderRadius: 20, justifyContent: "center" }}><MatchProfileSexIcon /></View>
 							<View>
 								<CustomRegularPoppingText style={{ lineHieght: 8 }} color={null} fontSize={TEXT_SIZE.small} value="Gender" />
-								<CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary} value="Female" />
+								<CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary} value={userData.userInfo[0].qP1} />
 							</View>
 						</View>
 
@@ -164,7 +167,7 @@ const ProfileScreen = ({ navigation }) => {
 							<View style={{ marginRight: 20, backgroundColor: COLORS.light, height: 30, width: 30, alignItems: "center", borderRadius: 20, justifyContent: "center" }}><MatchProfileBirthDay /></View>
 							<View>
 								<CustomRegularPoppingText style={{ lineHieght: 8 }} color={null} fontSize={TEXT_SIZE.small} value="Birthday" />
-								<CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary} value="8 June 1998" />
+								<CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary} value={dayjs(userData.userInfo[0].qP2).format('D MMM, YYYY')} />
 							</View>
 						</View>
 
@@ -173,7 +176,7 @@ const ProfileScreen = ({ navigation }) => {
 							<View style={{ marginRight: 20, backgroundColor: COLORS.light, height: 30, width: 30, alignItems: "center", borderRadius: 20, justifyContent: "center" }}><MatchProfileHome /></View>
 							<View>
 								<CustomRegularPoppingText style={{ lineHieght: 8 }} color={null} fontSize={TEXT_SIZE.small} value="Home" />
-								<CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary} value="Los Angeles, USA" />
+								<CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary} value={userData.address + ', ' + userData.city + ', ' + userData.country} />
 							</View>
 						</View>
 

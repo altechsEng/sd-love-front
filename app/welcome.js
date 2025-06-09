@@ -38,7 +38,7 @@ const Welcome = () => {
 				resizeMode="cover"
 				style={{}}
 			/> */}
-			<ImageBackground className={'relative flex-1 items-center justify-start bg-green-100'} source={require('../assets/images/hands.png')} resizeMode="cover">
+			<ImageBackground className={'relative flex-1 items-center justify-start'} source={require('../assets/images/hands.png')} resizeMode="cover">
 				<View className={'absolute top-[200px] z-10'}>
 					<Logo className={'scale-0.5'} />
 				</View>
