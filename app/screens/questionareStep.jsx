@@ -992,239 +992,239 @@ export function Questionaire2({ navigation }) {
 
 
 
-export function Questionaire2({navigation}) {
+// export function Questionaire2({navigation}) {
 
-  const {questioniareLevel,err,setErr,registrationData,setQuestionaireLevel,setQuestionnaireProgress,questionnaireData,setQuestionnaireData} = useGlobalVariable()
+//   const {questioniareLevel,err,setErr,registrationData,setQuestionaireLevel,setQuestionnaireProgress,questionnaireData,setQuestionnaireData} = useGlobalVariable()
 
-  useEffect(() => {
-    // Calculate initial progress when component mounts
-    const initialProgress = Object.values(questionnaireData.answered)
-      .filter(answered => answered).length;
+//   useEffect(() => {
+//     // Calculate initial progress when component mounts
+//     const initialProgress = Object.values(questionnaireData.answered)
+//       .filter(answered => answered).length;
     
-    setQuestionnaireProgress(initialProgress);
-  }, []);
+//     setQuestionnaireProgress(initialProgress);
+//   }, []);
 
-    useEffect(()=>{
-      setTimeout(()=>setErr(""),2000)
-    },[err])
+//     useEffect(()=>{
+//       setTimeout(()=>setErr(""),2000)
+//     },[err])
   
 
-  const handleSubmission = async() => {
-    setIsLoading(true)
-    const data = {
-      ...registrationData,
-      ...questionnaireData?.answers,
-      qP13:JSON.stringify(questionnaireData?.answers.qP13),
-      qP15:JSON.stringify(questionnaireData?.answers.qP15),
-      qP16:JSON.stringify(questionnaireData?.answers.qP16),
-      qS10:JSON.stringify(questionnaireData?.answers.qS10),
-    }
-   await axios.post("/api/register/en",data).then((res) => {
-      console.log(res.data,"resdata")
-      if(res.data.errors) {
-        setErr(`address: ${res.data.errors?.address}` || `city: ${res.data.errors?.city}`)
-      } else if(res.data.status === 401){
-        setErr(`email error : ${res.data.message}`)
-      } else {
+//   const handleSubmission = async() => {
+//     setIsLoading(true)
+//     const data = {
+//       ...registrationData,
+//       ...questionnaireData?.answers,
+//       qP13:JSON.stringify(questionnaireData?.answers.qP13),
+//       qP15:JSON.stringify(questionnaireData?.answers.qP15),
+//       qP16:JSON.stringify(questionnaireData?.answers.qP16),
+//       qS10:JSON.stringify(questionnaireData?.answers.qS10),
+//     }
+//    await axios.post("/api/register/en",data).then((res) => {
+//       console.log(res.data,"resdata")
+//       if(res.data.errors) {
+//         setErr(`address: ${res.data.errors?.address}` || `city: ${res.data.errors?.city}`)
+//       } else if(res.data.status === 401){
+//         setErr(`email error : ${res.data.message}`)
+//       } else {
         
-        navigation.navigate("BottomTabsHome")
-      }
-      setIsLoading(false)
-    }).catch((err)=> {
-      console.log(err,"opppp")
-      setErr(err)
-      setIsLoading(false)
+//         navigation.navigate("BottomTabsHome")
+//       }
+//       setIsLoading(false)
+//     }).catch((err)=> {
+//       console.log(err,"opppp")
+//       setErr(err)
+//       setIsLoading(false)
 
-    })
-  }
+//     })
+//   }
 
 
 
-  const MultiSelectAnswer = ({
-    questionKey,
-    answers,
-    direction = 'column',
-    selectedValues = [],
-    maxSelections,
-    onSelect
-  }) => {
-    const safeSelectedValues = Array.isArray(selectedValues) ? selectedValues : [];
+//   const MultiSelectAnswer = ({
+//     questionKey,
+//     answers,
+//     direction = 'column',
+//     selectedValues = [],
+//     maxSelections,
+//     onSelect
+//   }) => {
+//     const safeSelectedValues = Array.isArray(selectedValues) ? selectedValues : [];
   
-    return (
-      <View style={{
-         marginTop:10,
-        flexDirection: direction,
-        flexWrap: direction === 'row' ? 'wrap' : undefined,
-        alignItems: direction === 'column' ? 'flex-start' : 'center'
-      }}>
-        {answers.map(answer => {
-          const isSelected = safeSelectedValues.includes(answer);
-          const isDisabled = maxSelections !== undefined && 
-                            safeSelectedValues.length >= maxSelections && 
-                            !isSelected;
+//     return (
+//       <View style={{
+//          marginTop:10,
+//         flexDirection: direction,
+//         flexWrap: direction === 'row' ? 'wrap' : undefined,
+//         alignItems: direction === 'column' ? 'flex-start' : 'center'
+//       }}>
+//         {answers.map(answer => {
+//           const isSelected = safeSelectedValues.includes(answer);
+//           const isDisabled = maxSelections !== undefined && 
+//                             safeSelectedValues.length >= maxSelections && 
+//                             !isSelected;
   
                         
-          return (
-            <TouchableOpacity
-              key={answer}
-              onPress={() => {
-                   console.log(isSelected,isDisabled,safeSelectedValues,answer,selectedValues,questionKey)
-                  return !isDisabled && onSelect(questionKey, answer,maxSelections)
-              }}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginRight: 10,
-                marginBottom: 10,
-                opacity: isDisabled ? 0.5 : 1
-              }}
-              disabled={isDisabled}
-            >
-              <View style={{
-                width: 20,
-                height: 20,
-                borderRadius: 10,
-                borderWidth: 2,
-                borderColor: COLORS.primary,
-                backgroundColor: isSelected ? COLORS.primary : 'transparent',
-                marginRight: 8,
-                justifyContent: 'center',
-                alignItems: 'center'
-              }}>
-                {isSelected && (
-                  <Text style={{ color: 'white', fontSize: 12 }}>✓</Text>
-                )}
-              </View>
-              <Text style={{ fontFamily: FAMILLY.regular, fontSize: TEXT_SIZE.small }}>
-                {answer}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-    );
-  };
+//           return (
+//             <TouchableOpacity
+//               key={answer}
+//               onPress={() => {
+//                    console.log(isSelected,isDisabled,safeSelectedValues,answer,selectedValues,questionKey)
+//                   return !isDisabled && onSelect(questionKey, answer,maxSelections)
+//               }}
+//               style={{
+//                 flexDirection: 'row',
+//                 alignItems: 'center',
+//                 marginRight: 10,
+//                 marginBottom: 10,
+//                 opacity: isDisabled ? 0.5 : 1
+//               }}
+//               disabled={isDisabled}
+//             >
+//               <View style={{
+//                 width: 20,
+//                 height: 20,
+//                 borderRadius: 10,
+//                 borderWidth: 2,
+//                 borderColor: COLORS.primary,
+//                 backgroundColor: isSelected ? COLORS.primary : 'transparent',
+//                 marginRight: 8,
+//                 justifyContent: 'center',
+//                 alignItems: 'center'
+//               }}>
+//                 {isSelected && (
+//                   <Text style={{ color: 'white', fontSize: 12 }}>✓</Text>
+//                 )}
+//               </View>
+//               <Text style={{ fontFamily: FAMILLY.regular, fontSize: TEXT_SIZE.small }}>
+//                 {answer}
+//               </Text>
+//             </TouchableOpacity>
+//           );
+//         })}
+//       </View>
+//     );
+//   };
 
 
-  const handleMultiSelect = (questionKey, value,limit) => {
-    setQuestionnaireData(prev => {
-      // Safely get current values and limit
-      const currentValues = Array.isArray(prev.answers[questionKey]) 
-        ? prev.answers[questionKey]  
-        : [];
-      const maxLimit = limit;
+//   const handleMultiSelect = (questionKey, value,limit) => {
+//     setQuestionnaireData(prev => {
+//       // Safely get current values and limit
+//       const currentValues = Array.isArray(prev.answers[questionKey]) 
+//         ? prev.answers[questionKey]  
+//         : [];
+//       const maxLimit = limit;
   
-      // Determine new values
-      let newValues;
-      if (currentValues.includes(value)) {
-        // Remove if already selected
-        newValues = currentValues.filter(v => v !== value);
-      } else {
-        // Add if under limit or no limit
-        if (maxLimit === undefined || currentValues.length < maxLimit) {
-          newValues = [...currentValues, value];
-        } else {
-          // At max limit - don't change
-          return prev;
-        }
-      }
+//       // Determine new values
+//       let newValues;
+//       if (currentValues.includes(value)) {
+//         // Remove if already selected
+//         newValues = currentValues.filter(v => v !== value);
+//       } else {
+//         // Add if under limit or no limit
+//         if (maxLimit === undefined || currentValues.length < maxLimit) {
+//           newValues = [...currentValues, value];
+//         } else {
+//           // At max limit - don't change
+//           return prev;
+//         }
+//       }
   
-      // Calculate progress changes
-      const wasAnswered = currentValues.length > 0;
-      const isNowAnswered = newValues.length > 0;
-      const progressDelta = !wasAnswered && isNowAnswered 
-        ? 1 
-        : wasAnswered && !isNowAnswered 
-          ? -1 
-          : 0;
+//       // Calculate progress changes
+//       const wasAnswered = currentValues.length > 0;
+//       const isNowAnswered = newValues.length > 0;
+//       const progressDelta = !wasAnswered && isNowAnswered 
+//         ? 1 
+//         : wasAnswered && !isNowAnswered 
+//           ? -1 
+//           : 0;
   
-      if (progressDelta !== 0) {
-        setQuestionnaireProgress(prevProgress => prevProgress + progressDelta);
-      }
+//       if (progressDelta !== 0) {
+//         setQuestionnaireProgress(prevProgress => prevProgress + progressDelta);
+//       }
  
-      return {
+//       return {
         
-        answers: {
-          ...prev.answers,
-          [questionKey]: newValues
-        },
-        answered: {
-          ...prev.answered,
-          [questionKey]: isNowAnswered
-        }
-      };
-    });
-  };
+//         answers: {
+//           ...prev.answers,
+//           [questionKey]: newValues
+//         },
+//         answered: {
+//           ...prev.answered,
+//           [questionKey]: isNowAnswered
+//         }
+//       };
+//     });
+//   };
 
   
 
    
 
     
-     const [country,setCountry] = useState({
-              flag:getEmojiFlag('CM'),
-                name:"Cameroon",
-                dial_code:"+237"
-     })
+//      const [country,setCountry] = useState({
+//               flag:getEmojiFlag('CM'),
+//                 name:"Cameroon",
+//                 dial_code:"+237"
+//      })
 
-     const [isLoading,setIsLoading] = useState(false)
-     const [date, setDate] = useState(new Date());
-     const [show, setShow] = useState(false);
-     const [visible,setVisible] = useState(false)
-     const [questionaireLevelLocal,setQuestionaireLevelLocal] = useState('1/2 Questions générales')
-     const hobies = ["Voyages","Sports","Dances","Cinéma","Musées","Conférences","Politique","Camping","Nourritures","Science","Bouquins","Musique"]
+//      const [isLoading,setIsLoading] = useState(false)
+//      const [date, setDate] = useState(new Date());
+//      const [show, setShow] = useState(false);
+//      const [visible,setVisible] = useState(false)
+//      const [questionaireLevelLocal,setQuestionaireLevelLocal] = useState('1/2 Questions générales')
+//      const hobies = ["Voyages","Sports","Dances","Cinéma","Musées","Conférences","Politique","Camping","Nourritures","Science","Bouquins","Musique"]
 
 
-     const updateAnswer = (questionKey, value) => {
-      setQuestionnaireData(prev => {
-        const wasAnswered = prev.answered[questionKey];
-        const isNowAnswered = value !== "" && value !== null && 
-                             (!Array.isArray(value) || value.length > 0);
+//      const updateAnswer = (questionKey, value) => {
+//       setQuestionnaireData(prev => {
+//         const wasAnswered = prev.answered[questionKey];
+//         const isNowAnswered = value !== "" && value !== null && 
+//                              (!Array.isArray(value) || value.length > 0);
     
-        // Only update progress if answer state changed from unanswered to answered
-        if (!wasAnswered && isNowAnswered) {
-          setQuestionnaireProgress(prevProgress => prevProgress + 1);
-        } 
-        // If answer changed from answered to unanswered, decrement progress
-        else if (wasAnswered && !isNowAnswered) {
-          setQuestionnaireProgress(prevProgress => prevProgress - 1);
-        }
+//         // Only update progress if answer state changed from unanswered to answered
+//         if (!wasAnswered && isNowAnswered) {
+//           setQuestionnaireProgress(prevProgress => prevProgress + 1);
+//         } 
+//         // If answer changed from answered to unanswered, decrement progress
+//         else if (wasAnswered && !isNowAnswered) {
+//           setQuestionnaireProgress(prevProgress => prevProgress - 1);
+//         }
     
-        return {
-          answers: {
-            ...prev.answers,
-            [questionKey]: value
-          },
-          answered: {
-            ...prev.answered,
-            [questionKey]: isNowAnswered
-          }
-        };
-      });
-    };
+//         return {
+//           answers: {
+//             ...prev.answers,
+//             [questionKey]: value
+//           },
+//           answered: {
+//             ...prev.answered,
+//             [questionKey]: isNowAnswered
+//           }
+//         };
+//       });
+//     };
      
-     const CustomQuestionDisplayer = ({answers,direction,onSelect,currentValue}) => {
-      let firstStyles = {}
-      if(direction == "column"){
-           firstStyles = {flexDirection:direction,alignItems:"flex-start",justifyContent:"center"}
-      } else {
-           firstStyles = {flexDirection:direction,alignItems:"center",justifyContent:"space-between"}
-      }
-      return (<View>
-      <View style={{...firstStyles,marginTop:10}}>
-           {answers.map((an)=> {
-                return (<View key={`${an}`} style={{marginBottom:direction=="column"?10:0,flexDirection:"row",alignItems:"center",justifyContent:"flex-start"}}>
-                     <TouchableOpacity onPress={async() => {
-                          onSelect(an)
+//      const CustomQuestionDisplayer = ({answers,direction,onSelect,currentValue}) => {
+//       let firstStyles = {}
+//       if(direction == "column"){
+//            firstStyles = {flexDirection:direction,alignItems:"flex-start",justifyContent:"center"}
+//       } else {
+//            firstStyles = {flexDirection:direction,alignItems:"center",justifyContent:"space-between"}
+//       }
+//       return (<View>
+//       <View style={{...firstStyles,marginTop:10}}>
+//            {answers.map((an)=> {
+//                 return (<View key={`${an}`} style={{marginBottom:direction=="column"?10:0,flexDirection:"row",alignItems:"center",justifyContent:"flex-start"}}>
+//                      <TouchableOpacity onPress={async() => {
+//                           onSelect(an)
                           
                      
-                     }} style={{alignItems:"center",justifyContent:"center",marginRight:10,padding:1,borderColor:COLORS.primary,borderWidth:2,borderRadius:50}}><View style={{height:13,width:13,backgroundColor: currentValue == an ? COLORS.primary:"white",borderRadius:50}}></View></TouchableOpacity>
-                     <Text style={{fontFamily:FAMILLY.regular,fontSize:TEXT_SIZE.small,marginTop:2,paddingRight:20}}>{an}</Text>
-                </View>)
-           })}
-      </View>
-      </View>)
- }
+//                      }} style={{alignItems:"center",justifyContent:"center",marginRight:10,padding:1,borderColor:COLORS.primary,borderWidth:2,borderRadius:50}}><View style={{height:13,width:13,backgroundColor: currentValue == an ? COLORS.primary:"white",borderRadius:50}}></View></TouchableOpacity>
+//                      <Text style={{fontFamily:FAMILLY.regular,fontSize:TEXT_SIZE.small,marginTop:2,paddingRight:20}}>{an}</Text>
+//                 </View>)
+//            })}
+//       </View>
+//       </View>)
+//  }
 
 
 
@@ -1232,137 +1232,135 @@ export function Questionaire2({navigation}) {
  
 
       
-     return (<View>
+//      return (<View>
        
-       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{backgroundColor:"white"}}>
-<View style={{height:50}}></View>
+//        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{backgroundColor:"white"}}>
+// <View style={{height:50}}></View>
 
-<View style={{marginVertical:20,paddingHorizontal:20}}>
-<CustomRegularPoppingText value="En quelques mots, comment décrirais-tu ta relation avec Dieu (Ce que Jésus représente pour toi, le type d’église que tu fréquentes…) ?" color={'black'} fontSize={TEXT_SIZE.primary}/>          
-<CustomRegularPoppingText value="C’est l’une des premières choses que les gens liront sur ton profil. Tu auras l’occasion d’en dire plus par la suite" color={null} fontSize={TEXT_SIZE.small} />
+// <View style={{marginVertical:20,paddingHorizontal:20}}>
+// <CustomRegularPoppingText value="En quelques mots, comment décrirais-tu ta relation avec Dieu (Ce que Jésus représente pour toi, le type d’église que tu fréquentes…) ?" color={'black'} fontSize={TEXT_SIZE.primary}/>          
+// <CustomRegularPoppingText value="C’est l’une des premières choses que les gens liront sur ton profil. Tu auras l’occasion d’en dire plus par la suite" color={null} fontSize={TEXT_SIZE.small} />
 
-<Pressable style={{paddingVertical:0,marginVertical:0,borderRadius:10,paddingHorizontal:15,backgroundColor:"rgba(181, 181, 181, 0.12)"}}>
-<CustomTextInput rightIconAction={null} name="height" placeHolder="Ex: Gagner les âmes, mon combat" LeftIcon={null} LeftIconStyles={null} RightIcon={null} RightIconStyles={null} directState={true} setState={(text) => updateAnswer("qS1",text)} state={questionnaireData.answers.qS1} />
-</Pressable>
-</View>
+// <Pressable style={{paddingVertical:0,marginVertical:0,borderRadius:10,paddingHorizontal:15,backgroundColor:"rgba(181, 181, 181, 0.12)"}}>
+// <CustomTextInput rightIconAction={null} name="height" placeHolder="Ex: Gagner les âmes, mon combat" LeftIcon={null} LeftIconStyles={null} RightIcon={null} RightIconStyles={null} directState={true} setState={(text) => updateAnswer("qS1",text)} state={questionnaireData.answers.qS1} />
+// </Pressable>
+// </View>
 
-<View style={{height:1,backgroundColor:"#F3F3F3"}}></View>
-
-
-<View style={{marginVertical:20,paddingHorizontal:20}}>
-<CustomRegularPoppingText value="Depuis combien de temps estimes tu que tu marches pleinement, de tout ton cœur avec le Seigneur ?" color={'black'} fontSize={TEXT_SIZE.primary}/>          
-<CustomQuestionDisplayer answers={["Moins d’un an","1 à 2 ans","2 à 5 ans","5 à 10 ans","10 à 20 ans","Plus de 20 ans"]} direction={"column"} currentValue={questionnaireData.answers.qS2} onSelect={(value) => updateAnswer("qS2", value)}/>
-</View>
-
-<View style={{height:1,backgroundColor:"#F3F3F3"}}></View>
-
-<View style={{marginVertical:20,paddingHorizontal:20}}>
-<CustomRegularPoppingText value="Quelle est ta dénomination religieuse ?" color={'black'} fontSize={TEXT_SIZE.primary}/>          
-<CustomQuestionDisplayer answers={["Catholique","Calviniste","Évangélique","Charismatique","Méthodiste","Chrétien non pratiquant","Non croyant"]} direction={"column"} currentValue={questionnaireData.answers.qS3} onSelect={(value) => updateAnswer("qS3", value)}/>
-</View>
-
-<View style={{height:1,backgroundColor:"#F3F3F3"}}></View>
+// <View style={{height:1,backgroundColor:"#F3F3F3"}}></View>
 
 
+// <View style={{marginVertical:20,paddingHorizontal:20}}>
+// <CustomRegularPoppingText value="Depuis combien de temps estimes tu que tu marches pleinement, de tout ton cœur avec le Seigneur ?" color={'black'} fontSize={TEXT_SIZE.primary}/>          
+// <CustomQuestionDisplayer answers={["Moins d’un an","1 à 2 ans","2 à 5 ans","5 à 10 ans","10 à 20 ans","Plus de 20 ans"]} direction={"column"} currentValue={questionnaireData.answers.qS2} onSelect={(value) => updateAnswer("qS2", value)}/>
+// </View>
 
-<View style={{marginVertical:20,paddingHorizontal:20}}>
-<CustomRegularPoppingText value="Es-tu ouvert(e) à rencontrer un partenaire qui a une dénomination religieuse différente de la tienne ?" color={'black'} fontSize={TEXT_SIZE.primary}/>          
-<CustomQuestionDisplayer answers={["oui","non","ça dépend"]} direction={"row"} currentValue={questionnaireData.answers.qS4} onSelect={(value) => updateAnswer("qS4", value)}/>
-</View>
+// <View style={{height:1,backgroundColor:"#F3F3F3"}}></View>
 
-<View style={{height:1,backgroundColor:"#F3F3F3"}}></View>
+// <View style={{marginVertical:20,paddingHorizontal:20}}>
+// <CustomRegularPoppingText value="Quelle est ta dénomination religieuse ?" color={'black'} fontSize={TEXT_SIZE.primary}/>          
+// <CustomQuestionDisplayer answers={["Catholique","Calviniste","Évangélique","Charismatique","Méthodiste","Chrétien non pratiquant","Non croyant"]} direction={"column"} currentValue={questionnaireData.answers.qS3} onSelect={(value) => updateAnswer("qS3", value)}/>
+// </View>
 
-
-<View style={{marginVertical:20,paddingHorizontal:20}}>
-<CustomRegularPoppingText value="Es-tu baptisé(e) d’eau ?" color={'black'} fontSize={TEXT_SIZE.primary}/>          
-<CustomQuestionDisplayer answers={["Oui, par immersion","Oui, par aspersion mais sans confirmation","Oui, par aspersion et avec confirmation","non"]} direction={"column"} currentValue={questionnaireData.answers.qS5} onSelect={(value) => updateAnswer("qS5", value)}/>
-</View>
-
-<View style={{height:1,backgroundColor:"#F3F3F3"}}></View>
+// <View style={{height:1,backgroundColor:"#F3F3F3"}}></View>
 
 
-<View style={{marginVertical:20,paddingHorizontal:20}}>
-<CustomRegularPoppingText value="Es-tu baptisé(e) du Saint Esprit ?" color={'black'} fontSize={TEXT_SIZE.primary}/>          
-<CustomQuestionDisplayer answers={["Oui et je parle en langues","Oui, mais je ne parle pas en langues","Je ne crois pas au baptême du Saint Esprit","Je ne sais pas ce que cela veut dire","non"]} direction={"column"} currentValue={questionnaireData.answers.qS6} onSelect={(value) => updateAnswer("qS6", value)}/>
-</View>
 
-<View style={{height:1,backgroundColor:"#F3F3F3"}}></View>
+// <View style={{marginVertical:20,paddingHorizontal:20}}>
+// <CustomRegularPoppingText value="Es-tu ouvert(e) à rencontrer un partenaire qui a une dénomination religieuse différente de la tienne ?" color={'black'} fontSize={TEXT_SIZE.primary}/>          
+// <CustomQuestionDisplayer answers={["oui","non","ça dépend"]} direction={"row"} currentValue={questionnaireData.answers.qS4} onSelect={(value) => updateAnswer("qS4", value)}/>
+// </View>
 
-
-<View style={{marginVertical:20,paddingHorizontal:20}}>
-<CustomRegularPoppingText value="Es-tu un membre régulier d’une église locale, paroisse ou communauté ?" color={'black'} fontSize={TEXT_SIZE.primary}/>          
-<CustomQuestionDisplayer answers={["Oui","Non"]} direction={"row"} currentValue={questionnaireData.answers.qS7} onSelect={(value) => updateAnswer("qS7", value)}/>
-</View>
-
-<View style={{height:1,backgroundColor:"#F3F3F3"}}></View>
+// <View style={{height:1,backgroundColor:"#F3F3F3"}}></View>
 
 
-<View style={{marginVertical:20,paddingHorizontal:20}}>
-<CustomRegularPoppingText value="Combien de fois par mois assistes tu généralement à un programme (culte, messe, ateliers, prières…) de l’église :" color={'black'} fontSize={TEXT_SIZE.primary}/>          
-<CustomQuestionDisplayer answers={["Rarement : 1 fois","Occasionnel : 2 fois","Régulier : Plus de 4 fois","Je ne vais pas aux programmes de l’église","Ça dépend"]} direction={"column"} currentValue={questionnaireData.answers.qS8} onSelect={(value) => updateAnswer("qS8", value)}/>
-</View>
+// <View style={{marginVertical:20,paddingHorizontal:20}}>
+// <CustomRegularPoppingText value="Es-tu baptisé(e) d’eau ?" color={'black'} fontSize={TEXT_SIZE.primary}/>          
+// <CustomQuestionDisplayer answers={["Oui, par immersion","Oui, par aspersion mais sans confirmation","Oui, par aspersion et avec confirmation","non"]} direction={"column"} currentValue={questionnaireData.answers.qS5} onSelect={(value) => updateAnswer("qS5", value)}/>
+// </View>
 
-<View style={{height:1,backgroundColor:"#F3F3F3"}}></View>
-
-
-<View style={{marginVertical:20,paddingHorizontal:20}}>
-<CustomRegularPoppingText value=" Si tu as répondu non à la question précédente, peux-tu donner la raison ?" color={'black'} fontSize={TEXT_SIZE.primary}/>          
-<CustomQuestionDisplayer answers={["Je recherche une église ","Je préfère vivre ma foi à la maison","Je fréquente plusieurs assemblées chrétiennes","Autre"]} direction={"column"} currentValue={questionnaireData.answers.qS9} onSelect={(value) => updateAnswer("qS9", value)}/>
-<Pressable style={{paddingVertical:0,marginVertical:0,borderRadius:10,paddingHorizontal:15,backgroundColor:"rgba(181, 181, 181, 0.12)"}}>
-<CustomTextInput rightIconAction={null} name="height" placeHolder="Ta réponse ici" LeftIcon={null} LeftIconStyles={null} RightIcon={null} RightIconStyles={null} directState={true} setState={(text) => updateAnswer("qS9",text)} state={questionnaireData.answers.qS9}/>
-</Pressable>
-</View>
+// <View style={{height:1,backgroundColor:"#F3F3F3"}}></View>
 
 
-<View style={{height:1,backgroundColor:"#F3F3F3"}}></View>
+// <View style={{marginVertical:20,paddingHorizontal:20}}>
+// <CustomRegularPoppingText value="Es-tu baptisé(e) du Saint Esprit ?" color={'black'} fontSize={TEXT_SIZE.primary}/>          
+// <CustomQuestionDisplayer answers={["Oui et je parle en langues","Oui, mais je ne parle pas en langues","Je ne crois pas au baptême du Saint Esprit","Je ne sais pas ce que cela veut dire","non"]} direction={"column"} currentValue={questionnaireData.answers.qS6} onSelect={(value) => updateAnswer("qS6", value)}/>
+// </View>
+
+// <View style={{height:1,backgroundColor:"#F3F3F3"}}></View>
+
+
+// <View style={{marginVertical:20,paddingHorizontal:20}}>
+// <CustomRegularPoppingText value="Es-tu un membre régulier d’une église locale, paroisse ou communauté ?" color={'black'} fontSize={TEXT_SIZE.primary}/>          
+// <CustomQuestionDisplayer answers={["Oui","Non"]} direction={"row"} currentValue={questionnaireData.answers.qS7} onSelect={(value) => updateAnswer("qS7", value)}/>
+// </View>
+
+// <View style={{height:1,backgroundColor:"#F3F3F3"}}></View>
+
+
+// <View style={{marginVertical:20,paddingHorizontal:20}}>
+// <CustomRegularPoppingText value="Combien de fois par mois assistes tu généralement à un programme (culte, messe, ateliers, prières…) de l’église :" color={'black'} fontSize={TEXT_SIZE.primary}/>          
+// <CustomQuestionDisplayer answers={["Rarement : 1 fois","Occasionnel : 2 fois","Régulier : Plus de 4 fois","Je ne vais pas aux programmes de l’église","Ça dépend"]} direction={"column"} currentValue={questionnaireData.answers.qS8} onSelect={(value) => updateAnswer("qS8", value)}/>
+// </View>
+
+// <View style={{height:1,backgroundColor:"#F3F3F3"}}></View>
+
+
+// <View style={{marginVertical:20,paddingHorizontal:20}}>
+// <CustomRegularPoppingText value=" Si tu as répondu non à la question précédente, peux-tu donner la raison ?" color={'black'} fontSize={TEXT_SIZE.primary}/>          
+// <CustomQuestionDisplayer answers={["Je recherche une église ","Je préfère vivre ma foi à la maison","Je fréquente plusieurs assemblées chrétiennes","Autre"]} direction={"column"} currentValue={questionnaireData.answers.qS9} onSelect={(value) => updateAnswer("qS9", value)}/>
+// <Pressable style={{paddingVertical:0,marginVertical:0,borderRadius:10,paddingHorizontal:15,backgroundColor:"rgba(181, 181, 181, 0.12)"}}>
+// <CustomTextInput rightIconAction={null} name="height" placeHolder="Ta réponse ici" LeftIcon={null} LeftIconStyles={null} RightIcon={null} RightIconStyles={null} directState={true} setState={(text) => updateAnswer("qS9",text)} state={questionnaireData.answers.qS9}/>
+// </Pressable>
+// </View>
+
+
+// <View style={{height:1,backgroundColor:"#F3F3F3"}}></View>
 
  
 
-<View style={{marginVertical: 20, paddingHorizontal: 20}}>
-  <CustomRegularPoppingText 
-    value="Comment aimes-tu servir au sein de l’église locale ? (trois choix maximum)" 
-    color={'black'} 
-    fontSize={TEXT_SIZE.primary}
-  />
-  <MultiSelectAnswer
-    questionKey="qS10"
-    answers={["Administration","Addiction","Art.","Communication et Médias","Sonorisation","Éclairage","Bébés et enfants"]}
-    direction="column"
-    selectedValues={questionnaireData.answers.qS10}
-    maxSelections={3}
-    onSelect={handleMultiSelect}
-  />
-</View>
+// <View style={{marginVertical: 20, paddingHorizontal: 20}}>
+//   <CustomRegularPoppingText 
+//     value="Comment aimes-tu servir au sein de l’église locale ? (trois choix maximum)" 
+//     color={'black'} 
+//     fontSize={TEXT_SIZE.primary}
+//   />
+//   <MultiSelectAnswer
+//     questionKey="qS10"
+//     answers={["Administration","Addiction","Art.","Communication et Médias","Sonorisation","Éclairage","Bébés et enfants"]}
+//     direction="column"
+//     selectedValues={questionnaireData.answers.qS10}
+//     maxSelections={3}
+//     onSelect={handleMultiSelect}
+//   />
+// </View>
 
-<View style={{height:1,backgroundColor:"#F3F3F3"}}></View>
-
-
-
-<View style={{marginVertical:20,paddingHorizontal:20}}>
-<CustomRegularPoppingText value="Crois-tu en l’abstinence sexuelle avant le mariage ?" color={'black'} fontSize={TEXT_SIZE.primary}/>          
-<CustomQuestionDisplayer answers={["Oui, et je compte fermement la respecter","Non, j’ai mon avis sur ce sujet et je préfère en parler en privé avec la personne concernée","Ça dépend"]} direction={"column"} currentValue={questionnaireData.answers.qS11} onSelect={(value) => updateAnswer("qS11", value)}/>
-</View>
-
-<View style={{height:1,backgroundColor:"#F3F3F3"}}></View>
+// <View style={{height:1,backgroundColor:"#F3F3F3"}}></View>
 
 
-<View style={{marginVertical:20,paddingHorizontal:20}}>
-<CustomRegularPoppingText value="Crois-tu au principe de la dîme (10% des revenus) qui est donnée à l’église ?" color={'black'} fontSize={TEXT_SIZE.primary}/>          
-<CustomQuestionDisplayer answers={["Oui, je la donne systématiquement à l’église","Oui, je la donne occasionnellement à l’église","Non, je ne crois pas en la dîme","Ça dépend"]} direction={"column"} currentValue={questionnaireData.answers.qS12} onSelect={(value) => updateAnswer("qS12", value)}/>
-</View>
 
-<View style={{height:1,backgroundColor:"#F3F3F3"}}></View>
+// <View style={{marginVertical:20,paddingHorizontal:20}}>
+// <CustomRegularPoppingText value="Crois-tu en l’abstinence sexuelle avant le mariage ?" color={'black'} fontSize={TEXT_SIZE.primary}/>          
+// <CustomQuestionDisplayer answers={["Oui, et je compte fermement la respecter","Non, j’ai mon avis sur ce sujet et je préfère en parler en privé avec la personne concernée","Ça dépend"]} direction={"column"} currentValue={questionnaireData.answers.qS11} onSelect={(value) => updateAnswer("qS11", value)}/>
+// </View>
 
-
-<View style={{marginVertical:20,paddingHorizontal:20}}>
-<CustomRegularPoppingText value="Quelle sera la place de la vie spirituelle du couple dans ton mariage (prier ensemble, méditer ensemble, servir ensemble…) ?" color={'black'} fontSize={TEXT_SIZE.primary}/>          
-<CustomQuestionDisplayer answers={["Primordial, je ne m’imagine pas un seul instant avec un partenaire qui ne fait pas ces choses avec moi dans le mariage.","Nécessaire, c’est l’idéal à atteindre mais dans les faits ce n’est pas possible. Je suis ouvert(e) aux concessions.","Utile, le faire à deux c’est mieux mais le plus important c’est d’avoir ma liberté de le faire de mon côté.","Au besoin, je n’imposerais jamais ma foi à l’autre."]} direction={"column"} currentValue={questionnaireData.answers.qS13} onSelect={(value) => updateAnswer("qS13", value)}/>
-</View>
+// <View style={{height:1,backgroundColor:"#F3F3F3"}}></View>
 
 
-<View style={{height:1,backgroundColor:"#F3F3F3",marginVertical:10}}></View>
+// <View style={{marginVertical:20,paddingHorizontal:20}}>
+// <CustomRegularPoppingText value="Crois-tu au principe de la dîme (10% des revenus) qui est donnée à l’église ?" color={'black'} fontSize={TEXT_SIZE.primary}/>          
+// <CustomQuestionDisplayer answers={["Oui, je la donne systématiquement à l’église","Oui, je la donne occasionnellement à l’église","Non, je ne crois pas en la dîme","Ça dépend"]} direction={"column"} currentValue={questionnaireData.answers.qS12} onSelect={(value) => updateAnswer("qS12", value)}/>
+// </View>
+
+// <View style={{height:1,backgroundColor:"#F3F3F3"}}></View>
 
 
+// <View style={{marginVertical:20,paddingHorizontal:20}}>
+// <CustomRegularPoppingText value="Quelle sera la place de la vie spirituelle du couple dans ton mariage (prier ensemble, méditer ensemble, servir ensemble…) ?" color={'black'} fontSize={TEXT_SIZE.primary}/>          
+// <CustomQuestionDisplayer answers={["Primordial, je ne m’imagine pas un seul instant avec un partenaire qui ne fait pas ces choses avec moi dans le mariage.","Nécessaire, c’est l’idéal à atteindre mais dans les faits ce n’est pas possible. Je suis ouvert(e) aux concessions.","Utile, le faire à deux c’est mieux mais le plus important c’est d’avoir ma liberté de le faire de mon côté.","Au besoin, je n’imposerais jamais ma foi à l’autre."]} direction={"column"} currentValue={questionnaireData.answers.qS13} onSelect={(value) => updateAnswer("qS13", value)}/>
+// </View>
+
+
+// <View style={{height:1,backgroundColor:"#F3F3F3",marginVertical:10}}></View>
 
 
 
@@ -1391,16 +1389,18 @@ export function Questionaire2({navigation}) {
 
 
 
-{err!==""? <CustomRegularPoppingText style={{alignSelf:'center',marginTop:10}} fontSize={TEXT_SIZE.small} color={COLORS.red} value={err}/>:null}
+
+
+// {err!==""? <CustomRegularPoppingText style={{alignSelf:'center',marginTop:10}} fontSize={TEXT_SIZE.small} color={COLORS.red} value={err}/>:null}
   
-<View style={{height:50,paddingHorizontal:20}}>
+// <View style={{height:50,paddingHorizontal:20}}>
  
-     <TouchableOpacity onPress={() => handleSubmission()} style={{borderRadius:10,alignItems:'center',justifyContent:"center",backgroundColor:COLORS.primary,paddingVertical:10,paddingHorizontal:20}}>
-         {isLoading ? <ActivityIndicator color="white"/>:
-          <CustomRegularPoppingText color={"white"} fontSize={TEXT_SIZE.primary} value="Suivant"/> }
-     </TouchableOpacity>
-</View>
-<View style={{height:20}}></View>
+//      <TouchableOpacity onPress={() => handleSubmission()} style={{borderRadius:10,alignItems:'center',justifyContent:"center",backgroundColor:COLORS.primary,paddingVertical:10,paddingHorizontal:20}}>
+//          {isLoading ? <ActivityIndicator color="white"/>:
+//           <CustomRegularPoppingText color={"white"} fontSize={TEXT_SIZE.primary} value="Suivant"/> }
+//      </TouchableOpacity>
+// </View>
+// <View style={{height:20}}></View>
 
 
 
@@ -1414,12 +1414,12 @@ export function Questionaire2({navigation}) {
 
 
 
-</ScrollView>
+// </ScrollView>
 
 
      
-     </View>)
-}
+//      </View>)
+// }
 
 
  

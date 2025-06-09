@@ -11,6 +11,7 @@ import React, {
 import { getEmojiFlag } from "countries-list";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 
  
 
@@ -156,17 +157,22 @@ const [settingType,setSettingType] = useState(null)
 
 const [image,setImage] = useState(null)
 const [userData,setUserData] = useState({}) // load it here once 
-  
+const navigation = useNavigation()
 const loadData = async() => {
     try {
          let result = await AsyncStorage.getItem("user_data")
-         let data = await JSON.parse(result)
+         if(result) {
+                   let data = await JSON.parse(result)
           
          setUserData({...data?.user,dob:data?.user_info[0]?.qP2})
         
       
          if(data?.user_image) setImage(data?.user_image)
          else setImage(null)
+
+        navigation.navigate("BottomTabsHome",{screen:"HomeFeed"})
+
+         }
 
        
  

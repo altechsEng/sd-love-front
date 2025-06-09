@@ -229,7 +229,7 @@ export default function HomeFeed({ navigation }) {
 	}
 
 	return (
-		<View clasName={'bg-green-100'} style={{ flex: 1, backgroundColor: "green" }}>
+		<View clasName={'bg-green-100'} style={{ flex: 1, backgroundColor: "white" }}>
 			<View clasName={'flex flex-row items-center justify-between py-4'} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical:10, backgroundColor: "white", position: "relative", borderBottomWidth: 0, borderColor: COLORS.light }}>
 				<View style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "flex-start", paddingLeft: 20 }}>
 					<LogoSmall />
