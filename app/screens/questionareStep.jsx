@@ -884,7 +884,7 @@ export function Questionaire2({ navigation }) {
 				</View>
 
 				{
-					questionnaireData.answers.qS7 === "Oui" && (
+					questionnaireData.answers.qS7 === "Non" && (
 						<View>
 							<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
 

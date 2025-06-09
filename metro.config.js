@@ -3,6 +3,10 @@ const { withNativeWind } = require('nativewind/metro');
 
 const config = getDefaultConfig(__dirname);
 
+const {
+  wrapWithReanimatedMetroConfig,
+} = require('react-native-reanimated/metro-config');
+
 config.transformer = {
   ...config.transformer,
   babelTransformerPath: require.resolve('react-native-svg-transformer'),
@@ -13,6 +17,6 @@ config.resolver = {
   sourceExts: [...config.resolver.sourceExts, 'svg'],
 };
 
-module.exports = withNativeWind(config, { input: './global.css' });
+module.exports = wrapWithReanimatedMetroConfig(withNativeWind(config, { input: './global.css' }));
 
 // module.exports = config;  
