@@ -1,39 +1,48 @@
 
-import React, { useState, useEffect } from "react"
-import { FlatList, ScrollView } from "react-native-gesture-handler"
-import { View, Text, TouchableOpacity, Image, Dimensions, PermissionsAndroid } from "react-native"
-import { MatchScreenAdress, MatchScreenAdressWithBox, MatchScreenDownArrow, MatchScreenFakeLayers, MatchScreenFilters, MatchScreenGridCards, MatchScreenSideCards, MatchScreenFace, MatchScreenXmark, MatchScreenHeartWhite } from "../components/vectors"
-import { COLORS, FAMILLY, TEXT_SIZE } from "../../utils/constants"
+import React, { useState,useEffect } from "react"
+import {FlatList, ScrollView} from "react-native-gesture-handler"
+import {View,Text, TouchableOpacity,Image, Dimensions,  PermissionsAndroid } from "react-native"
+import { MatchScreenAdress, MatchScreenAdressWithBox, MatchScreenDownArrow,MatchScreenFakeLayers, MatchScreenFilters, MatchScreenGridCards, MatchScreenSideCards,MatchScreenFace,MatchScreenXmark,MatchScreenHeartWhite } from "../components/vectors"
+import { COLORS, FAMILLY,TEXT_SIZE } from "../../utils/constants"
 import { LinearGradient } from "react-native-linear-gradient";
 import MapView, { Marker, Circle, PROVIDER_GOOGLE } from "react-native-maps";
 
 import MasonryList from "@react-native-seoul/masonry-list"
 import * as Location from "expo-location"
 import { SafeAreaView } from "react-native-safe-area-context"
+import axios from "axios"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import { useInfiniteQuery } from "@tanstack/react-query"
+import CustomMatchLoader from "../components/customMatchLoader";
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window')
+const {width:SCREEN_WIDTH,height:SCREEN_HEIGHT} = Dimensions.get('window')
 
-const MatchScreen = ({ navigation }) => {
-	const [userLocation, setUserLocation] = useState();
+ 
 
-	const getDistance = (lat1, lon1, lat2, lon2) => {
-		const R = 6371; // Earth radius in km
-		const dLat = (lat2 - lat1) * Math.PI / 180;
-		const dLon = (lon2 - lon1) * Math.PI / 180;
-		const a =
-			Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-			Math.cos(lat1 * Math.PI / 180) *
-			Math.cos(lat2 * Math.PI / 180) *
-			Math.sin(dLon / 2) * Math.sin(dLon / 2);
-		const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-		return R * c * 1000; // Distance in meters
-	};
 
-	const getColorForDistance = (distance) => {
-		if (distance <= 1000) return "rgba(215, 168, 152, 1)"; // Green
-		if (distance <= 1500) return 'rgba(215, 168, 152, 05)'; // Yellow
-		return 'rgba(215, 168, 152, 0.2)'; // Red
-	};
+const  MatchScreen = ({navigation}) => {
+     const [userLocation, setUserLocation] = useState();
+    
+     const getDistance = (lat1, lon1, lat2, lon2) => {
+          const R = 6371; // Earth radius in km
+          const dLat = (lat2 - lat1) * Math.PI / 180;
+          const dLon = (lon2 - lon1) * Math.PI / 180;
+          const a = 
+              Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * 
+              Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+          return R * c * 1000; // Distance in meters
+      };
+      
+      
+      
+       const getColorForDistance = (distance) => {
+           if (distance <= 1000) return  "rgba(215, 168, 152, 1)"; // Green
+           if (distance <= 1500) return 'rgba(215, 168, 152, 05)'; // Yellow
+           return 'rgba(215, 168, 152, 0.2)'; // Red
+       };
 
 	const requestLocationPermission = async () => {
 		console.log("called...")
@@ -60,7 +69,7 @@ const MatchScreen = ({ navigation }) => {
 		if (activeScreen == "box") requestLocationPermission();
 	}, [activeScreen]);
 
-	const [activeScreen, setActiveScreen] = useState('side')
+     const [activeScreen,setActiveScreen] = useState('side')
 
 	const [mapRegion, setMapRegion] = useState({
 		latitude: 37.78825,
@@ -129,24 +138,25 @@ const MatchScreen = ({ navigation }) => {
 
 	}])
 
-	const renderProfile = ({ item }) => (
-		<View key={item.key} style={{ borderRadius: 20, overflow: "hidden", marginBottom: 10, height: 200, marginRight: 10 }}>
-			<LinearGradient colors={["rgba(215, 168, 152, 0)", "rgba(215, 168, 152, 1)"]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={{ height: 55, alignSelf: "flex-start", position: "absolute", zIndex: 10, bottom: 0, width: "100%" }} >
-				<View style={{ flexDirection: "column", marginLeft: 10 }}>
-					<View style={{ height: 19, flexDirection: "row", alignItems: "center" }}>
-						<Text style={{ fontSize: TEXT_SIZE.secondary, fontFamily: FAMILLY.semibold, color: "white" }}>{item.name}, </Text>
-						<Text style={{ fontSize: TEXT_SIZE.secondary, margin: 0, padding: 0, fontFamily: FAMILLY.light, color: "white", marginLeft: 10, marginTop: 3, textAlign: "center", textAlignVertical: "center" }}>{item.age} ans</Text>
-					</View>
-					<View style={{}}>
-						<Text style={{ fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.light, color: "white" }}>{item.location}</Text>
-					</View>
-				</View>
-			</LinearGradient>
-			<TouchableOpacity>
-				<Image source={item.image} resizeMode="cover" style={{ height: "100%", width: "100%" }} />
-			</TouchableOpacity>
-		</View>
-	)
+  
+     const renderProfile = ({item})=> (
+          <View key={item.key} style={{borderRadius:20,overflow:"hidden",marginBottom:10,height:200,marginRight:10}}>
+          <LinearGradient colors={["rgba(215, 168, 152, 0)","rgba(215, 168, 152, 1)"]} start={{x:0,y:0}} end={{x:0,y:1}} style={{height:55,alignSelf:"flex-start",position:"absolute",zIndex:10,bottom:0,width:"100%"}} >
+          <View style={{flexDirection:"column",marginLeft:10}}>
+          <View style={{ height:19, flexDirection:"row",alignItems:"center"}}>
+          <Text style={{fontSize:TEXT_SIZE.secondary,fontFamily:FAMILLY.semibold,color:"white"}}>{item.name}, </Text>
+          <Text style={{fontSize:TEXT_SIZE.secondary ,margin:0,padding:0,fontFamily:FAMILLY.light,color:"white",marginLeft:10,marginTop:3,textAlign:"center",textAlignVertical:"center"}}>{item.age} ans</Text>
+          </View>
+          <View style={{}}>
+          <Text style={{fontSize:TEXT_SIZE.small,fontFamily:FAMILLY.light,color:"white"}}>{item.location}</Text>
+          </View>
+          </View>         
+          </LinearGradient>
+         <TouchableOpacity> 
+          <Image source={item.image} resizeMode="cover" style={{height:"100%",width:"100%"}}/>
+          </TouchableOpacity>
+          </View>
+     )
 
 	return (
 		<View className={'py-4'} style={{ backgroundColor: "white", paddingHorizontal: 20, position: "relative", flex: 1 }}>
@@ -200,16 +210,19 @@ const MatchScreen = ({ navigation }) => {
 
 				</View>}
 
-			{activeScreen == 'grid' &&
-				<MasonryList
-					className={'py-6'}
-					keyExtractor={(item) => item.key}
-					data={profiles}
-					renderItem={renderProfile}
-					numColumns={2}
-					showsVerticalScrollIndicator={false}
-				/>
-			}
+
+          {activeScreen == 'grid' &&
+         
+               <MasonryList
+               keyExtractor={(item) => item.key}
+               data={profiles}
+               renderItem={renderProfile}
+               numColumns={2}
+               showsVerticalScrollIndicator={false}
+ 
+               />
+        
+          }
 
 			{activeScreen == "box" &&
 				<View style={{ flex: 1 }}>

@@ -81,3 +81,6 @@ export const FAMILLY = {
     semibold:  "Poppins-SemiBold",
     light:  "Poppins-Light",
 };
+
+
+export const BaseImageUrl = `https://sdlove-api.altechs.africa/storage/app/private/public/user_images`
