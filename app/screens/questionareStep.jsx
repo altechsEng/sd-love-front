@@ -983,7 +983,3 @@ export function Questionaire2({ navigation }) {
 		</View>
 	);
 }
-
-
-
- 
