@@ -18,10 +18,10 @@ const Login = ({ navigation }) => {
 	const [password, setPassword] = useState("")
 
 	useEffect(() => {
-		// let user_id = AsyncStorage.getItem('user_id');
-		// if(user_id) {
-		// 	return navigation.navigate("BottomTabsHome");
-		// }
+		let user_id = AsyncStorage.getItem('user_id');
+		if(user_id) {
+			return navigation.navigate("BottomTabsHome");
+		}
 		setTimeout(() => setErr(""), 5000)
 	}, [err])
 

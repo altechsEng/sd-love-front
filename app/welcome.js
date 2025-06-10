@@ -9,12 +9,11 @@ import {
 import { FAMILLY, COLORS, TEXT_SIZE } from "../utils/constants.js"
 import Home_overlay from "../assets/images/home_overlay.svg"
 import { useNavigation } from "@react-navigation/native";
- 
+import { useEffect } from "react";
 
 const Welcome = () => {
-     const navigation = useNavigation()
- 
-	
+
+	const navigation = useNavigation()
 
 	return (
 		<View className={'flex-1 bg-white'}>

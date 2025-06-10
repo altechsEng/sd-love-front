@@ -156,18 +156,19 @@ export const GlobalVariableProvider = ({
 
 	const [image, setImage] = useState(null)
 	const [userData, setUserData] = useState({}) // load it here once 
-const navigation = useNavigation()
+	const navigation = useNavigation()
 	const loadData = async () => {
 		try {
 			let result = await AsyncStorage.getItem("user_data")
 			if (!result) {
 				let data = await JSON.parse(result)
-	
+
 				setUserData({ ...data?.user, userInfo: data.user_info, dob: data?.user_info[0]?.qP2, loveLang: data?.user_info[0]?.qP13, leisures: data?.user_info[0]?.qP16, importantFactor: data?.user_info[0]?.qP15 })
-	
+
 				if (data?.user_image) setImage(data?.user_image)
 				else setImage(null)
-			navigation.navigate("BottomTabsHome",{screen:"HomeFeed"})
+			
+				navigation.navigate("BottomTabsHome", { screen: "HomeFeed" })
 			}
 
 		} catch (err) {
