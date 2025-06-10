@@ -6,7 +6,7 @@ import {
 	heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { HomeFeedBell, HomeFeedComment, HomeFeedGradient, HomeFeedHeart, HomeFeedSearch, HomeFeedShare, HomeFeedSmallArrowRight, HomeFeedThreeDots, LogoSmall, PostAddIcon } from "../components/vectors.js";
-import { COLORS, FAMILLY, POST_LIMIT, TEXT_SIZE } from "../../utils/constants.js";
+import { BaseImageUrl, COLORS, FAMILLY, POST_LIMIT, TEXT_SIZE } from "../../utils/constants.js";
 import { LinearGradient } from "react-native-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import axios from "axios";
@@ -16,6 +16,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime"
 import CustomPostLoader from "../components/customPostLoader.jsx";
 import CustomMatchLoader from "../components/customMatchLoader.jsx";
+import { calculateAge } from "../../utils/functions.js";
 
 dayjs.extend(relativeTime)
 
@@ -82,20 +83,27 @@ export default function HomeFeed({ navigation }) {
 	const getAllPost = async ({ pageParam = 0 }) => {
 		try {
 			isSearching.current = true;
-			let url = '/api/get-all-posts';
+			 
 			let token = await AsyncStorage.getItem("user_token");
 
 			if (token) {
-				const response = await axios.post(
-					url,
+				const postResponse = await axios.post(
+					'/api/get-all-posts',
+					{ offset: pageParam, limit: POST_LIMIT },
+					{ headers: { "Authorization": `Bearer ${token}` } }
+				);
+
+				const matchResponse = await axios.post(
+					"/api/show-matches",
 					{ offset: pageParam, limit: POST_LIMIT },
 					{ headers: { "Authorization": `Bearer ${token}` } }
 				);
 
 				isSearching.current = false;
 				return {
-					posts: response?.data?.posts,
-					nextOffset: response?.data?.next_offset,
+					matches:matchResponse?.data?.matches,
+					posts: postResponse?.data?.posts,
+					nextOffset: postResponse?.data?.next_offset,
 				};
 			}
 		} catch (err) {
@@ -112,7 +120,7 @@ export default function HomeFeed({ navigation }) {
 		isFetchingNextPage,
 		isFetching
 	} = useInfiniteQuery({
-		queryKey: ["posts"],
+		queryKey: ["posts","matches"],
 		queryFn: getAllPost,
 		getNextPageParam: (lastPage) => lastPage?.nextOffset ?? undefined,
 		initialPageParam: 0,
@@ -120,6 +128,7 @@ export default function HomeFeed({ navigation }) {
 
 	// FLATTEN ALL PAGES INTO SINGLE ARRAY
 	const allPosts = data?.pages.flatMap(page => page?.posts) ?? [];
+	const allmatches = data?.pages.flatMap(page => page?.matches) ?? [];
 
 	const loadMoreItem = () => {
 		if (hasNextPage && !isFetchingNextPage) {
@@ -134,25 +143,26 @@ export default function HomeFeed({ navigation }) {
 	};
 
 	const renderMatches = ({ item, index }) => {
-
+ 
+      let age =calculateAge(item?.match_user?.user_infos[0]?.qP2)
 		if (isFetching) {
 			return <CustomMatchLoader />
 		}
 
 		return (
-			<TouchableOpacity style={{ flex: 1, position: "relative", alignItems: "center", justifyContent: "center", marginRight: 10, borderRadius: 20, width: 130, overflow: "hidden", marginVertical: 10 }} key={item.key}>
+			<TouchableOpacity onPress={() => navigation.navigate("MatchConnection",{item})} style={{ flex: 1, position: "relative", alignItems: "center", justifyContent: "center", marginRight: 10, borderRadius: 20, width: 130, overflow: "hidden", marginVertical: 10 }}>
 				<LinearGradient colors={["rgba(215, 168, 152, 0)", "rgba(215, 168, 152, 1)"]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={{ height: 50, alignSelf: "flex-start", position: "absolute", zIndex: 10, bottom: -5, width: "100%" }} >
 					<View style={{ flexDirection: "column", marginLeft: 10 }}>
 						<View style={{ height: 19, flexDirection: "row", alignItems: "center" }}>
-							<Text style={{ fontSize: TEXT_SIZE.primary, fontFamily: FAMILLY.semibold, color: "white" }}>{item.name}</Text>
-							<Text style={{ fontSize: TEXT_SIZE.primary - 3, margin: 0, padding: 0, fontFamily: FAMILLY.light, color: "white", marginLeft: 10, marginTop: 3, textAlign: "center", textAlignVertical: "center" }}>{item.age}ans</Text>
+							<Text style={{ fontSize: TEXT_SIZE.primary, fontFamily: FAMILLY.semibold, color: "white" }}>{item?.match_user?.firstname ? `${item?.match_user?.firstname} ${item?.match_user?.lastname}` : item?.name}</Text>
+							<Text style={{ fontSize: TEXT_SIZE.primary - 3, margin: 0, padding: 0, fontFamily: FAMILLY.light, color: "white", marginLeft: 10, marginTop: 3, textAlign: "center", textAlignVertical: "center" }}>{age ||item?.age || 25}ans</Text>
 						</View>
 						<View style={{}}>
-							<Text style={{ fontSize: TEXT_SIZE.small - 2, fontFamily: FAMILLY.light, color: "white" }}>{item.location}</Text>
+							<Text style={{ fontSize: TEXT_SIZE.small - 2, fontFamily: FAMILLY.light, color: "white" }}>{item?.match_user?.city ||item?.location}</Text>
 						</View>
 					</View>
 				</LinearGradient>
-				<Image source={item?.img} resizeMode="cover" style={{ height: "100%", width: "100%" }} />
+				<Image source={item?.match_user?.user_image!==undefined ?  {uri:`${BaseImageUrl}/${item?.match_user?.user_image}`} : item?.img} resizeMode="cover" style={{ height: "100%", width: "100%" }} />
 			</TouchableOpacity>
 		)
 
@@ -255,7 +265,7 @@ export default function HomeFeed({ navigation }) {
 
 				<View style={{ paddingLeft: 20 }}>
 					<FlatList
-						data={newMatches}
+						data={allmatches.length>0 ? allmatches: newMatches}
 						renderItem={renderMatches}
 						keyExtractor={(item) => item?.key || item?.id}
 						horizontal={true}
