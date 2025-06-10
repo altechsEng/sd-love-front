@@ -19,9 +19,13 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window')
 
 const ProfileScreen = ({ navigation }) => {
 
+ 
 	const [modalVisible, setModalVisible] = useState(false)
 
-	const { isProfileMenuAcitve, activeSubCat, setActiveSubCat } = useGlobalVariable()
+	const { isProfileMenuAcitve, loadData,activeSubCat, setActiveSubCat } = useGlobalVariable()
+	useEffect(()=>{
+		loadData()
+	})
 
 	const [posts, setPosts] = useState([
 		{

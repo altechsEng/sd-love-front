@@ -1,11 +1,9 @@
 import {StyleSheet,View,TouchableOpacity,Text, Dimensions} from 'react-native';
-import React, { useEffect,useState } from 'react';
+import React, { useEffect } from 'react';
 import Animated, {
   useAnimatedStyle,
   interpolate,
   withTiming,
-  runOnJS,
-  useAnimatedReaction
 } from 'react-native-reanimated';
 import {
   FlingGestureHandler,
@@ -33,15 +31,7 @@ const Card = ({
 }) => {
   const IMAGE_WIDTH = 300;
   const IMAGE_HEIGHT = 300;
-const [isActive, setIsActive] = useState(index === currentIndex.value);
 
-useAnimatedReaction(
-  () => currentIndex.value,
-  (current) => {
-    runOnJS(setIsActive)(current === index);
-  },
-  [index]
-);
  
   const navigation = useNavigation()
   let age =calculateAge(item?.match_user?.user_infos[0]?.qP2)
@@ -54,7 +44,7 @@ useAnimatedReaction(
     const translateY2 = interpolate(
       animatedValue.value,
       [index - 1, index, index + 1],
-      [-200, 1, 200],
+      [-800, 1, 800],
     );
     const scale = interpolate(
       animatedValue.value,
@@ -85,7 +75,6 @@ useAnimatedReaction(
   return (
     <FlingGestureHandler
       key="up"
-       enabled={isActive} // Disable for inactive cards
       direction={Directions.UP}
       onHandlerStateChange={ev => {
         if (ev.nativeEvent.state === State.END) {
@@ -97,7 +86,6 @@ useAnimatedReaction(
       }}>
       <FlingGestureHandler
         key="down"
-         enabled={isActive} // Disable for inactive cards
         direction={Directions.DOWN}
         onHandlerStateChange={ev => {
           if (ev.nativeEvent.state === State.END) {
@@ -120,9 +108,9 @@ useAnimatedReaction(
                <Text style={{fontFamily:FAMILLY.semibold,color:"white",textTransform:"capitalize",fontSize:TEXT_SIZE.small}}> Los angeles - 7km </Text>
           </View>
                <View style={{flexDirection:"column",alignItems:"center",justifyContent:"space-evenly",position:"absolute",bottom:28,right:20,zIndex:11}}>
-                    <TouchableOpacity  disabled={!isActive} style={{backgroundColor:"#E55E6F",alignItems:"center",justifyContent:"center",height:50,width:50,borderRadius:50,marginTop:10}}><MatchScreenFace/></TouchableOpacity>
-                    <TouchableOpacity  disabled={!isActive} style={{backgroundColor:"#D7A898",alignItems:"center",justifyContent:"center",height:50,width:50,borderRadius:50,marginTop:10}}><MatchScreenHeartWhite/></TouchableOpacity>
-                    <TouchableOpacity  disabled={!isActive} style={{backgroundColor:"white",alignItems:"center",justifyContent:"center",height:50,width:50,borderRadius:50,marginTop:10}}><MatchScreenXmark/></TouchableOpacity>
+                    <TouchableOpacity style={{backgroundColor:"#E55E6F",alignItems:"center",justifyContent:"center",height:50,width:50,borderRadius:50,marginTop:10}}><MatchScreenFace/></TouchableOpacity>
+                    <TouchableOpacity style={{backgroundColor:"#D7A898",alignItems:"center",justifyContent:"center",height:50,width:50,borderRadius:50,marginTop:10}}><MatchScreenHeartWhite/></TouchableOpacity>
+                    <TouchableOpacity style={{backgroundColor:"white",alignItems:"center",justifyContent:"center",height:50,width:50,borderRadius:50,marginTop:10}}><MatchScreenXmark/></TouchableOpacity>
                </View>
 
                     <LinearGradient colors={["rgba(215, 168, 152, 0)","rgba(215, 168, 152, 1)"]} start={{x:0,y:0}} end={{x:0,y:1}} style={{height:55,alignSelf:"flex-start",position:"absolute",zIndex:10,bottom:-2,width:"100%",borderRadius:20}} >
@@ -136,9 +124,7 @@ useAnimatedReaction(
                     </View>
                     </View>         
                     </LinearGradient>
-                   <TouchableOpacity  onPress={isActive ? () => navigation.navigate("MatchConnection", {item}) : undefined}
-          disabled={!isActive}
-          activeOpacity={isActive ? 0.7 : 1}> 
+                   <TouchableOpacity onPress={()=>navigation.navigate("MatchConnection",{item})}> 
                     
                       <Animated.Image
           source={{uri:`${BaseImageUrl}/${item?.match_user?.user_image}`}|| item?.image}

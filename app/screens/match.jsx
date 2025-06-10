@@ -20,6 +20,7 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { calculateAge } from "../../utils/functions";
+import VerticalCardCarousel from "../components/verticalCardCarousel";
 
 const {width:SCREEN_WIDTH,height:SCREEN_HEIGHT} = Dimensions.get('window')
 
@@ -85,7 +86,7 @@ const  MatchScreen = ({navigation}) => {
      
          // FLATTEN ALL PAGES INTO SINGLE ARRAY
          const allMatches = data?.pages.flatMap(page => {
-            console.log(page)
+             
             return page?.matches
          }) ?? [];
      
@@ -124,7 +125,7 @@ const  MatchScreen = ({navigation}) => {
        };
 
      const requestLocationPermission = async () => {
-         console.log("called...")
+       
           let {status} = await Location.requestForegroundPermissionsAsync()
           if(status !== 'granted'){
                console.log("permission denied")  
@@ -145,10 +146,10 @@ const  MatchScreen = ({navigation}) => {
     };
 
 useEffect(() => {
-    if(activeScreen == "box")  requestLocationPermission();
+    if(activeScreen === "box")  requestLocationPermission();
  }, [activeScreen]);
 
-     const [activeScreen,setActiveScreen] = useState('grid')
+     const [activeScreen,setActiveScreen] = useState('side')
 
      const [mapRegion, setMapRegion] = useState({
          latitude: 37.78825,
@@ -221,7 +222,7 @@ useEffect(() => {
 
 
      const renderProfile = ({item})=> {
-        console.log(calculateAge(item?.match_user?.user_infos[0]?.qP2),"item...", item?.match_user?.user_infos[0]?.qP2)
+ 
         let age =calculateAge(item?.match_user?.user_infos[0]?.qP2)
         if(isFetching) {
             return  <View   style={{marginTop:10,borderRadius:20,overflow:"hidden",backgroundColor:COLORS.light,marginBottom:10,height:200,marginRight:10,flex:1}}>
@@ -244,7 +245,7 @@ useEffect(() => {
           <LinearGradient colors={["rgba(215, 168, 152, 0)","rgba(215, 168, 152, 1)"]} start={{x:0,y:0}} end={{x:0,y:1}} style={{height:55,alignSelf:"flex-start",position:"absolute",zIndex:10,bottom:0,width:"100%"}} >
           <View style={{flexDirection:"column",marginLeft:10}}>
           <View style={{ height:19, flexDirection:"row",alignItems:"center"}}>
-          <Text style={{fontSize:TEXT_SIZE.secondary,fontFamily:FAMILLY.semibold,color:"white"}}>{`${item?.match_user?.firstname} ${item?.match_user?.lastname}` || item?.name}, </Text>
+          <Text style={{fontSize:TEXT_SIZE.secondary,fontFamily:FAMILLY.semibold,color:"white"}}>{item?.match_user?.firstname? `${item?.match_user?.firstname} ${item?.match_user?.lastname}` : item?.name}, </Text>
           <Text style={{fontSize:TEXT_SIZE.secondary ,margin:0,padding:0,fontFamily:FAMILLY.light,color:"white",lineHeight:19,marginLeft:10,textAlign:"center",textAlignVertical:"center"}}>{ age ||item?.age || 25} ans</Text>
           </View>
           <View style={{}}>
@@ -253,7 +254,7 @@ useEffect(() => {
           </View>         
           </LinearGradient>
          <TouchableOpacity onPress={()=>navigation.navigate("MatchConnection",{item})}> 
-          <Image source={ {uri:`${BaseImageUrl}/${item?.match_user?.user_image}`} ||item?.image} resizeMode="cover" style={{height:"100%",width:"100%"}}/>
+          <Image source={ item?.match_user?.user_image ?  {uri:`${BaseImageUrl}/${item?.match_user?.user_image}`} :item?.image} resizeMode="cover" style={{height:"100%",width:"100%"}}/>
           </TouchableOpacity>
           </View>
      
@@ -281,41 +282,42 @@ useEffect(() => {
           
 
           {activeScreen == 'side' && 
-          <View style={{marginVertical:20,alignItems:"center",flexDirection:"column"}} >
-          <View style={{position:"relative",zIndex:10,height:SCREEN_HEIGHT*0.78,width:SCREEN_WIDTH*0.9,borderRadius:20,alignItems:"center",justifyContent:"center",overflow:"hidden"}}>
-          <View style={{backgroundColor:"rgba(215, 168, 152, 0.5)",position:"absolute",top:13,left:10,zIndex:11,borderRadius:10,paddingVertical:5,paddingHorizontal:10}}> 
-               <Text style={{fontFamily:FAMILLY.semibold,color:"white",textTransform:"capitalize",fontSize:TEXT_SIZE.small}}> Los angeles - 7km </Text>
-          </View>
-               <View style={{flexDirection:"column",alignItems:"center",justifyContent:"space-evenly",position:"absolute",bottom:28,right:20,zIndex:11}}>
-                    <TouchableOpacity style={{backgroundColor:"#E55E6F",alignItems:"center",justifyContent:"center",height:50,width:50,borderRadius:50,marginTop:10}}><MatchScreenFace/></TouchableOpacity>
-                    <TouchableOpacity style={{backgroundColor:"#D7A898",alignItems:"center",justifyContent:"center",height:50,width:50,borderRadius:50,marginTop:10}}><MatchScreenHeartWhite/></TouchableOpacity>
-                    <TouchableOpacity style={{backgroundColor:"white",alignItems:"center",justifyContent:"center",height:50,width:50,borderRadius:50,marginTop:10}}><MatchScreenXmark/></TouchableOpacity>
-               </View>
+           <View style={{marginVertical:20,alignItems:"center",flexDirection:"column"}} >
+           {/* <View style={{position:"relative",zIndex:10,height:SCREEN_HEIGHT*0.78,width:SCREEN_WIDTH*0.9,borderRadius:20,alignItems:"center",justifyContent:"center",overflow:"hidden"}}>
+        //   <View style={{backgroundColor:"rgba(215, 168, 152, 0.5)",position:"absolute",top:13,left:10,zIndex:11,borderRadius:10,paddingVertical:5,paddingHorizontal:10}}> 
+        //        <Text style={{fontFamily:FAMILLY.semibold,color:"white",textTransform:"capitalize",fontSize:TEXT_SIZE.small}}> Los angeles - 7km </Text>
+        //   </View>
+        //        <View style={{flexDirection:"column",alignItems:"center",justifyContent:"space-evenly",position:"absolute",bottom:28,right:20,zIndex:11}}>
+        //             <TouchableOpacity style={{backgroundColor:"#E55E6F",alignItems:"center",justifyContent:"center",height:50,width:50,borderRadius:50,marginTop:10}}><MatchScreenFace/></TouchableOpacity>
+        //             <TouchableOpacity style={{backgroundColor:"#D7A898",alignItems:"center",justifyContent:"center",height:50,width:50,borderRadius:50,marginTop:10}}><MatchScreenHeartWhite/></TouchableOpacity>
+        //             <TouchableOpacity style={{backgroundColor:"white",alignItems:"center",justifyContent:"center",height:50,width:50,borderRadius:50,marginTop:10}}><MatchScreenXmark/></TouchableOpacity>
+        //        </View>
 
-               <LinearGradient colors={["rgba(215, 168, 152, 0)","rgba(215, 168, 152, 1)"]} start={{x:0,y:0}} end={{x:0,y:1}} style={{height:80,alignSelf:"flex-start",position:"absolute",zIndex:10,bottom:-5,width:"100%"}} >
-               <View style={{flexDirection:"column",marginLeft:10}}>
-               <View style={{ height:30, flexDirection:"row",alignItems:"center"}}>
-               <Text style={{fontSize:TEXT_SIZE.title,fontFamily:FAMILLY.semibold,color:"white"}}>Maggy, </Text>
-               <Text style={{fontSize:TEXT_SIZE.title ,margin:0,padding:0,fontFamily:FAMILLY.light,color:"white",marginLeft:10,marginTop:3,textAlign:"center",textAlignVertical:"center"}}>24 ans</Text>
-               </View>
-               <View style={{}}>
-               <Text style={{fontSize:TEXT_SIZE.secondary,fontFamily:FAMILLY.light,color:"white"}}>Revelation Church, Los Angeles</Text>
-               </View>
-               </View>         
-               </LinearGradient>
+        //        <LinearGradient colors={["rgba(215, 168, 152, 0)","rgba(215, 168, 152, 1)"]} start={{x:0,y:0}} end={{x:0,y:1}} style={{height:80,alignSelf:"flex-start",position:"absolute",zIndex:10,bottom:-5,width:"100%"}} >
+        //        <View style={{flexDirection:"column",marginLeft:10}}>
+        //        <View style={{ height:30, flexDirection:"row",alignItems:"center"}}>
+        //        <Text style={{fontSize:TEXT_SIZE.title,fontFamily:FAMILLY.semibold,color:"white"}}>Maggy, </Text>
+        //        <Text style={{fontSize:TEXT_SIZE.title ,margin:0,padding:0,fontFamily:FAMILLY.light,color:"white",marginLeft:10,marginTop:3,textAlign:"center",textAlignVertical:"center"}}>24 ans</Text>
+        //        </View>
+        //        <View style={{}}>
+        //        <Text style={{fontSize:TEXT_SIZE.secondary,fontFamily:FAMILLY.light,color:"white"}}>Revelation Church, Los Angeles</Text>
+        //        </View>
+        //        </View>         
+        //        </LinearGradient>
 
 
 
-               <TouchableOpacity onPress={() => {}} style={{width:"100%",height:"100%"}}><Image source={require("../../assets/images/test_match1.jpg")} resizeMode="cover" style={{height:"100%",width:"100%",zIndex:9}}/></TouchableOpacity>
+        //        <TouchableOpacity onPress={() => {}} style={{width:"100%",height:"100%"}}><Image source={require("../../assets/images/test_match1.jpg")} resizeMode="cover" style={{height:"100%",width:"100%",zIndex:9}}/></TouchableOpacity>
           
-          </View>
+           </View>
 
-          <View style={{alignItems:"center",justifyContent:"center"}}>
-          <View style={{position:"absolute",margin:"auto",zIndex:9,bottom:-15,backgroundColor:"#EAD2CA",height:50,width:SCREEN_WIDTH*0.85,borderRadius:20}}></View>
-          <View style={{position:"absolute",margin:"auto",zIndex:8,bottom:-25,backgroundColor:"#F0E8E5",height:50,width:SCREEN_WIDTH*0.75,borderRadius:20}}></View>
-          </View>
-          {/* <CardContainer data={allMatches} maxVisibleItems={5} /> */}
-          </View>
+           <View style={{alignItems:"center",justifyContent:"center"}}>
+        //   <View style={{position:"absolute",margin:"auto",zIndex:9,bottom:-15,backgroundColor:"#EAD2CA",height:50,width:SCREEN_WIDTH*0.85,borderRadius:20}}></View>
+        //   <View style={{position:"absolute",margin:"auto",zIndex:8,bottom:-25,backgroundColor:"#F0E8E5",height:50,width:SCREEN_WIDTH*0.75,borderRadius:20}}></View>
+           </View> */}
+         {/* <VerticalCardCarousel/> */}
+           <CardContainer data={allMatches} isLoading={isFetching} maxVisibleItems={5} /> 
+           </View>
           }
 
 
