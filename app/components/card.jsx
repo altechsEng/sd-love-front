@@ -34,7 +34,7 @@ const Card = ({
 
  
   const navigation = useNavigation()
-  let age =calculateAge(item?.match_user?.user_infos[0]?.qP2)
+  let age =calculateAge(item?.match_user?.user_infos?.qP2)
   const animatedStyle = useAnimatedStyle(() => {
     const translateY = interpolate(
       animatedValue.value,
@@ -98,7 +98,7 @@ const Card = ({
           <Animated.View   style={[
             styles.image,
             {
-              zIndex: dataLength - index,
+             zIndex: dataLength - index,
              height:SCREEN_HEIGHT*0.78,width:SCREEN_WIDTH*0.9, borderRadius:20
             },
             animatedStyle,

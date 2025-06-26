@@ -24,9 +24,9 @@ dayjs.extend(relativeTime)
      const {item} = useRoute().params
      const [interest,setInterest] = useState(["Travel","Music","Fishing","Gym","Bible","Dance"])
      useEffect(()=> {
-          let data = JSON.parse(item?.match_user?.user_infos[0]?.qP16)
+          let data = JSON.parse(item?.match_user?.user_infos?.qP16)
           setInterest(data)
-          console.log(item?.match_user?.firstname,"poppp---")
+           
           
           
      },[])
@@ -219,7 +219,7 @@ dayjs.extend(relativeTime)
           <View style={{marginRight:20,backgroundColor:COLORS.light,height:30,width:30,alignItems:"center",borderRadius:20,justifyContent:"center"}}><MatchProfileSexIcon/></View>
            <View>
                <CustomRegularPoppingText style={{lineHieght:8}} color={null} fontSize={TEXT_SIZE.small} value="Gender"/>
-               <CustomRegularPoppingText style={{lineHeight:15}} color={null} fontSize={TEXT_SIZE.secondary+1} value={item?.match_user?.user_infos[0]?.qP1 || "Not specified"}/>
+               <CustomRegularPoppingText style={{lineHeight:15}} color={null} fontSize={TEXT_SIZE.secondary+1} value={item?.match_user?.user_infos?.qP1 || "Not specified"}/>
            </View>
      </View>
 
@@ -227,7 +227,7 @@ dayjs.extend(relativeTime)
           <View style={{marginRight:20,backgroundColor:COLORS.light,height:30,width:30,alignItems:"center",borderRadius:20,justifyContent:"center"}}><MatchProfileBirthDay/></View>
            <View>
                <CustomRegularPoppingText style={{lineHieght:8}} color={null} fontSize={TEXT_SIZE.small} value="Birthday"/>
-               <CustomRegularPoppingText style={{lineHeight:15}} color={null} fontSize={TEXT_SIZE.secondary+1} value={dayjs(item?.match_user?.user_infos[0]?.qP2).format("DD MMMM YYYY") || "Not specified"}/>
+               <CustomRegularPoppingText style={{lineHeight:15}} color={null} fontSize={TEXT_SIZE.secondary+1} value={dayjs(item?.match_user?.user_infos?.qP2).format("DD MMMM YYYY") || "Not specified"}/>
            </View>
      </View>
 
@@ -260,7 +260,7 @@ dayjs.extend(relativeTime)
           <View style={{marginRight:20,backgroundColor:COLORS.light,height:30,width:30,alignItems:"center",borderRadius:20,justifyContent:"center"}}><MatchProfileFaithIcon1/></View>
            <View>
                <CustomRegularPoppingText style={{lineHieght:8}} color={null} fontSize={TEXT_SIZE.small} value="Gave my life to God"/>
-               <CustomRegularPoppingText style={{lineHeight:15}} color={null} fontSize={TEXT_SIZE.secondary+1} value={item?.match_user?.user_infos[0]?.qS2 || "Not specified"}/>
+               <CustomRegularPoppingText style={{lineHeight:15}} color={null} fontSize={TEXT_SIZE.secondary+1} value={item?.match_user?.user_infos?.qS2 || "Not specified"}/>
            </View>
      </View>
 
@@ -291,7 +291,7 @@ dayjs.extend(relativeTime)
      <View style={{flexDirection:"row",alignItems:"center",marginBottom:10}}>
           <View style={{marginRight:20,backgroundColor:COLORS.light,height:30,width:30,alignItems:"center",borderRadius:20,justifyContent:"center"}}><MatchProfileEducation/></View>
            <View>
-               <CustomRegularPoppingText style={{lineHieght:8}} color={null} fontSize={TEXT_SIZE.small} value={item?.match_user?.user_infos[0]?.qP11 || "Not specified"}/>
+               <CustomRegularPoppingText style={{lineHieght:8}} color={null} fontSize={TEXT_SIZE.small} value={item?.match_user?.user_infos?.qP11 || "Not specified"}/>
                <CustomRegularPoppingText style={{lineHeight:15}} color={null} fontSize={TEXT_SIZE.secondary+1} value="Lorem Ipsum university"/>
            </View>
      </View>

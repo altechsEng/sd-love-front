@@ -223,7 +223,7 @@ useEffect(() => {
 
      const renderProfile = ({item})=> {
  
-        let age =calculateAge(item?.match_user?.user_infos[0]?.qP2)
+        let age =calculateAge(item?.match_user?.user_infos?.qP2)
         if(isFetching) {
             return  <View   style={{marginTop:10,borderRadius:20,overflow:"hidden",backgroundColor:COLORS.light,marginBottom:10,height:200,marginRight:10,flex:1}}>
                                         <LinearGradient colors={["rgba(215, 168, 152, 0)","white"]} start={{x:0,y:0}} end={{x:0,y:1}} style={{height:50,alignSelf:"flex-start",position:"absolute",zIndex:10,bottom:-5,width:"100%"}} >

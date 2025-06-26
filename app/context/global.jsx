@@ -165,7 +165,7 @@ const loadData = async() => {
                    let data = await JSON.parse(result)
           
          setUserData({...data?.user,dob:data?.user_info[0]?.qP2})
-        
+       
       
          if(data?.user_image) setImage(data?.user_image)
          else setImage(null)

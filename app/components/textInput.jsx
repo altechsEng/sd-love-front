@@ -3,7 +3,7 @@ import { View, TouchableOpacity, TextInput } from "react-native"
 import { PostScreenEmojiPicker, TextInputAddress, TextInputCity, TextInputEmail, TextInputEye, TextInputLock, TextInputPerson, TextInputPhone, TextInputArrowDownCircle, TextInputSearch, AccountSecurityScreenKey } from "./vectors"
 import { FAMILLY, TEXT_SIZE } from "../../utils/constants"
 
-export default function CustomTextInput({ name, secure, directState, placeHolder, setState, state, LeftIcon, RightIcon, LeftIconStyles, RightIconStyles, rightIconAction }) {
+export default function CustomTextInput({ name,ref, secure, directState, placeHolder, setState, state, LeftIcon, RightIcon, LeftIconStyles, RightIconStyles, rightIconAction }) {
 
   return (< >
 
@@ -27,6 +27,8 @@ export default function CustomTextInput({ name, secure, directState, placeHolder
         marginTop: 3,
         width: "100%"
       }}
+      
+      ref={ref}
       placeholderTextColor="#818181"
       placeholder={placeHolder}
       onChangeText={(text) => {

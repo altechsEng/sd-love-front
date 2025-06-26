@@ -99,6 +99,7 @@ export default function HomeFeed({ navigation }) {
 					{ headers: { "Authorization": `Bearer ${token}` } }
 				);
 
+				 
 				isSearching.current = false;
 				return {
 					matches:matchResponse?.data?.matches,
@@ -144,7 +145,7 @@ export default function HomeFeed({ navigation }) {
 
 	const renderMatches = ({ item, index }) => {
  
-      let age =calculateAge(item?.match_user?.user_infos[0]?.qP2)
+      let age =calculateAge(item?.match_user?.user_infos?.qP2)
 		if (isFetching) {
 			return <CustomMatchLoader />
 		}
@@ -154,7 +155,7 @@ export default function HomeFeed({ navigation }) {
 				<LinearGradient colors={["rgba(215, 168, 152, 0)", "rgba(215, 168, 152, 1)"]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={{ height: 50, alignSelf: "flex-start", position: "absolute", zIndex: 10, bottom: -5, width: "100%" }} >
 					<View style={{ flexDirection: "column", marginLeft: 10 }}>
 						<View style={{ height: 19, flexDirection: "row", alignItems: "center" }}>
-							<Text style={{ fontSize: TEXT_SIZE.primary, fontFamily: FAMILLY.semibold, color: "white" }}>{item?.match_user?.firstname ? `${item?.match_user?.firstname} ${item?.match_user?.lastname}` : item?.name}</Text>
+							<Text style={{ fontSize: TEXT_SIZE.primary, fontFamily: FAMILLY.semibold, color: "white" }}>{item?.match_user?.firstname ? `${item?.match_user?.firstname}...` : item?.name}</Text>
 							<Text style={{ fontSize: TEXT_SIZE.primary - 3, margin: 0, padding: 0, fontFamily: FAMILLY.light, color: "white", marginLeft: 10, marginTop: 3, textAlign: "center", textAlignVertical: "center" }}>{age ||item?.age || 25}ans</Text>
 						</View>
 						<View style={{}}>
@@ -170,15 +171,17 @@ export default function HomeFeed({ navigation }) {
 
 	const renderPosts = ({ item, index }) => {
 
+		 
 		if (isFetching) {
 			return <CustomPostLoader />
 		}
 
+		 
 		return (
 			<View key={item?.key} style={{ flex: 1, marginVertical: 10, marginRight: 20, width: wp(80), flexDirection: "column" }}>
 				<View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
 					<View style={{ flex: 2, flexDirection: "row" }}>
-						<TouchableOpacity style={{ borderRadius: 50, height: 50, width: 50, overflow: "hidden", alignItems: "center" }}><Image source={item?.img || require("../../assets/images/test_person1.png")} resizeMode="cover" style={{ height: "100%", width: "100%" }} /></TouchableOpacity>
+						<TouchableOpacity style={{ borderRadius: 50, height: 50, width: 50, overflow: "hidden", alignItems: "center" }}><Image source={item?.user?.user_image || require("../../assets/images/test_person1.png")} resizeMode="cover" style={{ height: "100%", width: "100%" }} /></TouchableOpacity>
 						<View style={{ flexDirection: "column", justifyContent: "center", marginLeft: 10 }}>
 							<Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.secondary - 2, fontFamily: FAMILLY.semibold }}>{item?.user?.firstname || "Johan mark"}</Text>
 							<Text style={{ color: COLORS.gray, fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.light }}>{dayjs(item?.created_at).fromNow() || "2h ago"}</Text>
