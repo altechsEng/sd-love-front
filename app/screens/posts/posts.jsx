@@ -1,184 +1,112 @@
  
-
-
-
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
-  Image,
-  Dimensions,
+  SafeAreaView,
+  ScrollView,
   FlatList,
-  KeyboardAvoidingView,
-  Platform,
-  ToastAndroid,
+  Image,
+  TouchableOpacity,
   StyleSheet,
+  TextInput,
+  Dimensions,
+  ToastAndroid,
   ActivityIndicator
 } from 'react-native';
-import { useRoute } from '@react-navigation/native';
-import { COLORS, FAMILLY, POST_LIMIT, TEXT_SIZE } from "../../../utils/constants";
-import { 
-  PostScreenSendComment, 
-  HomeFeedBell, 
-  PostScreenImagePicker, 
-  PostScreenBigComment, 
-  PostScreenBookMark, 
-  HomeFeedComment, 
-  PostScreenDots, 
-  HomeFeedGradient, 
-  HomeFeedHeart, 
-  HomeFeedSearch,
-  HomeFeedShare,
-  HomeFeedSmallArrowRight,
-  HomeFeedThreeDots,
-  LogoSmall, 
-  PostScreenMiniHeart 
-} from "../../components/vectors.js";
+import dayjs from 'dayjs';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { CustomRegularPoppingText, CustomSemiBoldPoppingText } from '../../../app/components/text';
-import CustomTextInput from "../../../app/components/textInput";
-import { ScrollView } from "react-native-gesture-handler";
-import MessageSender from '../../../app/components/messageSender.jsx';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import { useRoute } from '@react-navigation/native';
+import { useGlobalVariable } from '../../context/global';
+import { COLORS,FAMILLY,POST_LIMIT,TEXT_SIZE } from '../../../utils/constants';
+import { HomeFeedComment, HomeFeedHeart, HomeFeedShare, PostScreenBigComment, PostScreenBookMark, PostScreenDots, PostScreenMiniHeart } from '../../components/vectors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import { useGlobalVariable } from '../../context/global.jsx';
+import { CustomRegularPoppingText, CustomSemiBoldPoppingText } from '../../components/text';
+import MessageSender from '../../components/messageSender';
 import { useInfiniteQuery } from '@tanstack/react-query';
- 
 
 dayjs.extend(relativeTime);
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-
-const PostScreen = ({ navigation }) => {
-   const [mainItem, setMainItem] = useState(null);
-   const { item } = useRoute().params;
-   const [comment, setComment] = useState("");
-   const [showComment, setShowComment] = useState(false);
-    
-   const defaultComments = [
-      {
-        id: "post122-98",
-        img: require("../../../assets/images/test_match1.jpg"),
-        comment: "Lorem ipsum dolor sit amet consectetur. Commodo sapien metus et a vitae a nec. Enim blandit mauris habitasse mattis justo. Tellus lorem massa auctor.",
-        name: "Maggy McLeen",
-        time: "23h ago",
-        likes: 23,
-      },
-      {
-        id: "post102-35",
-        img: require("../../../assets/images/test_match1.jpg"),
-        comment: "Lorem ipsum dolor sit amet consectetur. Commodo sapien metus et a vitae a nec. Enim blandit mauris habitasse mattis justo.",
-        name: "Maggy McLeen",
-        time: "23h ago",
-        likes: 15,
-        replies: [
-          {
-            id: "post102rep2",
-            img: require("../../../assets/images/test_match1.jpg"),
-            comment: "Lorem ipsum dolor sit amet consectetur. Commodo sapien metus et a vitae a nec. Enim blandit mauris habitasse mattis justo.",
-            name: "Maggy McLeen",
-            time: "23h ago",
-            likes: 5,
-          }
-        ]
-      },
-    ]
-   const [comments, setComments] = useState([]);
-   const [likedComments, setLikedComments] = useState({});
-   const [replyingTo, setReplyingTo] = useState(null);
-   const scrollViewRef = useRef();
-   const flatListRef = useRef();
-   const messageInputRef = useRef();
-   const {image,userData} = useGlobalVariable()
-   const [replyingCom,setReplyingCom] = useState(null)
- 
- 
-   useEffect(() => {
-     setMainItem(item);
-     getAllComments()     
-   }, [item]);
-
-
-
-       const isSearching = useRef(false);
-     const getAllComments = async ({ pageParam = 0 }) => {
-          try {
-               isSearching.current = true;
-                
-               let token = await AsyncStorage.getItem("user_token");
-
-             
-               if (token) {
-                    const response = await axios.post(
-                         '/api/get-comments',
-                         { offset: pageParam, limit: POST_LIMIT ,postId:mainItem?.id },
-                         { headers: { "Authorization": `Bearer ${token}` } }
-                    );
-  
-                 
-  
-                    isSearching.current = false;
-                  console.log(response.data,"poping-----")
-                    return {
-                         comments:response?.data?.comments,
-                         nextOffset: response?.data?.next_offset,
-                    };
-               }
-          } catch (err) {
-               console.log(err.message, "in getallComments", Object.keys(err), err?.request);
-               isSearching.current = false;
-               throw err; // Important for React Query error handling
-          }
-     };
-  
-     const {
-          data,
-          fetchNextPage,
-          hasNextPage,
-          isFetchingNextPage,
-          isFetching
-     } = useInfiniteQuery({
-          queryKey: ["comments"],
-          queryFn: getAllComments,
-          getNextPageParam: (lastPage) => lastPage?.nextOffset ?? undefined,
-          initialPageParam: 0,
-     });
-  
+const BlogPostScreen = () => {
 
      
-     // FLATTEN ALL PAGES INTO SINGLE ARRAY
-     const allComments = data?.pages.flatMap(page => page?.comments) ?? [];
-     useEffect(()=>{
-    
-      setComment(allComments)
-     },[data])
+     const { item:mainItem } = useRoute().params;
+   
+     const [comment, setComment] = useState("");
+     const [showComment, setShowComment] = useState(false);
+      
+     const defaultComments = [
+        {
+          id: "post122-98",
+          img: require("../../../assets/images/test_match1.jpg"),
+          comment: "Lorem ipsum dolor sit amet consectetur. Commodo sapien metus et a vitae a nec. Enim blandit mauris habitasse mattis justo. Tellus lorem massa auctor.",
+          name: "Maggy McLeen",
+          time: "23h ago",
+          likes: 23,
+        },
+        {
+          id: "post102-35",
+          img: require("../../../assets/images/test_match1.jpg"),
+          comment: "Lorem ipsum dolor sit amet consectetur. Commodo sapien metus et a vitae a nec. Enim blandit mauris habitasse mattis justo.",
+          name: "Maggy McLeen",
+          time: "23h ago",
+          likes: 15,
+          replies: [
+            {
+              id: "post102rep2",
+              img: require("../../../assets/images/test_match1.jpg"),
+              comment: "Lorem ipsum dolor sit amet consectetur. Commodo sapien metus et a vitae a nec. Enim blandit mauris habitasse mattis justo.",
+              name: "Maggy McLeen",
+              time: "23h ago",
+              likes: 5,
+            }
+          ]
+        },
+      ]
+     
+     const [likedComments, setLikedComments] = useState({});
+     const [replyingTo, setReplyingTo] = useState(null);
+     
+     const flatListRef = useRef();
+     const messageInputRef = useRef();
+     const {image,userData} = useGlobalVariable()
+     const [replyingCom,setReplyingCom] = useState(null)
+     
+  // Sample post data
+  const [post, setPost] = useState({
+    id: '1',
+    user: {
+      id: '1',
+      name: 'John Doe',
+      avatar: 'https://randomuser.me/api/portraits/men/1.jpg'
+    },
+    content: 'This is a sample blog post content. It can be multiple lines long and contain various information about the topic being discussed.',
+    image: 'https://picsum.photos/800/600',
+    likes: 42,
+    comments: 8,
+    shares: 3,
+    createdAt: new Date(Date.now() - 3600000 * 5) // 5 hours ago
+  });
 
-    
-  
-     const loadMoreItem = () => {
-          if (hasNextPage && !isFetchingNextPage) {
-               fetchNextPage();
-          }
-     };
-  
-     const renderLoader = () => {
- 
-          return isFetchingNextPage ? (
-               <ActivityIndicator size="large" color={COLORS.blue} />
-          ) : null;
-     };
- 
+  // Sample comments data
+  const [comments, setComments] = useState([]);
+
+  const [newComment, setNewComment] = useState('');
+  const [isPostLiked, setIsPostLiked] = useState(false);
+  const scrollViewRef = useRef();
+
 
  
 
- 
-
+  // Handle post like
+  const handlePostLike = () => {
+    setIsPostLiked(!isPostLiked);
+  };
 
 const handleLikePost = async() => {
   try {
@@ -199,32 +127,19 @@ const handleLikePost = async() => {
     console.log(err,"error in handlelike post try cathc")
   }
 }
- 
 
- 
- 
-  const handleBookMark = async (postId) => {
-    try {
-        let token = await AsyncStorage.getItem("user_token");
-      if (token) {
-        await axios.post('/api/save-post', { postId }, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-          }
-        }).then((res) => {
-          if (res.data.status === 200) {
-            ToastAndroid.show("Post saved successfully", 1000);
-          }
-        }).catch((err) => {
-          console.log(err, "error in catch");
-        });
-      }
-    } catch (err) {
-      console.log(err, "the error");
-    }
-  };
 
-  const handleLikeComment = (commentId) => {
+  const handleLikeComment = async(commentId) => {
+
+    let token = await AsyncStorage.getItem("user_token")
+
+    axios.post(`/api/new-comment-like/${mainItem?.id}/${commentId}`,{type:"regular",target:"comment",postId:mainItem?.id,commentId,targetId:commentId},{headers:{  "Authorization": `Bearer ${token}`}}).then((res) => {
+      console.log(res.data,"in like comment---")
+     if(res.data?.status == 400){
+       ToastAndroid.show(res.data.message,1000)
+     } 
+
+    if(res.data?.status == 200) {
     setLikedComments(prev => ({
       ...prev,
       [commentId]: !prev[commentId]
@@ -251,6 +166,13 @@ const handleLikePost = async() => {
       }
       return comment;
     }));
+
+     }
+
+    }).catch(err => {
+      console.log(err?.request,err,"in handle like comment")
+    })
+
   };
 
  
@@ -260,105 +182,211 @@ const handleLikePost = async() => {
     messageInputRef.current.focus();
   };
 
-  const handleSendComment = async() => {
-    try {
-
-     let token = await AsyncStorage.getItem("user_token");
-     let postId = mainItem?.id
-     if (comment.trim() === "") return;
-    
-    const newComment = {
-      id: `comment-${Date.now()}`,
-      img: {uri:image }|| require("../../../assets/images/test_person1.png"),
-      comment: comment,
-      name: userData?.firstname,
-      time: new Date(),
-      likes: 0
-    };
-
-  
-    
-    if (replyingTo) {
-
-      console.log(replyingCom,"pppppppppppppppppppppppppppp")
+   const handleSendComment = async() => {
+     try {
  
-           if(token) {
-     await axios.post("/api/new-child-comment",{postId,content:newComment?.comment,content_type:"string",commentId:replyingCom?.id},{
-                    headers: {
-            "Authorization": `Bearer ${token}`,
-          }
-      }).then(res=>{
-          console.log(res.data,"child......comment")
-                // Add as a reply
-      setComments(prev => prev.map(c => {
-        if (c.id === replyingTo.id) {
-          return {
-            ...c,
-            replies: [...(c.replies || []), newComment]
-          };
-        }
-        // Check if it's a reply to a reply
-        if (c.replies && c.replies.some(r => r.id === replyingTo.id)) {
-          return {
-            ...c,
-            replies: c.replies.map(r => {
-              if (r.id === replyingTo.id) {
-                return {
-                  ...r,
-                  replies: [...(r.replies || []), newComment]
-                };
-              }
-              return r;
-            })
-          };
-        }
-        return c;
-      }));
-      setReplyingTo(null);
-
-      }).catch(err => [
-          console.log(err,"in catch handlesend coment")
-      ])
-     }
-
-    } else {
-
+      let token = await AsyncStorage.getItem("user_token");
+      let postId = mainItem?.id
+      if (comment.trim() === "") return;
      
-
+     const newComment = {
+       id: `comment-${Date.now()}`,
+       img: {uri:image }|| require("../../../assets/images/test_person1.png"),
+       comment: comment,
+       name: userData?.firstname,
+       time: new Date(),
+       likes: 0
+     };
+ 
+   
      
-     if(token) {
-     await axios.post("/api/new-comment",{postId,content:newComment?.comment,content_type:"string"},{
-                    headers: {
-            "Authorization": `Bearer ${token}`,
-          }
-      }).then(res=>{
-          console.log(res.data,"......")
-       // Add as a new top-level comment
-      setComments(prev => [{...newComment,id:res.data?.comment?.id}, ...prev]);
-      }).catch(err => [
-          console.log(err,"in catch handlesend coment")
-      ])
-     }
-    }
-    
-      setComment("");
-    
-    if (flatListRef.current) {
-      flatListRef.current.scrollToOffset({ offset: 0, animated: true });
-    }
-    } catch(err) {
+     if (replyingTo) {
+ 
+       console.log(replyingCom,"pppppppppppppppppppppppppppp")
+  
+            if(token) {
+      await axios.post("/api/new-child-comment",{postId,content:newComment?.comment,content_type:"string",commentId:replyingCom?.id},{
+                     headers: {
+             "Authorization": `Bearer ${token}`,
+           }
+       }).then(res=>{
+           console.log(res.data,"child......comment")
+                 // Add as a reply
+       setComments(prev => prev.map(c => {
+         if (c.id === replyingTo.id) {
+           return {
+             ...c,
+             replies: [...(c.replies || []), newComment]
+           };
+         }
+         // Check if it's a reply to a reply
+         if (c.replies && c.replies.some(r => r.id === replyingTo.id)) {
+           return {
+             ...c,
+             replies: c.replies.map(r => {
+               if (r.id === replyingTo.id) {
+                 return {
+                   ...r,
+                   replies: [...(r.replies || []), newComment]
+                 };
+               }
+               return r;
+             })
+           };
+         }
+         return c;
+       }));
+       setReplyingTo(null);
+ 
+       }).catch(err => [
+           console.log(err,"in catch handlesend coment")
+       ])
+      }
+ 
+     } else {
+ 
       
-      console.log(err,"in postscreen handle send comment.")
-    
+ 
+      
+      if(token) {
+      await axios.post("/api/new-comment",{postId,content:newComment?.comment,content_type:"string"},{
+                     headers: {
+             "Authorization": `Bearer ${token}`,
+           }
+       }).then(res=>{
+           console.log(res.data,"......")
+        // Add as a new top-level comment
+       setComments(prev => [{...newComment,id:res.data?.comment?.id}, ...prev]);
+       }).catch(err => [
+           console.log(err,"in catch handlesend coment")
+       ])
+      }
+     }
+     
+       setComment("");
+     
+    //  if (flatListRef.current) {
+    //    flatListRef.current.scrollToOffset({ offset: 0, animated: true });
+    //  }
+     } catch(err) {
+       
+       console.log(err,"in postscreen handle send comment.")
+     
+     }
+   };
+
+  // Handle share
+  const handleShare = () => {
+    // Implement share functionality
+    alert('Sharing post...');
+  };
+
+ 
+
+
+
+  const handleBookMark = async (postId) => {
+    try {
+        let token = await AsyncStorage.getItem("user_token");
+      if (token) {
+        await axios.post('/api/save-post', { postId }, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          }
+        }).then((res) => {
+          if (res.data.status === 200) {
+            ToastAndroid.show("Post saved successfully", 1000);
+          }
+        }).catch((err) => {
+          console.log(err, "error in catch");
+        });
+      }
+    } catch (err) {
+      console.log(err, "the error");
     }
   };
 
+
+
+       const isSearching = useRef(false);
+     const getAllComments = async ({ pageParam = 0 }) => {
+          try {
+               isSearching.current = true;
+                
+               let token = await AsyncStorage.getItem("user_token");
+
+             
+               if (token) {
+                    const response = await axios.post(
+                         `/api/get-comments/${mainItem?.id}`,
+                         { offset: pageParam, limit: POST_LIMIT ,postId:mainItem?.id },
+                         { headers: { "Authorization": `Bearer ${token}` } }
+                    );
+  
+                 
+  
+                    isSearching.current = false;
+                  console.log(response.data,"poping-----")
+                    return {
+                         comments:response?.data?.comments,
+                         nextOffset: response?.data?.next_offset,
+                    };
+               }
+          } catch (err) {
+               console.log(err.message, "in getallComments", Object.keys(err), err?.request);
+               isSearching.current = false;
+               throw err; // Important for React Query error handling
+          }
+     };
+
+     const {
+          data,
+          fetchNextPage,
+          hasNextPage,
+          isFetchingNextPage,
+          isFetching
+     } = useInfiniteQuery({
+          queryKey: ["comments"],
+          queryFn: getAllComments,
+          getNextPageParam: (lastPage) => lastPage?.nextOffset ?? undefined,
+          initialPageParam: 0,
+     });
+  
+
+     
+     // FLATTEN ALL PAGES INTO SINGLE ARRAY
+    
+     useEffect(()=>{
+     console.log("logged")
+      const allComments = data?.pages.flatMap(page => page?.comments) ?? [];
+      setComments(allComments)
+     },[data])
+
+    
+  
+     const loadMoreItem = () => {
+          if (hasNextPage && !isFetchingNextPage) {
+               fetchNextPage();
+          }
+     };
+  
+     const renderLoader = () => {
+ 
+          return isFetchingNextPage ? (
+               <ActivityIndicator size="large" color={COLORS.blue} />
+          ) : null;
+     };
+ 
+
+
+  // Render comment item
   const renderCommentItem = ({ item }) => {
     const isLiked = likedComments[item.id] || false;
     let time = dayjs(item?.time).fromNow()  
      
+     
    if(isFetching) {
-         return  <View style={{...styles.commentContainer}}>
+         return  <View key={"loader-key"} style={{...styles.commentContainer}}>
         <View style={styles.commentMainContent}>
           <View style={{
                 overflow: 'hidden',
@@ -418,7 +446,7 @@ const handleLikePost = async() => {
 
     
     return (
-      <View style={styles.commentContainer}>
+      <View key={`comment-${item.id}`} style={styles.commentContainer}>
         <View style={styles.commentMainContent}>
           <View style={styles.commentAvatarContainer}>
             <Image 
@@ -497,9 +525,10 @@ const handleLikePost = async() => {
         {item.replies && item.replies.length > 0 && (
           <View style={styles.repliesContainer}>
             {item.replies.map(reply => {
+            
               const isReplyLiked = likedComments[reply.id] || false;
               return (
-                <View key={reply.id} style={styles.replyItem}>
+                <View key={`reply-${reply.id}`} style={styles.replyItem}>
                   <View style={styles.commentAvatarContainer}>
                     <Image 
                       source={reply.img || require("../../../assets/images/test_person1.png")} 
@@ -521,7 +550,7 @@ const handleLikePost = async() => {
                       <CustomRegularPoppingText 
                         fontSize={TEXT_SIZE.small} 
                         color={"#A0A7AE"} 
-                        value={reply.time}
+                        value={dayjs(reply?.time).fromNow()}
                       />
                     </View>
                     
@@ -580,57 +609,33 @@ const handleLikePost = async() => {
       </View>
     );
   };
-  return (
- 
-<FlatList
 
-data={["key-new-1"]}
-renderItem={({item}) => {
-  return <View style={{flex:1}}>
-      <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{...styles.container,flex:1,backgroundColor:"white"}}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-    >
+  return (
+    <SafeAreaView style={styles.container}>
       <ScrollView 
         ref={scrollViewRef}
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollViewContent}
-        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={styles.scrollContainer}
       >
-        <View style={styles.content}>
-          {/* Post Header */}
-          <View style={styles.postHeader}>
-            <View style={styles.postUserInfo}>
-              <TouchableOpacity style={styles.userAvatarContainer}>
-                <Image 
-                  source={mainItem?.img || require("../../../assets/images/test_person1.png")} 
-                  style={styles.userAvatar}
-                />
-              </TouchableOpacity>
-              <View style={styles.userInfo}>
-                <Text style={styles.userName}>
-                  {mainItem?.user?.firstname || "Johno orlan"}
-                </Text>
-                <Text style={styles.postTime}>
-                  {dayjs(mainItem?.created_at).fromNow() || "12 hours ago"}
-                </Text>
-              </View>
-            </View>
-            
-            <TouchableOpacity style={styles.postOptions}>
-              <PostScreenDots />
-            </TouchableOpacity>
+        {/* Post Header */}
+        <View style={styles.postHeader}>
+          <Image source={mainItem?.user?.user_image || require("../../../assets/images/test_person1.png")} 
+          style={styles.postAvatar}/>
+          <View style={styles.postUserInfo}>
+            <Text style={styles.postUserName}>{mainItem?.user?.firstname || "Johno orlan"}</Text>
+            <Text style={styles.postTime}>{dayjs(new Date(mainItem?.created_at)).fromNow() || "12 hours ago"}</Text>
           </View>
-          
-          {/* Post Content */}
-          <View style={styles.postContent}>
-            <Text style={styles.postText}>
-              {mainItem?.text || "Lorem ipsum dolor sit amet consectetur. Lorem varius quisque odio nisl tempor sit bibendum pulvinar sed. pharetra sed magnis vitae."}
-            </Text>
-          </View>
-          
-          {/* Post Media */}
+
+          <TouchableOpacity >
+            <PostScreenDots />
+          </TouchableOpacity>
+        </View>
+        
+        {/* Post Content */}
+        <Text style={styles.postContent}>
+           {mainItem?.text || "Lorem ipsum dolor sit amet consectetur. Lorem varius quisque odio nisl tempor sit bibendum pulvinar sed. pharetra sed magnis vitae."}
+        </Text>
+        
+        {/* Post Image */}
           <View style={styles.postMediaContainer}>
             {mainItem?.media?.length === 1 ? (
               <Image 
@@ -662,15 +667,15 @@ renderItem={({item}) => {
               />
             )}
           </View>
-          
-          {/* Post Actions */}
+        
+     
           <View style={styles.postActions}>
-            <View style={styles.postLeftActions}>
+            <View style={{flexDirection:"row",justifyContent:"space-between"}}>
               <View style={styles.postActionItem}>
                 <TouchableOpacity onPress={()=> handleLikePost()}>
                   <HomeFeedHeart stroke={"#2E2E2E"} fill={"white"} />
                 </TouchableOpacity>
-                <Text style={styles.postActionCount}>{item?.likes_count}</Text>
+                <Text style={styles.postActionCount}>{mainItem?.likes_count || 0}</Text>
               </View>
               
               <View style={styles.postActionItem}>
@@ -695,27 +700,29 @@ renderItem={({item}) => {
               <PostScreenBookMark />
             </TouchableOpacity>
           </View>
-          
-          {/* Comments Section */}
-          <View style={styles.commentsSection}>
+        
+        {/* Comments Section */}
+        <View style={styles.commentsSection}>
             {showComment ? (
               <View style={styles.commentsListContainer}>
                 <CustomRegularPoppingText 
-                  style={styles.commentsTitle} 
+                  style={styles.sectionTitle} 
                   fontSize={TEXT_SIZE.primary + 1} 
                   color={null} 
                   value={'Comments'}
                 />
                 <FlatList
-                  ref={flatListRef}
-                  data={allComments.length>0?allComments:defaultComments}
-                  renderItem={renderCommentItem}
-                  keyExtractor={item => item.id}
-                  showsVerticalScrollIndicator={false}
-                  showsHorizontalScrollIndicator={false}
-                  initialNumToRender={10}
+            data={comments.length>0?comments:defaultComments}
+            renderItem={renderCommentItem}
+            
+            scrollEnabled={false}
+
+               
+                  
+               
+                  initialNumToRender={5}
                   onEndReached={loadMoreItem}
-                  onEndReachedThreshold={0.8}
+                  onEndReachedThreshold={0.5}
                   ListFooterComponent={renderLoader}
                 />
               </View>
@@ -730,24 +737,16 @@ renderItem={({item}) => {
                 />
               </View>
             )}
-          </View>
+
+ 
         </View>
       </ScrollView>
       
+      {/* Comment Input */}
+      <View style={styles.commentInputContainer}>
+ 
 
-
-   
-
-
-    </KeyboardAvoidingView>
-
-    <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{...styles.container,backgroundColor:"white"}}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-    >
-            {/* Comment Input */}
-      <View style={styles.messageSenderContainer}>
+        <View style={styles.messageSenderContainer}>
         {replyingTo && (
           <View style={styles.replyingToContainer}>
             <Text style={styles.replyingToText}>
@@ -773,85 +772,64 @@ renderItem={({item}) => {
       />
  
       </View>
-    </KeyboardAvoidingView>
-</View>
-}}
-/>
 
-
-     
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'white',
-  },
-  scrollView: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#fff',
+    paddingBottom:15
   },
-  scrollViewContent: {
-    paddingBottom: 80, // Space for the input
-  },
-  content: {
-    flex: 1,
-    backgroundColor: 'white',
+  scrollContainer: {
+    paddingBottom: 70
   },
   postHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderBottomWidth: 2,
-    borderTopWidth: 2,
-    borderColor: COLORS.light,
+    padding: 15
   },
-  postUserInfo: {
-    flex: 2,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  userAvatarContainer: {
-    borderRadius: 50,
-    height: 50,
+  postAvatar: {
     width: 50,
-    overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10
   },
-  userAvatar: {
-    height: '100%',
-    width: '100%',
+
+ 
+  postUserInfo: {
+    flex: 1
   },
-  userInfo: {
-    marginLeft: 10,
-  },
-  userName: {
+  postUserName: {
     color: COLORS.black,
-    fontSize: TEXT_SIZE.primary,
-    fontFamily: FAMILLY.semibold,
+    fontSize:16,
+    fontWeight: FAMILLY.semibold,
   },
   postTime: {
-    color: COLORS.gray,
-    fontSize: TEXT_SIZE.small,
-    fontFamily: FAMILLY.light,
+    fontSize: 12,
+    color: '#888'
   },
-  postOptions: {
-    alignItems: 'center',
-    justifyContent: 'center',
+  noCommentsContainer:{
+    alignItems:"center"
   },
   postContent: {
-    marginVertical: 10,
-    paddingHorizontal: 20,
-  },
-  postText: {
+    
+    lineHeight: 22,
+    paddingHorizontal: 15,
+    marginBottom: 10,
     color: COLORS.black,
     fontSize: TEXT_SIZE.secondary,
-    fontFamily: FAMILLY.light,
+    fontWeight: FAMILLY.light,
   },
-  postMediaContainer: {
+  postImage: {
+    width: '100%',
+    height: 300,
+    marginBottom: 15
+  },
+    postMediaContainer: {
     height: 200,
     width: '100%',
   },
@@ -872,166 +850,233 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+
+  postActionItem:{flexDirection:"row",alignItems:"center",marginRight:10},
+
   postActions: {
-    paddingHorizontal: 20,
-    height: 30,
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 10,
+    paddingVertical: 10,
+    paddingHorizontal:10,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+    marginBottom: 15
   },
-  postLeftActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  postAction: {
+ 
+paddingHorizontal: 10
   },
-  postActionItem: {
-    marginRight: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+  postActionText: {
+    fontSize: 14,
+    color: '#333'
   },
-  postActionCount: {
-    fontFamily: FAMILLY.light,
-    marginLeft: 5,
-  },
-  bookmarkButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
+  likedText: {
+    color: '#ff5656'
   },
   commentsSection: {
-    minHeight: SCREEN_HEIGHT * 0.35,
-    borderBottomWidth: 2,
-    borderColor: COLORS.light,
+    paddingHorizontal: 15
   },
-  commentsListContainer: {
-    paddingHorizontal: 10,
-  },
-  commentsTitle: {
-    textAlign: 'left',
-    marginTop: 10,
-    alignSelf: 'flex-start',
-  },
-  noCommentsContainer: {
-    alignItems: 'center',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    paddingVertical: 40,
-  },
-  noCommentsText: {
-    marginTop: 10,
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: FAMILLY.semibold,
+    marginBottom: 15,
+    
   },
   commentContainer: {
-    borderBottomWidth: 2,
-    borderColor: COLORS.light,
-    paddingVertical: 10,
-    backgroundColor: 'white',
-  },
-  commentMainContent: {
     flexDirection: 'row',
-    width: '100%',
-  },
-  commentAvatarContainer: {
-    overflow: 'hidden',
-    height: 50,
-    width: 50,
-    borderRadius: 50,
-    marginRight: 10,
+    marginBottom: 15
   },
   commentAvatar: {
-    height: '100%',
-    width: '100%',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10
   },
   commentContent: {
-    flex: 1,
+    flex: 1
   },
   commentHeader: {
-    alignItems: 'center',
     flexDirection: 'row',
-    justifyContent: 'flex-start',
+    alignItems: 'center',
+    marginBottom: 5
   },
   commentName: {
-    marginRight: 5,
+    fontWeight: 'bold',
+    marginRight: 10
   },
-  commentTimeSeparator: {
-    backgroundColor: 'white',
-    height: 25,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  commentTimeDot: {
-    height: 5,
-    marginBottom: 2,
-    width: 5,
-    backgroundColor: 'black',
-    borderRadius: 50,
-    marginRight: 5,
+  commentTime: {
+    fontSize: 12,
+    color: '#888'
   },
   commentText: {
-    marginTop: 5,
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 5
   },
   commentActions: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 10,
+    alignItems: 'center'
   },
-  commentLeftActions: {
-    flexDirection: 'row',
-  },
-  commentActionButton: {
-    marginRight: 10,
+  commentAction: {
+    marginRight: 15
   },
   commentActionText: {
-    marginRight: 10,
+    fontSize: 13,
+    color: '#555'
   },
-  likedText: {
-    color: '#FF5656',
+  commentLikes: {
+    fontSize: 12,
+    color: '#888'
   },
-  commentRightActions: {
+  commentInputContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     alignItems: 'center',
+    padding: 10,
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#eee'
   },
-  likeCount: {
-    marginLeft: 5,
+  commentInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    marginRight: 10
   },
-  repliesContainer: {
-    marginTop: 10,
-    marginLeft: 20,
+  commentButton: {
+    backgroundColor: '#007AFF',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 20
   },
-  replyItem: {
-    flexDirection: 'row',
-    marginTop: 10,
-    width: '100%',
+  commentButtonText: {
+    color: '#fff',
+    fontWeight: 'bold'
   },
-    messageSenderContainer: {
-      position: 'absolute',
-      bottom: 0,
-      left: 0,
-      right: 0,
+
+
+
+
+
+   commentContainer: {
+      borderBottomWidth: 2,
+      borderColor: COLORS.light,
+      paddingVertical: 10,
       backgroundColor: 'white',
-      borderTopWidth: 1,
-      borderTopColor: COLORS.light,
     },
-    replyingToContainer: {
+    commentMainContent: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
+      width: '100%',
+    },
+    commentAvatarContainer: {
+      overflow: 'hidden',
+      height: 50,
+      width: 50,
+      borderRadius: 50,
+      marginRight: 10,
+    },
+    commentAvatar: {
+      height: '100%',
+      width: '100%',
+    },
+    commentContent: {
+      flex: 1,
+    },
+    commentHeader: {
       alignItems: 'center',
-      paddingHorizontal: 15,
-      paddingVertical: 8,
-      backgroundColor: '#f5f5f5',
+      flexDirection: 'row',
+      justifyContent: 'flex-start',
     },
-    replyingToText: {
-      fontSize: TEXT_SIZE.small,
-      color: COLORS.gray,
+    commentName: {
+      marginRight: 5,
     },
-    cancelReplyButton: {
-      padding: 5,
+    commentTimeSeparator: {
+      backgroundColor: 'white',
+      height: 25,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
-    cancelReplyText: {
-      fontSize: TEXT_SIZE.small,
-      color: COLORS.gray,
+    commentTimeDot: {
+      height: 5,
+      marginBottom: 2,
+      width: 5,
+      backgroundColor: 'black',
+      borderRadius: 50,
+      marginRight: 5,
     },
+    commentText: {
+      marginTop: 5,
+    },
+    commentActions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginTop: 10,
+    },
+    commentLeftActions: {
+      flexDirection: 'row',
+    },
+    commentActionButton: {
+      marginRight: 10,
+    },
+    commentActionText: {
+      marginRight: 10,
+    },
+    likedText: {
+      color: '#FF5656',
+    },
+    commentRightActions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    likeCount: {
+      marginLeft: 5,
+    },
+    repliesContainer: {
+      marginTop: 10,
+      marginLeft: 20,
+    },
+    replyItem: {
+      flexDirection: 'row',
+      marginTop: 10,
+      width: '100%',
+    },
+      messageSenderContainer: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: 'white',
+        borderTopWidth: 1,
+        borderTopColor: COLORS.light,
+      },
+      replyingToContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 15,
+        paddingVertical: 8,
+        backgroundColor: '#f5f5f5',
+      },
+      replyingToText: {
+        fontSize: TEXT_SIZE.small,
+        color: COLORS.gray,
+      },
+      cancelReplyButton: {
+        padding: 5,
+      },
+      cancelReplyText: {
+        fontSize: TEXT_SIZE.small,
+        color: COLORS.gray,
+      },
 });
 
-export default PostScreen;
-
+export default BlogPostScreen;

@@ -170,11 +170,11 @@ const loadData = async() => {
          if(data?.user_image) setImage(data?.user_image)
          else setImage(null)
 
-        navigation.navigate("BottomTabsHome",{screen:"HomeFeed"})
+        return result
 
          }
 
-       
+       return null
  
     } catch(err) {
          console.log(err,"Eror")
@@ -184,7 +184,10 @@ const loadData = async() => {
     }
   
   useEffect(() => {
-  loadData()
+  let result = loadData()
+  if(result && navigation){
+    navigation.navigate("BottomTabsHome",{screen:"HomeFeed"})
+  }
   },[])
 
 

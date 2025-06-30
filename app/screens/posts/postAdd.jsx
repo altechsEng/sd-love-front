@@ -321,7 +321,7 @@ if (isValidSize) {
           ListFooterComponent={() => (
             <TouchableOpacity
               style={{ height: 70, width: 70, borderStyle: "dashed", borderWidth: 2, alignItems: "center", justifyContent: "center", borderColor: COLORS.light }}
-              onPress={handleImageUpload}
+              onPress={()=>handleImageUpload()}
               disabled={isProcessing}
             >
               {isProcessing ? (
@@ -335,19 +335,19 @@ if (isValidSize) {
       </View>
 
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 10, backgroundColor: "white", borderTopWidth: 2, borderColor: COLORS.light }}>
-        <TouchableOpacity onPress={handleImageUpload} disabled={isProcessing}>
+        <TouchableOpacity onPress={()=>handleImageUpload()} disabled={isProcessing}>
           <PostScreenMediaImage fill={isProcessing ? COLORS.light : COLORS.dark} />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={handleGifUpload} disabled={isProcessing}>
+        <TouchableOpacity onPress={()=>handleGifUpload()} disabled={isProcessing}>
           <PostScreenMediaGif fill={isProcessing ? COLORS.light : COLORS.dark} />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={handleTakePicture} disabled={isProcessing}>
+        <TouchableOpacity onPress={()=>handleTakePicture()} disabled={isProcessing}>
           <PostScreenMediaCamera fill={isProcessing ? COLORS.light : COLORS.dark} />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={handleTakeVideo} disabled={isProcessing}>
+        <TouchableOpacity onPress={()=>handleTakeVideo()} disabled={isProcessing}>
           <PostScreenMediaVideo fill={isProcessing ? COLORS.light : COLORS.dark} />
         </TouchableOpacity>
       </View>

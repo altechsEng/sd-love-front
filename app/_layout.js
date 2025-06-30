@@ -201,7 +201,7 @@ export default function Application() {
 
 							<Stack.Screen options={{
 								header: ({ navigation }) => {
-									return <View style={{ height: 70, justifyContent: "center", backgroundColor: "white", paddingLeft: 20, paddingTop: 20 }}>
+									return <View style={{ height: 70, justifyContent: "center", backgroundColor: "white", paddingLeft: 20, paddingTop: 20,borderBottomColor:COLORS.light,borderBottomWidth:2 }}>
 										<TouchableOpacity onPress={() => navigation.goBack()} style={{}}>
 											<HeaderBackArrowBlack />
 										</TouchableOpacity>

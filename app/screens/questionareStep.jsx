@@ -17,6 +17,7 @@ import {
 import { getEmojiFlag } from "countries-list";
 
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 
@@ -601,6 +602,7 @@ export function Questionaire2({ navigation }) {
 
 
 	const handleSubmission = async () => {
+		let token = await AsyncStorage.getItem("user_token")
 		setIsLoading(true)
 		const data = {
 			...registrationData,
@@ -610,7 +612,11 @@ export function Questionaire2({ navigation }) {
 			qP16: JSON.stringify(questionnaireData?.answers.qP16),
 			qS10: JSON.stringify(questionnaireData?.answers.qS10),
 		}
-		await axios.post("/api/register/en", data).then((res) => {
+
+		 
+		await axios.post("/api/register/en", data,
+          { headers: { "Authorization": `Bearer ${token}` } }
+		).then((res) => {
 			console.log(res.data, "resdata")
 			if (res.data.errors) {
 				setErr(`address: ${res.data.errors?.address}` || `city: ${res.data.errors?.city}`)
@@ -622,7 +628,7 @@ export function Questionaire2({ navigation }) {
 			}
 			setIsLoading(false)
 		}).catch((err) => {
-			console.log(err, "opppp")
+			console.log(err?.request, "opppp")
 			setErr(err)
 			setIsLoading(false)
 
