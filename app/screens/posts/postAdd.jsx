@@ -26,9 +26,9 @@ const PostAdd = ({ navigation }) => {
    
   const [thoughts,setThoughts] = useState("")
   const [images, setImages] = useState([
-    { id: "imk1", img: require("../../../assets/images/match_pro1.jpg") },
-    { id: "imk2", img: require("../../../assets/images/match_pro2.jpg") },
-    { id: "imk3", img: require("../../../assets/images/match_pro3.jpg") },
+    // { id: "imk1", img: require("../../../assets/images/match_pro1.jpg") },
+    // { id: "imk2", img: require("../../../assets/images/match_pro2.jpg") },
+    // { id: "imk3", img: require("../../../assets/images/match_pro3.jpg") },
   ]);
   const [cameraPermission, requestCameraPermission] = Camera.useCameraPermissions();
   const [mediaPermission, requestMediaPermission] = MediaLibrary.usePermissions();

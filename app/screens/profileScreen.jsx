@@ -1,5 +1,5 @@
 import { SafeAreaView } from "react-native-safe-area-context"
-import { View, TouchableOpacity, Image, Dimensions, FlatList, Text, Modal, StyleSheet, Pressable } from "react-native"
+import { View, TouchableOpacity, Image, Dimensions, FlatList, Text, Modal, StyleSheet, Pressable, ActivityIndicator, ToastAndroid } from "react-native"
 import { CustomRegularPoppingText, CustomSemiBoldPoppingText } from "../components/text"
 
 import {
@@ -7,11 +7,19 @@ import {
 	heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { ScrollView } from "react-native-gesture-handler";
-import { useEffect, useState } from "react";
-import { PostAddIcon, MatchProfileArrowBack, MatchProfileBirthDay, MatchProfileEducation, MatchProfileFaithChurch, MatchProfileFaithIcon1, MatchProfileFaithOccupation, MatchProfileHome, MatchProfileLang, MatchProfilePlus, MatchProfileSexIcon, MatchProfileSmallHeart, MatchProfleSmallFace, PostScreenBookMark, ProfileScreenBookMark, ProfileScreenAddPost, PostScreenDots, ProfileScreenPostEdit, ProfileScreenPostDelete, ProfileScreenManageProfile, ProfileScreenAccountSecurity, ProfileScreenTheme, ProfileScreenGlobe, ProfileScreenPermissions, ProfileScreenQuestionMark, ProfileSCreenExclamation, ProfileScreenPrivacyPolicy, ProfileScreenLogOut } from "../components/vectors";
-import { COLORS, FAMILLY, TEXT_SIZE } from "../../utils/constants";
+import { useCallback, useEffect, useState } from "react";
+import { PostAddIcon, MatchProfileArrowBack, MatchProfileBirthDay, MatchProfileEducation, MatchProfileFaithChurch, MatchProfileFaithIcon1, MatchProfileFaithOccupation, MatchProfileHome, MatchProfileLang, MatchProfilePlus, MatchProfileSexIcon, MatchProfileSmallHeart, MatchProfleSmallFace, PostScreenBookMark, ProfileScreenBookMark, ProfileScreenAddPost, PostScreenDots, ProfileScreenPostEdit, ProfileScreenPostDelete, ProfileScreenManageProfile, ProfileScreenAccountSecurity, ProfileScreenTheme, ProfileScreenGlobe, ProfileScreenPermissions, ProfileScreenQuestionMark, ProfileSCreenExclamation, ProfileScreenPrivacyPolicy, ProfileScreenLogOut, HomeFeedHeart } from "../components/vectors";
+import { COLORS, FAMILLY, POST_LIMIT, TEXT_SIZE } from "../../utils/constants";
 import { useGlobalVariable } from "../context/global";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { useFocusEffect } from "@react-navigation/native";
+import {  useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import CustomPostLoader from "../components/customPostLoader";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime"
+
+dayjs.extend(relativeTime)
 
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window')
@@ -21,6 +29,7 @@ const ProfileScreen = ({ navigation }) => {
 
  
 	const [modalVisible, setModalVisible] = useState(false)
+	const queryClient = useQueryClient()
 
 	const { isProfileMenuAcitve, loadData,activeSubCat, setActiveSubCat } = useGlobalVariable()
 	useEffect(()=>{
@@ -54,34 +63,201 @@ const ProfileScreen = ({ navigation }) => {
 			pupil: "SD Academy"
 		}])
 
+	const [activePostItem,setActivePostItem] = useState(null)
+	const [isLoading,setIsLoading] = useState(false)
+	// const handleDeletePost = async(post) => {
+
+	// 	try {
+	// 		setIsLoading(true)
+	// 		let token = await AsyncStorage.getItem("user_token")
+	// 		console.log(post,"active post")
+	// 		let formData = new FormData()
+	// 		formData.append("post_id",post?.id || 55)
+	// 	     await axios.post("/api/delete-post",formData,{headers: {"Authorization": `Bearer ${token}`}}).
+	// 		then(res => {
+	// 			console.log(res.data,"response data")	
+	// 		setIsLoading(false)
+
+	// 		}).catch(err => {
+	// 			console.log(err.request,"eror in cathc",err)
+	// 		setIsLoading(false)
+
+	// 		})
+
+	// 	}catch(err) {
+	// 		console.log(err,"erorr in handle delte post try catch")
+	// 		setIsLoading(false)
+
+	// 	}
+
+	// }
+
+
+
+	 const deletePostMutation = useMutation({
+    mutationFn: async (postId) => {
+      const token = await AsyncStorage.getItem("user_token");
+      const formData = new FormData();
+      formData.append("post_id", postId);
+      return axios.post("/api/delete-post", formData, {
+        headers: { "Authorization": `Bearer ${token}` }
+      }).then(res=>{
+		console.log(res.data,"Data----")
+		 ToastAndroid.show("Post deleted",1000)
+		
+	 }).catch(err => {
+		console.log(err?.request,"opo")
+	 })
+    },
+ 
+    onSuccess: () => {
+      setModalVisible(false);
+	 queryClient.invalidateQueries({ queryKey: ['userPosts'] });
+    },
+    onError: (error) => {
+      console.error("Error deleting post:", error);
+    }
+  });
+
+const handleDeletePost = (post) => {
+    deletePostMutation.mutate(post.id)
+  };
+
+
+	const getAllPosts = async ({ pageParam = 1 }) => {
+		try {
+			 
+			 
+			let token = await AsyncStorage.getItem("user_token");
+
+			if (token) {
+				const response = await axios.post(
+					'/api/get-all-user-posts',
+					{ page: pageParam },
+					{ headers: { "Authorization": `Bearer ${token}` } }
+				);
+ 
+				 
+				 
+			 console.log(response.data,"okau")
+				return response.data
+			}
+		} catch (err) {
+			console.log(err.message, "in all user posts", Object.keys(err), err?.request);
+			 
+			throw err; // Important for React Query error handling
+		}
+	};
+	 // Infinite query for posts
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    refetch,
+    isFetching,
+    isLoading: postsLoading,
+    error: postsError,
+    isRefetching
+  } = useInfiniteQuery({
+    queryKey: ['userPosts'],
+    queryFn: getAllPosts,
+    getNextPageParam: (lastPage, allPages) => {
+      // Adjust this based on your API response structure
+      if (lastPage.hasMore) {
+        return lastPage?.next_page;
+      }
+      return undefined;
+    }
+  });
+
+  // Combine all pages into a single array
+  const allPosts = data?.pages.flatMap(page => page.posts) || [];
+ const [postFetched,setPostFetched] = useState([])
+
+
+    const appendUnique = (newData) => {
+	 setPostFetched(prev => {
+	   const existingIds = new Set(prev.map(l => l.id)); // Store existing IDs in a Set for fast lookup
+	   const filteredNewData = newData.filter(l => !existingIds.has(l.id)); // Only add new IDs
+    
+	   return [...prev, ...filteredNewData]; // Merge without duplicates
+	 });
+    };
+    
+  
+    useEffect(()=>{
+	 if(data?.pages.length>0 && activeSubCat == "Posts"){
+	   const postList = data?.pages.flatMap((page) => page.posts) || [];
+	   appendUnique(postList)
+	 }
+    },[data,activeSubCat])
+
+  // Load more posts when reaching end of list
+  const loadMorePosts = () => {
+    if (hasNextPage && !isFetchingNextPage ) {
+      fetchNextPage();
+    }
+  };
+
+const renderLoader = () => {
+		return isFetchingNextPage ? (
+			<ActivityIndicator size="large" color={COLORS.blue} />
+		) : null;
+	};
+
+  // Refetch when screen comes into focus
+//   useEffect(
+//     useCallback(() => {
+//       refetch();
+//     }, [refetch])
+//   );
+
+
 	const renderPosts = ({ item }) => {
 
-		return (
-			<View key={item?.key} style={{ flex: 1, marginVertical: 10, marginRight: 20, width: wp(90), flexDirection: "column" }}>
+	  if (isFetching) {
+		return <CustomPostLoader />
+	 }
+
+	 
+ 
+	 
+				return (<View  style={{ flex: 1, marginVertical: 10, marginRight: 20, width: wp(90), flexDirection: "column" }}>
 				<View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
 					<View style={{ flex: 2, flexDirection: "row" }}>
-						<TouchableOpacity style={{ borderRadius: 50, height: 50, width: 50, overflow: "hidden", alignItems: "center" }}><Image source={item.img} resizeMode="cover" style={{ height: "100%", width: "100%" }} /></TouchableOpacity>
+						<TouchableOpacity style={{ borderRadius: 50, height: 50, width: 50, overflow: "hidden", alignItems: "center" }}><Image source={{uri:`${item?.user?.profile_picture}`} || item?.img} resizeMode="cover" style={{ height: "100%", width: "100%" }} /></TouchableOpacity>
 						<View style={{ flexDirection: "column", justifyContent: "center", marginLeft: 10 }}>
-							<Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.secondary - 2, fontFamily: FAMILLY.semibold }}>{item.name}</Text>
-							<Text style={{ lineHeight: 12, color: COLORS.gray, fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.light }}>{item.time}</Text>
+							<Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.secondary - 2, fontFamily: FAMILLY.semibold }}>{item?.user?.name || item?.name}</Text>
+							<Text style={{ lineHeight: 12, color: COLORS.gray, fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.light }}>{dayjs(new Date(item?.created_at)).fromNow()|| item?.time}</Text>
 						</View>
 					</View>
 
-					<TouchableOpacity onPress={() => setModalVisible(true)} style={{ backgroundColor: "white", height: 25, width: 80, borderRadius: 20, alignItems: "center", justifyContent: "center" }}>
+					<TouchableOpacity onPress={() => {
+						setModalVisible(true)
+						setActivePostItem(item)
+					}} style={{ backgroundColor: "white", height: 25, width: 80, borderRadius: 20, alignItems: "center", justifyContent: "center" }}>
 						<PostScreenDots />
 					</TouchableOpacity>
 				</View>
 				<View style={{ marginVertical: 10 }}>
 					<Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.light }}>
-						Lorem ipsum dolor sit amet consectetur. Lorem varius quisque odio nisl tempor sit bibendum pulvinar sed. pharetra sed magnis vitae.
+						{item?.text ||"Lorem ipsum dolor sit amet consectetur. Lorem varius quisque odio nisl tempor sit bibendum pulvinar sed. pharetra sed magnis vitae."}
 					</Text>
 				</View>
-				<TouchableOpacity style={{ height: 200, margin: 0, padding: 0, overflow: "hidden", borderRadius: 20 }}>
+				{/* <TouchableOpacity style={{ height: 200, margin: 0, padding: 0, overflow: "hidden", borderRadius: 20 }}>
 					<Image source={item.postImg} resizeMode="cover" style={{ width: "100%", height: "100%" }} />
+				</TouchableOpacity> */}
+
+				<TouchableOpacity onPress={() => navigation.navigate("Post", { item })} style={{ height: 200, margin: 0, padding: 0, overflow: "hidden", borderRadius: 20 }}>
+				<Image source={item?.media?.length > 0 ? { uri: `${item?.media[0]?.url}` } : require("../../assets/images/blog_test.jpg")} resizeMode="cover" style={{ width: "100%", height: "100%" }} />
 				</TouchableOpacity>
 
 			</View>
 		)
+	 
+
+
 	}
 
 	const renderSavePosts = ({ item }) => {
@@ -261,11 +437,19 @@ const ProfileScreen = ({ navigation }) => {
 
 			{activeSubCat == "Posts" && (
 				<FlatList
-					data={posts}
+				     refreshing={isRefetching}
+					onRefresh={() =>queryClient.refetchQueries({queryKey:["userPosts"]})}
+					data={allPosts.length>0?allPosts:posts}
 					renderItem={renderPosts}
 					keyExtractor={(item) => item?.key || item?.id}
-
+					horizontal={true}
+				 
 					showsHorizontalScrollIndicator={false}
+					ListFooterComponent={renderLoader}
+					onEndReached={loadMorePosts}
+					onEndReachedThreshold={0.3}
+ 
+					 
 
 				/>
 			)}
@@ -423,9 +607,9 @@ const ProfileScreen = ({ navigation }) => {
 							</TouchableOpacity>
 
 
-							<TouchableOpacity style={{ alignItems: "center", justifyContent: "flex-start", flexDirection: "row"}} onPress={() => { }}>
+							<TouchableOpacity onPress={()=>handleDeletePost(activePostItem)} style={{ alignItems: "center", justifyContent: "flex-start", flexDirection: "row"}}>
 								<ProfileScreenPostDelete />
-								<CustomRegularPoppingText color={null} style={{ marginLeft: 20 }} value={"Delete post"} fontSize={TEXT_SIZE.primary} />
+								{isLoading? <ActivityIndicator color={COLORS.primary}/> : <CustomRegularPoppingText color={null} style={{ marginLeft: 20 }} value={"Delete post"} fontSize={TEXT_SIZE.primary} />}
 							</TouchableOpacity>
 						</View>
 					</View>

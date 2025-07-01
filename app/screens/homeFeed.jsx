@@ -200,6 +200,9 @@ export default function HomeFeed({ navigation }) {
 					<Image source={item?.media?.length > 0 ? { uri: `https://sdlove-api.altechs.africa/storage/app/private/public/post_media/${item?.media[0]?.url}` } : require("../../assets/images/blog_test.jpg")} resizeMode="cover" style={{ width: "100%", height: "100%" }} />
 				</TouchableOpacity>
 
+
+
+
 				{/* <FlatList
                     data={item.media || [{url:null}]}
                     showsHorizontalScrollIndicator={false}

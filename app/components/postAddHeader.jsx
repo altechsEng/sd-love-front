@@ -10,13 +10,14 @@ import {
    } from "react-native-responsive-screen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState,useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
  
 
 
 const PostAddHeader = ({navigation}) => { 
 
   const {postAddData,isLoading,setIsLoading,userData,image} = useGlobalVariable()
-
+  const queryClient = useQueryClient()
 
 
 
@@ -57,7 +58,13 @@ const handleSubmitAddPost = async() => {
 const formData = new FormData();
 formData.append('post_id', postId)
 
- 
+ if(postAddData?.media?.length == 0){
+  setIsLoading(false)
+  queryClient.invalidateQueries({ queryKey: ['userPosts',"posts"],refetchType:'all' });
+  ToastAndroid.show("Post created sucessfully",1000)
+  navigation.goBack()
+  return 
+ }
 postAddData?.media?.map((data) => {
    console.log(data,"foram data--dasingle")
     formData.append('media[]', {
@@ -78,6 +85,7 @@ await axios.post('/api/upload-post-images', formData, {
   console.log(res.data,"post images uploaded")
   setIsLoading(false)
   ToastAndroid.show("Post created sucessfully",1000)
+   queryClient.invalidateQueries({ queryKey: ['userPosts',"posts"] });
   navigation.goBack()
 }).catch(err => {
   setIsLoading(false)
