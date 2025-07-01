@@ -31,7 +31,7 @@ const ProfileScreen = ({ navigation }) => {
 	const [modalVisible, setModalVisible] = useState(false)
 	const queryClient = useQueryClient()
 
-	const { isProfileMenuAcitve, loadData,activeSubCat, setActiveSubCat } = useGlobalVariable()
+	const { isProfileMenuAcitve, loadData,activeSubCat, setActiveSubCat,userData } = useGlobalVariable()
 	useEffect(()=>{
 		loadData()
 	})
@@ -123,8 +123,76 @@ const handleDeletePost = (post) => {
     deletePostMutation.mutate(post.id)
   };
 
+//interest
+const [interest,setInterest] = useState(["Travel","Music","Fishing","Gym","Bible","Dance"])
+useEffect(()=> {
+if(activeSubCat == "About") {
+ let data = JSON.parse(userData?.user_infos?.qP16)
+ setInterest(data)
+	}
+},[activeSubCat])
 
-	const getAllPosts = async ({ pageParam = 1 }) => {
+
+// Infinite query for user post images
+const getAllPostsImages = async ({ pageParam = 1 }) => {
+		try {
+			 
+			 
+			let token = await AsyncStorage.getItem("user_token");
+
+			if (token) {
+				const response = await axios.post(
+					'/api/get-posts-images',
+					{ page: pageParam },
+					{ headers: { "Authorization": `Bearer ${token}` } }
+				);
+ 
+				 
+				 
+			 console.log(response.data,"okau images")
+				return response.data
+			}
+		} catch (err) {
+			console.log(err.message, "in all user posts images", Object.keys(err), err?.request);
+			 
+			throw err; // Important for React Query error handling
+		}
+	};
+
+  const {
+    data:postImages,
+    fetchNextPage:fetchNextPageImages,
+    hasNextPage:hasNextPageImages,
+    isFetchingNextPage:isFetchingNextPageImages,
+    refetch:refetchImages,
+    isFetching:isFetchingImages,
+    isLoading: imagesLoading,
+    error: imagesError,
+    isRefetching:isRefetchingImages
+  } = useInfiniteQuery({
+    queryKey: ['userPostsImages'],
+    queryFn: getAllPostsImages,
+    getNextPageParam: (lastPage, allPages) => {
+      // Adjust this based on your API response structure
+      if (lastPage.hasMore) {
+        return lastPage?.next_page;
+      }
+      return undefined;
+    }
+  });
+
+  // Combine all pages into a single array
+  const allPostsImages = postImages?.pages.flatMap(page => page.images) || [];
+ 
+  const loadMoreImages = () => {
+    if (hasNextPageImages && !isFetchingNextPageImages ) {
+      fetchNextPageImages();
+    }
+  };
+
+
+// Infinite query for posts
+const getAllPosts = async ({ pageParam = 1 }) => {
 		try {
 			 
 			 
@@ -139,7 +207,7 @@ const handleDeletePost = (post) => {
  
 				 
 				 
-			 console.log(response.data,"okau")
+			 
 				return response.data
 			}
 		} catch (err) {
@@ -148,7 +216,6 @@ const handleDeletePost = (post) => {
 			throw err; // Important for React Query error handling
 		}
 	};
-	 // Infinite query for posts
   const {
     data,
     fetchNextPage,
@@ -173,25 +240,8 @@ const handleDeletePost = (post) => {
 
   // Combine all pages into a single array
   const allPosts = data?.pages.flatMap(page => page.posts) || [];
- const [postFetched,setPostFetched] = useState([])
-
-
-    const appendUnique = (newData) => {
-	 setPostFetched(prev => {
-	   const existingIds = new Set(prev.map(l => l.id)); // Store existing IDs in a Set for fast lookup
-	   const filteredNewData = newData.filter(l => !existingIds.has(l.id)); // Only add new IDs
-    
-	   return [...prev, ...filteredNewData]; // Merge without duplicates
-	 });
-    };
-    
+ 
   
-    useEffect(()=>{
-	 if(data?.pages.length>0 && activeSubCat == "Posts"){
-	   const postList = data?.pages.flatMap((page) => page.posts) || [];
-	   appendUnique(postList)
-	 }
-    },[data,activeSubCat])
 
   // Load more posts when reaching end of list
   const loadMorePosts = () => {
@@ -321,7 +371,7 @@ const renderLoader = () => {
 					<View style={{ marginTop: 20, marginBottom: 10 }}>
 						<CustomSemiBoldPoppingText style={{}} color={null} fontSize={TEXT_SIZE.primary} value="Interests" />
 						<View className={'mt-2'} style={{ flexDirection: "row", flexWrap: "wrap" }}>
-							{["Travel", "Music", "Fishing", "Gym", "Bible", "Dance"].map((d) => (
+							{interest.map((d) => (
 								<View className={'py-2'} key={d} style={{ marginRight: 10, marginBottom: 5, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, backgroundColor: COLORS.light }}>
 									<CustomRegularPoppingText fontSize={TEXT_SIZE.small} color={null} style={{}} value={d} />
 								</View>
@@ -336,7 +386,7 @@ const renderLoader = () => {
 							<View style={{ marginRight: 20, backgroundColor: COLORS.light, height: 30, width: 30, alignItems: "center", borderRadius: 20, justifyContent: "center" }}><MatchProfileSexIcon /></View>
 							<View>
 								<CustomRegularPoppingText style={{ lineHieght: 8 }} color={null} fontSize={TEXT_SIZE.small} value="Gender" />
-								<CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary} value="Female" />
+								<CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary} value={userData?.user_infos?.qP1 || "Not specified"} />
 							</View>
 						</View>
 
@@ -344,7 +394,7 @@ const renderLoader = () => {
 							<View style={{ marginRight: 20, backgroundColor: COLORS.light, height: 30, width: 30, alignItems: "center", borderRadius: 20, justifyContent: "center" }}><MatchProfileBirthDay /></View>
 							<View>
 								<CustomRegularPoppingText style={{ lineHieght: 8 }} color={null} fontSize={TEXT_SIZE.small} value="Birthday" />
-								<CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary} value="8 June 1998" />
+								<CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary} value={dayjs(userData?.user_infos?.qP2).format("DD MMMM YYYY") || "Not specified"} />
 							</View>
 						</View>
 
@@ -353,7 +403,7 @@ const renderLoader = () => {
 							<View style={{ marginRight: 20, backgroundColor: COLORS.light, height: 30, width: 30, alignItems: "center", borderRadius: 20, justifyContent: "center" }}><MatchProfileHome /></View>
 							<View>
 								<CustomRegularPoppingText style={{ lineHieght: 8 }} color={null} fontSize={TEXT_SIZE.small} value="Home" />
-								<CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary} value="Los Angeles, USA" />
+								<CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary}  value={`${userData?.country} - ${userData?.city} - ${userData?.address}` || "Not specified"}/>
 							</View>
 						</View>
 
@@ -374,7 +424,7 @@ const renderLoader = () => {
 							<View style={{ marginRight: 20, backgroundColor: COLORS.light, height: 30, width: 30, alignItems: "center", borderRadius: 20, justifyContent: "center" }}><MatchProfileFaithIcon1 /></View>
 							<View>
 								<CustomRegularPoppingText style={{ lineHieght: 8 }} color={null} fontSize={TEXT_SIZE.small} value="Gave my life to God" />
-								<CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary} value="Since April 2017" />
+								<CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary}  value={userData?.user_infos?.qS2 || "Not specified"} />
 							</View>
 						</View>
 
@@ -456,16 +506,25 @@ const renderLoader = () => {
 
 			{activeSubCat == "Photos" && (
 				<View style={{ marginTop: 20, flexDirection: "row", flexWrap: "wrap" }}>
-					<FlatList data={[{ img: require("../../assets/images/match_pro1.jpg") }, { img: require("../../assets/images/match_pro2.jpg") }, { img: require("../../assets/images/match_pro3.jpg") }]}
-						keyExtractor={(item) => item.img}
+					<FlatList data={ allPostsImages?.length>0?allPostsImages:[{ testimg: require("../../assets/images/match_pro1.jpg") }, { testimg: require("../../assets/images/match_pro2.jpg") }, { testimg: require("../../assets/images/match_pro3.jpg") }]}
+						keyExtractor={(item) => item?.testimg || item?.id}
 						showsHorizontalScrollIndicator={false}
 						showsVerticalScrollIndicator={false}
 						horizontal={true}
-						renderItem={({ item }) => (
-							<View style={{ height: 100, width: 100, marginRight: 5, marginBottom: 5, borderRadius: 5, overflow: "hidden" }}>
-								<Image source={item.img} resizeMode="cover" style={{ height: "100%", width: "100%" }} />
+						refreshing={isRefetchingImages}
+					     onRefresh={() =>queryClient.refetchQueries({queryKey:["userPostsImages"]})}
+					     
+						ListFooterComponent={renderLoader}
+					     onEndReached={loadMoreImages}
+					     onEndReachedThreshold={0.3}
+
+						renderItem={({ item }) => {
+							 
+							return ( <View style={{ height: 100, width: 100, marginRight: 5, marginBottom: 5, borderRadius: 5, overflow: "hidden" }}>
+								<Image source={ item?.img ? {uri:`${item.img}`} : item?.testimg} resizeMode="cover" style={{ height: "100%", width: "100%" }} />
 							</View>
-						)}
+							)
+						}}
 					/>
 				</View>
 			)}

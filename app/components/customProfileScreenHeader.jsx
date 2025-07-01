@@ -12,12 +12,12 @@ import { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CustomProfileScreenHeader = ({ navigation }) => {
-	const [isProfileMenuAcitve, setIsProfileMenuActive] = useState(false)
 
-	const { setActiveSubCat, activeSubCat, image, userData } = useGlobalVariable()
+
+	const { setActiveSubCat, activeSubCat, image, userData ,isProfileMenuAcitve, setIsProfileMenuActive} = useGlobalVariable()
 
 	return (
-		<View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderBottomWidth: 2, backgroundColor: "white", padding: 20, borderColor: COLORS.light }}>
+		<View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderBottomWidth: 2, backgroundColor: "white", padding: 20, borderColor: COLORS.light,height:100 }}>
 			<View style={{ flexDirection: "row", alignItems: "center" }}>
 				<View className={'bg-gray-100'} style={{ overflow: "hidden", height: 50, width: 50, borderRadius: 50, marginRight: 10 }}>
 					<Image source={image ? { uri: `${image}` } : require("../../assets/default.png")} style={{ height: "100%", width: "100%" }} />

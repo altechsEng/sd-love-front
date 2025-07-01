@@ -42,7 +42,8 @@ import { useNavigation } from "@react-navigation/native";
     settingType:"",setSettingType:(val) => {},
     userData:{},setUserData:(val) => {},
     image:"",setImage:(val) => {},
-    refreshUserData:null,setRefreshUserData:(val) => {}
+    refreshUserData:null,setRefreshUserData:(val) => {},
+    isProfileMenuAcitve:false, setIsProfileMenuActive:(val) => {}
    
    })
 
@@ -153,7 +154,7 @@ const [activeScreen,setActiveScreen] = useState("side")
 const [isLoading,setIsLoading] = useState(false)
 const [refreshUserData,setRefreshUserData] = useState(null)
 const [settingType,setSettingType] = useState(null)
-
+const [isProfileMenuAcitve, setIsProfileMenuActive] = useState(false)
 
 const [image,setImage] = useState(null)
 const [userData,setUserData] = useState({}) // load it here once 
@@ -230,7 +231,8 @@ const [updateSettingData,setUpdateSettingData] = useState({
         updateSettingData,setUpdateSettingData,
         settingType,setSettingType,
         image,setImage,userData,setUserData,
-        refreshUserData,setRefreshUserData,loadData
+        refreshUserData,setRefreshUserData,loadData,
+        isProfileMenuAcitve, setIsProfileMenuActive
           }}
        >
          {children}
