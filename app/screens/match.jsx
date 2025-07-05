@@ -44,7 +44,7 @@ const  MatchScreen = ({navigation}) => {
     
 
           const isSearching = useRef(false);
-           const getAllMatches = async({pageParam = 0}) => {
+           const getAllMatches = async({pageParam = 1}) => {
              try {
                  isSearching.current = true;
                  let url = '/api/show-matches';
@@ -53,20 +53,16 @@ const  MatchScreen = ({navigation}) => {
                  if(token) {
                      const response = await axios.post(
                          url,
-                         {offset: pageParam, limit: POST_LIMIT},
+                         {page:pageParam},
                          {headers: {"Authorization": `Bearer ${token}`}}
                      );
      
-                      
-                     isSearching.current = false;
-                     return {
-                         matches: response?.data?.matches,
-                         nextOffset: response?.data?.next_offset,
-                     };
+                   
+                     return response.data
                  }
              } catch(err) {
                  console.log(err.message, "in getAllMatches",Object.keys(err),err?.request);
-                 isSearching.current = false;
+                  
                  throw err; // Important for React Query error handling
              }
          };
@@ -80,13 +76,17 @@ const  MatchScreen = ({navigation}) => {
          } = useInfiniteQuery({
              queryKey: ["matches"],
              queryFn: getAllMatches,
-             getNextPageParam: (lastPage) => lastPage?.nextOffset ?? undefined,
+             getNextPageParam: (lastPage) => {
+                	 if (lastPage.hasMore) {
+        return lastPage?.next_page;
+      }
+      return undefined;
+             },
               
          });
      
          // FLATTEN ALL PAGES INTO SINGLE ARRAY
          const allMatches = data?.pages.flatMap(page => {
-             
             return page?.matches
          }) ?? [];
      
@@ -329,6 +329,11 @@ useEffect(() => {
                renderItem={renderProfile}
                numColumns={2}
                showsVerticalScrollIndicator={false}
+
+               	onEndReached={loadMoreItem}
+				onEndReachedThreshold={0.3}
+				 
+				ListFooterComponentStyle={{ alignItems: "center", justifyContent: "center"}}
  
                />
         

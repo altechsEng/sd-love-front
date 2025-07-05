@@ -9,7 +9,7 @@ import {
 import { ScrollView } from "react-native-gesture-handler";
 import { useCallback, useEffect, useState } from "react";
 import { PostAddIcon, MatchProfileArrowBack, MatchProfileBirthDay, MatchProfileEducation, MatchProfileFaithChurch, MatchProfileFaithIcon1, MatchProfileFaithOccupation, MatchProfileHome, MatchProfileLang, MatchProfilePlus, MatchProfileSexIcon, MatchProfileSmallHeart, MatchProfleSmallFace, PostScreenBookMark, ProfileScreenBookMark, ProfileScreenAddPost, PostScreenDots, ProfileScreenPostEdit, ProfileScreenPostDelete, ProfileScreenManageProfile, ProfileScreenAccountSecurity, ProfileScreenTheme, ProfileScreenGlobe, ProfileScreenPermissions, ProfileScreenQuestionMark, ProfileSCreenExclamation, ProfileScreenPrivacyPolicy, ProfileScreenLogOut, HomeFeedHeart } from "../components/vectors";
-import { COLORS, FAMILLY, POST_LIMIT, TEXT_SIZE } from "../../utils/constants";
+import { BaseImageUrl, COLORS, FAMILLY, POST_LIMIT, TEXT_SIZE } from "../../utils/constants";
 import { useGlobalVariable } from "../context/global";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -331,7 +331,7 @@ const renderLoader = () => {
 				<View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
 					<View style={{ flex: 2, flexDirection: "row" }}>
 						<TouchableOpacity style={{ borderRadius: 50, height: 50, width: 50, overflow: "hidden", alignItems: "center" }}>
-							<Image source={{uri:`${item?.user?.profile_picture}`} || item?.img} resizeMode="cover" style={{ height: "100%", width: "100%" }} />
+							<Image source={item?.user?.user_image? {uri:`${BaseImageUrl}/${item?.user?.user_image}`} :item?.img} resizeMode="cover" style={{ height: "100%", width: "100%" }} />
 							</TouchableOpacity>
 						<View style={{ flexDirection: "column", justifyContent: "center", marginLeft: 10 }}>
 							<Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.secondary - 2, fontFamily: FAMILLY.semibold }}>{item?.user?.name || item?.name}</Text>
@@ -378,7 +378,7 @@ const renderLoader = () => {
 				<View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
 					<View style={{ flex: 2, flexDirection: "row" }}>
 						<TouchableOpacity style={{ borderRadius: 50, height: 50, width: 50, overflow: "hidden", alignItems: "center" }}>
-							<Image source={item?.user?.profile_picture ? {uri:`${item?.user?.profile_picture}`} :  item?.img } resizeMode="cover" style={{ height: "100%", width: "100%" }} />
+							<Image source={item?.user?.user_image ? {uri:`${BaseImageUrl}/${item?.user?.user_image}`} :  item?.img } resizeMode="cover" style={{ height: "100%", width: "100%" }} />
 							</TouchableOpacity>
 						<View style={{ flexDirection: "column", justifyContent: "center", marginLeft: 10 }}>
  	                              <Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.secondary - 2, fontFamily: FAMILLY.semibold }}>{item?.user?.name || item?.name}</Text>
@@ -560,7 +560,8 @@ const renderLoader = () => {
 					ListFooterComponent={renderLoader}
 					onEndReached={loadMorePosts}
 					onEndReachedThreshold={0.3}
- 
+					ListFooterComponentStyle={{ alignItems: "center", justifyContent: "center"}}
+
 					 
 
 				/>
@@ -579,6 +580,8 @@ const renderLoader = () => {
 						ListFooterComponent={renderLoader}
 					     onEndReached={loadMoreImages}
 					     onEndReachedThreshold={0.3}
+						ListFooterComponentStyle={{ alignItems: "center", justifyContent: "center"}}
+
 
 						renderItem={({ item }) => {
 							 
@@ -607,6 +610,8 @@ const renderLoader = () => {
 						ListFooterComponent={renderLoader}
 					     onEndReached={loadMoreUserSavePost}
 					     onEndReachedThreshold={0.3}
+						ListFooterComponentStyle={{ alignItems: "center", justifyContent: "center"}}
+
 					/>
 				</View>
 			)}

@@ -79,17 +79,17 @@ export default function HomeFeed({ navigation }) {
 		}
 	])
 
-	const isSearching = useRef(false);
-	const getAllPost = async ({ pageParam = 0 }) => {
+ 
+	const getAllPosts = async ({ pageParam = 1 }) => {
 		try {
-			isSearching.current = true;
+			 
 			 
 			let token = await AsyncStorage.getItem("user_token");
 
 			if (token) {
-				const postResponse = await axios.post(
+				const response = await axios.post(
 					'/api/get-all-posts',
-					{ offset: pageParam, limit: POST_LIMIT },
+					{ page: pageParam },
 					{ headers: { "Authorization": `Bearer ${token}` } }
 				);
 
@@ -100,45 +100,102 @@ export default function HomeFeed({ navigation }) {
 				);
 
 				 
-				isSearching.current = false;
-				return {
-					matches:matchResponse?.data?.matches,
-					posts: postResponse?.data?.posts,
-					nextOffset: postResponse?.data?.next_offset,
-				};
+				 
+				return response.data
 			}
 		} catch (err) {
 			console.log(err.message, "in getAllPost", Object.keys(err), err?.request);
-			isSearching.current = false;
+			 
+			throw err; // Important for React Query error handling
+		}
+	};
+
+
+		const getAllMatches = async ({ pageParam = 1 }) => {
+		try {
+			 
+			 
+			let token = await AsyncStorage.getItem("user_token");
+
+			if (token) {
+ 
+
+				const response = await axios.post(
+					"/api/show-matches",
+					{ page:pageParam },
+					{ headers: { "Authorization": `Bearer ${token}` } }
+				);
+
+				 
+			 
+				 
+				return response.data
+			}
+		} catch (err) {
+			console.log(err.message, "in getAllmatches", Object.keys(err), err?.request);
+			 
 			throw err; // Important for React Query error handling
 		}
 	};
 
 	const {
-		data,
+		data:postData,
 		fetchNextPage,
 		hasNextPage,
 		isFetchingNextPage,
 		isFetching
 	} = useInfiniteQuery({
-		queryKey: ["posts","matches"],
-		queryFn: getAllPost,
-		getNextPageParam: (lastPage) => lastPage?.nextOffset ?? undefined,
-		initialPageParam: 0,
+		queryKey: ["posts"],
+		queryFn: getAllPosts,
+		getNextPageParam: (lastPage) => {
+	 if (lastPage.hasMore) {
+        return lastPage?.next_page;
+      }
+      return undefined;
+		} 
+	});
+
+	const {
+		data:matchData,
+		fetchNextPage:fetchNextPageMatch,
+		hasNextPage:hasNextPageMatch,
+		isFetchingNextPage:isFetchingNextPageMatch,
+		isFetching:isFetchingMatch
+	} = useInfiniteQuery({
+		queryKey: ["matches"],
+		queryFn: getAllMatches,
+		getNextPageParam: (lastPage) => {
+	 if (lastPage.hasMore) {
+        return lastPage?.next_page;
+      }
+      return undefined;
+		} 
 	});
 
 	// FLATTEN ALL PAGES INTO SINGLE ARRAY
-	const allPosts = data?.pages.flatMap(page => page?.posts) ?? [];
-	const allmatches = data?.pages.flatMap(page => page?.matches) ?? [];
+	const allPosts = postData?.pages.flatMap(page => page?.posts) ?? [];
+	const allmatches = matchData?.pages.flatMap(page => page?.matches) ?? [];
 
-	const loadMoreItem = () => {
+	const loadMorePost = () => {
 		if (hasNextPage && !isFetchingNextPage) {
 			fetchNextPage();
 		}
 	};
 
+		const loadMoreMatch = () => {
+		if (hasNextPageMatch && !isFetchingNextPageMatch) {
+			fetchNextPageMatch();
+		}
+	};
+
+	const renderLoaderMatch = () => {
+				return isFetchingMatch ? (
+			<ActivityIndicator size="large" color={COLORS.blue} />
+		) : null;
+	}
+
 	const renderLoader = () => {
-		return isFetchingNextPage ? (
+		return isFetching ? (
 			<ActivityIndicator size="large" color={COLORS.blue} />
 		) : null;
 	};
@@ -146,7 +203,7 @@ export default function HomeFeed({ navigation }) {
 	const renderMatches = ({ item, index }) => {
  
       let age =calculateAge(item?.match_user?.user_infos?.qP2)
-		if (isFetching) {
+		if (isFetchingMatch) {
 			return <CustomMatchLoader />
 		}
 
@@ -176,12 +233,13 @@ export default function HomeFeed({ navigation }) {
 			return <CustomPostLoader />
 		}
 
+	 
 		 
 		return (
 			<View key={item?.key} style={{ flex: 1, marginVertical: 10, marginRight: 20, width: wp(80), flexDirection: "column" }}>
 				<View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
 					<View style={{ flex: 2, flexDirection: "row" }}>
-						<TouchableOpacity style={{ borderRadius: 50, height: 50, width: 50, overflow: "hidden", alignItems: "center" }}><Image source={item?.user?.user_image || require("../../assets/images/test_person1.png")} resizeMode="cover" style={{ height: "100%", width: "100%" }} /></TouchableOpacity>
+						<TouchableOpacity style={{ borderRadius: 50, height: 50, width: 50, overflow: "hidden", alignItems: "center" }}><Image source={item?.user?.user_image? {uri:`${BaseImageUrl}/${item?.user?.user_image}`}: require("../../assets/images/test_person1.png")} resizeMode="cover" style={{ height: "100%", width: "100%" }} /></TouchableOpacity>
 						<View style={{ flexDirection: "column", justifyContent: "center", marginLeft: 10 }}>
 							<Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.secondary - 2, fontFamily: FAMILLY.semibold }}>{item?.user?.firstname || "Johan mark"}</Text>
 							<Text style={{ color: COLORS.gray, fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.light }}>{dayjs(item?.created_at).fromNow() || "2h ago"}</Text>
@@ -225,7 +283,7 @@ export default function HomeFeed({ navigation }) {
 
 						<View style={{ marginRight: 10, flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
 							<TouchableOpacity onPress={() => navigation.navigate("Post", { item })}><HomeFeedComment stroke={"#2E2E2E"} fill={"white"} /></TouchableOpacity>
-							<Text style={{ fontFamily: FAMILLY.light, marginLeft: 5 }}>0</Text>
+							<Text style={{ fontFamily: FAMILLY.light, marginLeft: 5 }}>{item?.comment_count || 0}</Text>
 						</View>
 
 						<View style={{ marginRight: 10, flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
@@ -278,6 +336,12 @@ export default function HomeFeed({ navigation }) {
 						horizontal={true}
 						showsHorizontalScrollIndicator={false}
 						style={{ height: 180 }}
+
+						onEndReached={loadMoreMatch}
+						onEndReachedThreshold={0.5}
+						ListFooterComponent={renderLoaderMatch}
+						ListFooterComponentStyle={{ alignItems: "center", justifyContent: "center"}}
+
 					/>
 				</View>
 
@@ -288,10 +352,10 @@ export default function HomeFeed({ navigation }) {
 						keyExtractor={(item) => item?.key || item?.id}
 						horizontal={true}
 						showsHorizontalScrollIndicator={false}
-						onEndReached={loadMoreItem}
+						onEndReached={loadMorePost}
 						onEndReachedThreshold={0.5}
 						ListFooterComponent={renderLoader}
-						ListFooterComponentStyle={{ alignItems: "center", justifyContent: "center", paddingBottom: 50 }}
+						ListFooterComponentStyle={{ alignItems: "center", justifyContent: "center"}}
 					/>
 				</View>
 				<View style={{ paddingLeft: 20 }}>
@@ -301,7 +365,7 @@ export default function HomeFeed({ navigation }) {
 						keyExtractor={(item) => item?.key || item?.id}
 						horizontal={true}
 						showsHorizontalScrollIndicator={false}
-						onEndReached={loadMoreItem}
+						onEndReached={loadMoreMatch}
 						onEndReachedThreshold={0.5}
 						ListFooterComponent={renderLoader}
 						ListFooterComponentStyle={{ alignItems: "center", justifyContent: "center", paddingBottom: 50 }}

@@ -20,9 +20,7 @@ export default function MatchConnection({navigation}) {
      const maleImage = item?.match_user?.user_infos?.qP1 === "Homme" ? `${BaseImageUrl}/${item?.match_user?.user_image}` : image
      const femaleImage = item?.match_user?.user_infos?.qP1 === "Femme" ? `${BaseImageUrl}/${item?.match_user?.user_image}` : image
      
-     useEffect(()=> {
-          console.log(image,"user data....",item?.match_user?.user_image,item?.match_user?.user_infos?.qP1)
-     },[])
+ 
  
      return (
           <View style={{backgroundColor:"white",alignItems:"center",flex:1}}>

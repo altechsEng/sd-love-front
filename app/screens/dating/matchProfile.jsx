@@ -33,12 +33,12 @@ dayjs.extend(relativeTime)
 
  
 
-               const isSearching = useRef(false);
-                const getMatchPost = async({pageParam = 0}) => {
+              
+                const getMatchPost = async({pageParam = 1}) => {
                   try {
 
                      
-                      isSearching.current = true;
+                     
                       let url = '/api/show-match-posts';
                       let token = await AsyncStorage.getItem("user_token");
                       let matchId = item?.match_id
@@ -46,28 +46,53 @@ dayjs.extend(relativeTime)
                       if(token) {
                           const response = await axios.post(
                               url,
-                              {offset: pageParam, limit: POST_LIMIT,matchId},
+                              {page:pageParam,matchId},
                               {headers: {"Authorization": `Bearer ${token}`}}
                           );
           
                            
-                          isSearching.current = false;
                          
-                          return {
-                              match_posts: response?.data?.match_posts,
-                              match_images: response?.data?.match_images,
-                              nextOffset: response?.data?.next_offset,
-                          };
+                         console.log(response.data,":::response-data")
+                          return response.data
                       }
                   } catch(err) {
                       console.log(err.message, "in getAllMatches",Object.keys(err),err?.request);
-                      isSearching.current = false;
+                     
+                      throw err; // Important for React Query error handling
+                  }
+              };
+
+
+              const getMatchImages = async({pageParam = 1}) => {
+                  try {
+
+                     
+                     
+                      let url = '/api/show-match-images';
+                      let token = await AsyncStorage.getItem("user_token");
+                      let matchId = item?.match_id
+                      
+                      if(token) {
+                          const response = await axios.post(
+                              url,
+                              {page:pageParam,matchId},
+                              {headers: {"Authorization": `Bearer ${token}`}}
+                          );
+          
+                           
+                         
+                         
+                          return response.data
+                      }
+                  } catch(err) {
+                      console.log(err.message, "in getAllMatches images",Object.keys(err),err?.request);
+                     
                       throw err; // Important for React Query error handling
                   }
               };
           
               const { 
-                  data, 
+                  data:postData, 
                   fetchNextPage, 
                   hasNextPage,
                   isFetchingNextPage,
@@ -75,32 +100,67 @@ dayjs.extend(relativeTime)
               } = useInfiniteQuery({
                   queryKey: ["match_posts"],
                   queryFn: getMatchPost,
-                  getNextPageParam: (lastPage) => lastPage?.nextOffset ?? undefined,
+                  getNextPageParam: (lastPage) => {
+          if (lastPage.hasMore) {
+             return lastPage?.next_page;
+          }
+         return undefined;
+                  },
+                   
+              });
+
+
+              const { 
+                  data:matchImages, 
+                  fetchNextPage:fetchNextPageMatch, 
+                  hasNextPage:hasNextPageMatch,
+                  isFetchingNextPage:isFetchingNextPageMatch,
+                  isFetching:isFetchingMatch
+              } = useInfiniteQuery({
+                  queryKey: ["match_images"],
+                  queryFn: getMatchImages,
+                  getNextPageParam: (lastPage) => {
+          if (lastPage.hasMore) {
+             return lastPage?.next_page;
+          }
+         return undefined;
+                  },
                    
               });
           
               // FLATTEN ALL PAGES INTO SINGLE ARRAY
-              const allMatchPost = data?.pages.flatMap(page => {
-                  
+              const allMatchPost = postData?.pages.flatMap(page => {
                  return page?.match_posts
               }) ?? [];7
 
-               const allMatchImages = data?.pages.flatMap(page => {
-                  
+               const allMatchImages = matchImages?.pages.flatMap(page => {
                  return page?.match_images
               }) ?? [];
           
-              const loadMoreItem = () => {
+              const loadMoreMatchPost= () => {
                   if (hasNextPage && !isFetchingNextPage) {
                       fetchNextPage();
                   }  
               };
+
+          const loadMoreMatchImages= () => {
+                  if (hasNextPageMatch && !isFetchingNextPageMatch) {
+                      fetchNextPageMatch();
+                  }  
+              };
           
-              const renderLoader = () => {
-                  return isFetchingNextPage ? (
+              const renderLoaderPost = () => {
+                  return isFetching ? (
                       <ActivityIndicator size="large" color={COLORS.blue} />
                   ) : null;
               };
+
+            const renderLoaderMatch= () => {
+                  return isFetchingMatch ? (
+                      <ActivityIndicator size="large" color={COLORS.blue} />
+                  ) : null;
+              };
+
      const [activeSubCat ,setActiveSubCat] = useState('About')
  
 
@@ -121,11 +181,13 @@ dayjs.extend(relativeTime)
             if (isFetching) {
                     return <CustomPostLoader />
                }
+
+                
                return (
                     <View   style={{flex:1,marginVertical:10,marginRight:20,width:wp(90),flexDirection:"column"}}>
                          <View style={{flexDirection:"row",justifyContent:"space-evenly",alignItems:"center"}}>
                          <View style={{flex:2,flexDirection:"row"}}>
-                         <TouchableOpacity style={{borderRadius:50,height:50,width:50,overflow:"hidden",alignItems:"center"}}><Image source={{uri:`${BaseImageUrl}/${item?.user?.user_image}`} || require("../../../assets/images/test_match1.jpg")} resizeMode="cover" style={{height:"100%",width:"100%"}}/></TouchableOpacity>
+                         <TouchableOpacity style={{borderRadius:50,height:50,width:50,overflow:"hidden",alignItems:"center"}}><Image source={item?.user?.user_image? {uri:`${BaseImageUrl}/${item?.user?.user_image}`} : require("../../../assets/images/test_match1.jpg")} resizeMode="cover" style={{height:"100%",width:"100%"}}/></TouchableOpacity>
                          <View style={{flexDirection:"column",justifyContent:"center",marginLeft:10}}>
                                    <Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.secondary - 2, fontFamily: FAMILLY.semibold }}>{item?.user?.firstname || "Johan mark"}</Text>
                                    <Text style={{ color: COLORS.gray, fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.light }}>{dayjs(item?.created_at).fromNow() || "2h ago"}</Text>
@@ -334,6 +396,11 @@ dayjs.extend(relativeTime)
       horizontal={true}
       showsHorizontalScrollIndicator={false}
       style={{marginBottom:50}}
+
+	 onEndReached={loadMoreMatchPost}
+	 onEndReachedThreshold={0.5}
+	 ListFooterComponent={renderLoaderPost}
+	 ListFooterComponentStyle={{ alignItems: "center", justifyContent: "center"}}
       
       />
      )}
@@ -345,10 +412,16 @@ dayjs.extend(relativeTime)
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
                 horizontal={true}
+
+                onEndReached={loadMoreMatchImages}
+	           onEndReachedThreshold={0.5}
+	           ListFooterComponent={renderLoaderMatch}
+	           ListFooterComponentStyle={{ alignItems: "center", justifyContent: "center"}}
+
                 renderItem={({item}) => {
-                     
+                     console.log(item,"itemoooo---")
                     return       <View style={{height:100,width:100,marginRight:10,marginBottom:5,borderRadius:5,overflow:"hidden"}}>
-                         <Image source={{uri:`${BasePostImageUrl}/${item?.content}`} ||item?.img} resizeMode="cover" style={{height:"100%",width:"100%"}}/>
+                         <Image source={item?.content ? {uri:`${BasePostImageUrl}/${item?.content}`} : item?.img} resizeMode="cover" style={{height:"100%",width:"100%"}}/>
                     </View>
                 }}
                />

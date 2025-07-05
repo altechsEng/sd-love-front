@@ -22,13 +22,14 @@ import {
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useRoute } from '@react-navigation/native';
 import { useGlobalVariable } from '../../context/global';
-import { COLORS,FAMILLY,POST_LIMIT,TEXT_SIZE } from '../../../utils/constants';
+import { BaseImageUrl, COLORS,FAMILLY,POST_LIMIT,TEXT_SIZE } from '../../../utils/constants';
 import { HomeFeedComment, HomeFeedHeart, HomeFeedShare, PostScreenBigComment, PostScreenBookMark, PostScreenDots, PostScreenMiniHeart } from '../../components/vectors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { CustomRegularPoppingText, CustomSemiBoldPoppingText } from '../../components/text';
 import MessageSender from '../../components/messageSender';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 dayjs.extend(relativeTime);
 
@@ -315,10 +316,10 @@ const handleLikePost = async() => {
 
 
 
-       const isSearching = useRef(false);
-     const getAllComments = async ({ pageParam = 0 }) => {
+    
+     const getAllComments = async ({ pageParam = 1}) => {
           try {
-               isSearching.current = true;
+             
                 
                let token = await AsyncStorage.getItem("user_token");
 
@@ -326,22 +327,19 @@ const handleLikePost = async() => {
                if (token) {
                     const response = await axios.post(
                          `/api/get-comments/${mainItem?.id}`,
-                         { offset: pageParam, limit: POST_LIMIT ,postId:mainItem?.id },
+                         { page:pageParam ,postId:mainItem?.id },
                          { headers: { "Authorization": `Bearer ${token}` } }
                     );
   
                  
   
-                    isSearching.current = false;
+               
                   console.log(response.data,"poping-----")
-                    return {
-                         comments:response?.data?.comments,
-                         nextOffset: response?.data?.next_offset,
-                    };
+                    return  response.data
                }
           } catch (err) {
                console.log(err.message, "in getallComments", Object.keys(err), err?.request);
-               isSearching.current = false;
+             
                throw err; // Important for React Query error handling
           }
      };
@@ -355,8 +353,13 @@ const handleLikePost = async() => {
      } = useInfiniteQuery({
           queryKey: ["comments"],
           queryFn: getAllComments,
-          getNextPageParam: (lastPage) => lastPage?.nextOffset ?? undefined,
-          initialPageParam: 0,
+          getNextPageParam: (lastPage) =>  {
+        if (lastPage.hasMore) {
+        return lastPage?.next_page;
+            }
+         return undefined;
+          },
+         
      });
   
 
@@ -625,7 +628,7 @@ const handleLikePost = async() => {
       >
         {/* Post Header */}
         <View style={styles.postHeader}>
-          <Image source={mainItem?.user?.user_image || require("../../../assets/images/test_person1.png")} 
+          <Image source={mainItem?.user?.user_image ? {uri:`${BaseImageUrl}/${mainItem?.user?.user_image}`} : require("../../../assets/images/test_person1.png")} 
           style={styles.postAvatar}/>
           <View style={styles.postUserInfo}>
             <Text style={styles.postUserName}>{mainItem?.user?.firstname || "Johno orlan"}</Text>
@@ -680,7 +683,7 @@ const handleLikePost = async() => {
             <View style={{flexDirection:"row",justifyContent:"space-between"}}>
               <View style={styles.postActionItem}>
                 <TouchableOpacity onPress={()=> handleLikePost()}>
-                  <HomeFeedHeart stroke={"#2E2E2E"} fill={"white"} />
+                  {mainItem?.isLiked ? <HomeFeedHeart stroke={COLORS.primary} fill={COLORS.primary} />:<HomeFeedHeart stroke={"#2E2E2E"} fill={"white"} />}
                 </TouchableOpacity>
                 <Text style={styles.postActionCount}>{mainItem?.likes_count || 0}</Text>
               </View>
