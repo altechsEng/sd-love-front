@@ -683,7 +683,7 @@ const handleLikePost = async() => {
             <View style={{flexDirection:"row",justifyContent:"space-between"}}>
               <View style={styles.postActionItem}>
                 <TouchableOpacity onPress={()=> handleLikePost()}>
-                  {mainItem?.isLiked ? <HomeFeedHeart stroke={COLORS.primary} fill={COLORS.primary} />:<HomeFeedHeart stroke={"#2E2E2E"} fill={"white"} />}
+                  {mainItem?.is_liked ? <HomeFeedHeart stroke={COLORS.primary} fill={COLORS.primary} />:<HomeFeedHeart stroke={"#2E2E2E"} fill={"white"} />}
                 </TouchableOpacity>
                 <Text style={styles.postActionCount}>{mainItem?.likes_count || 0}</Text>
               </View>
