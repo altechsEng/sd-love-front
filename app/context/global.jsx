@@ -34,6 +34,7 @@ import { useNavigation } from "@react-navigation/native";
     handleSubmitAddPost:() => {},
     postAddData:{text:"",media:[]},
     setPostAddData:(value) => {},
+    postEditData:{text:"",media:[]},setPostEditData:(value) => {},
     activeScreen:"side",
     setActiveScreen:(value) => {} ,
     activeSubCat:"About" ,setActiveSubCat: (value) => {},
@@ -43,7 +44,8 @@ import { useNavigation } from "@react-navigation/native";
     userData:{},setUserData:(val) => {},
     image:"",setImage:(val) => {},
     refreshUserData:null,setRefreshUserData:(val) => {},
-    isProfileMenuAcitve:false, setIsProfileMenuActive:(val) => {}
+    isProfileMenuAcitve:false, setIsProfileMenuActive:(val) => {},
+    editingPostItem:"",setEditingPostItem:(val) => {}
    
    })
 
@@ -65,6 +67,7 @@ import { useNavigation } from "@react-navigation/native";
 
 
 
+  const [editingPostItem,setEditingPostItem] = useState(null)
   const [user, setUser] = useState(null);
   const [questioniareLevel,setQuestionaireLevel] = useState("1/2 Questions générales")
   const [questionnaireProgress, setQuestionnaireProgress] = useState(0);
@@ -145,6 +148,11 @@ import { useNavigation } from "@react-navigation/native";
 
      
 const [postAddData,setPostAddData] = useState({
+  text:"",
+  media:[]
+})
+
+const [postEditData,setPostEditData] = useState({
   text:"",
   media:[]
 })
@@ -232,7 +240,9 @@ const [updateSettingData,setUpdateSettingData] = useState({
         settingType,setSettingType,
         image,setImage,userData,setUserData,
         refreshUserData,setRefreshUserData,loadData,
-        isProfileMenuAcitve, setIsProfileMenuActive
+        isProfileMenuAcitve, setIsProfileMenuActive,
+        setPostEditData,postEditData,
+        editingPostItem,setEditingPostItem
           }}
        >
          {children}

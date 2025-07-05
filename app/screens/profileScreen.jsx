@@ -48,7 +48,7 @@ const ProfileScreen = ({ navigation }) => {
 
 	const [savePosts, setSavePosts] = useState([
 		{
-			key: "postsave1",
+			key: "postsave1-id",
 			img: require("../../assets/images/test_match1.jpg"),
 			postImg: require("../../assets/images/match_pro1.jpg"),
 			name: "Emanuel Sama",
@@ -94,7 +94,7 @@ const ProfileScreen = ({ navigation }) => {
 
 
 
-	 const deletePostMutation = useMutation({
+const deletePostMutation = useMutation({
     mutationFn: async (postId) => {
       const token = await AsyncStorage.getItem("user_token");
       const formData = new FormData();
@@ -149,7 +149,7 @@ const getAllPostsImages = async ({ pageParam = 1 }) => {
  
 				 
 				 
-			 console.log(response.data,"okau images")
+			  
 				return response.data
 			}
 		} catch (err) {
@@ -187,6 +187,65 @@ const getAllPostsImages = async ({ pageParam = 1 }) => {
   const loadMoreImages = () => {
     if (hasNextPageImages && !isFetchingNextPageImages ) {
       fetchNextPageImages();
+    }
+  };
+
+
+//infinite query for save posts
+
+// Infinite query for user post images
+const getAllUserSavePost = async ({ pageParam = 1 }) => {
+		try {
+			 
+			 
+			let token = await AsyncStorage.getItem("user_token");
+
+			if (token) {
+				const response = await axios.post(
+					'/api/get-user-save-post',
+					{ page: pageParam },
+					{ headers: { "Authorization": `Bearer ${token}` } }
+				);
+ 
+				 
+				  
+				return response.data
+			}
+		} catch (err) {
+			console.log(err.message, "in all user posts images", Object.keys(err), err?.request);
+			 
+			throw err; // Important for React Query error handling
+		}
+	};
+
+  const {
+    data:userSavePost,
+    fetchNextPage:fetchNextPageUserSavePost,
+    hasNextPage:hasNextPageUserSavePost,
+    isFetchingNextPage:isFetchingNextPageUserSavePost,
+    refetch:refetchUserSavePost,
+    isFetching:isFetchingUserSavePost,
+    isLoading: userSavePostLoading,
+    error: userSavePostError,
+    isRefetching:isRefetchingUserSavePost
+  } = useInfiniteQuery({
+    queryKey: ['userSavePosts'],
+    queryFn: getAllUserSavePost,
+    getNextPageParam: (lastPage, allPages) => {
+      // Adjust this based on your API response structure
+      if (lastPage.hasMore) {
+        return lastPage?.next_page;
+      }
+      return undefined;
+    }
+  });
+
+  // Combine all pages into a single array
+  const allUserSavePost = userSavePost?.pages.flatMap(page => page.savePosts) || [];
+ 
+  const loadMoreUserSavePost = () => {
+    if (hasNextPageUserSavePost && !isFetchingNextPageUserSavePost ) {
+      fetchNextPageUserSavePost();
     }
   };
 
@@ -256,12 +315,7 @@ const renderLoader = () => {
 		) : null;
 	};
 
-  // Refetch when screen comes into focus
-//   useEffect(
-//     useCallback(() => {
-//       refetch();
-//     }, [refetch])
-//   );
+ 
 
 
 	const renderPosts = ({ item }) => {
@@ -276,7 +330,9 @@ const renderLoader = () => {
 				return (<View  style={{ flex: 1, marginVertical: 10, marginRight: 20, width: wp(90), flexDirection: "column" }}>
 				<View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
 					<View style={{ flex: 2, flexDirection: "row" }}>
-						<TouchableOpacity style={{ borderRadius: 50, height: 50, width: 50, overflow: "hidden", alignItems: "center" }}><Image source={{uri:`${item?.user?.profile_picture}`} || item?.img} resizeMode="cover" style={{ height: "100%", width: "100%" }} /></TouchableOpacity>
+						<TouchableOpacity style={{ borderRadius: 50, height: 50, width: 50, overflow: "hidden", alignItems: "center" }}>
+							<Image source={{uri:`${item?.user?.profile_picture}`} || item?.img} resizeMode="cover" style={{ height: "100%", width: "100%" }} />
+							</TouchableOpacity>
 						<View style={{ flexDirection: "column", justifyContent: "center", marginLeft: 10 }}>
 							<Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.secondary - 2, fontFamily: FAMILLY.semibold }}>{item?.user?.name || item?.name}</Text>
 							<Text style={{ lineHeight: 12, color: COLORS.gray, fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.light }}>{dayjs(new Date(item?.created_at)).fromNow()|| item?.time}</Text>
@@ -300,7 +356,7 @@ const renderLoader = () => {
 				</TouchableOpacity> */}
 
 				<TouchableOpacity onPress={() => navigation.navigate("Post", { item })} style={{ height: 200, margin: 0, padding: 0, overflow: "hidden", borderRadius: 20 }}>
-				<Image source={item?.media?.length > 0 ? { uri: `${item?.media[0]?.url}` } : require("../../assets/images/blog_test.jpg")} resizeMode="cover" style={{ width: "100%", height: "100%" }} />
+				<Image source={item?.media?.length > 0 ?  { uri: `https://sdlove-api.altechs.africa/storage/app/private/public/post_media/${item?.media[0]?.url}` } : require("../../assets/images/blog_test.jpg")} resizeMode="cover" style={{ width: "100%", height: "100%" }} />
 				</TouchableOpacity>
 
 			</View>
@@ -312,29 +368,35 @@ const renderLoader = () => {
 
 	const renderSavePosts = ({ item }) => {
 
-		return (
-			<View key={item?.key} style={{ flex: 1, marginVertical: 10, marginRight: 20, width: wp(90), flexDirection: "column" }}>
+		if(isFetchingUserSavePost) {
+			return <CustomPostLoader/>
+		}
+
+		   
+		return (<View style={{ flex: 1, marginVertical: 10, marginRight: 20, width: wp(90), flexDirection: "column" }}>
 
 				<View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
 					<View style={{ flex: 2, flexDirection: "row" }}>
-						<TouchableOpacity style={{ borderRadius: 50, height: 50, width: 50, overflow: "hidden", alignItems: "center" }}><Image source={item.img} resizeMode="cover" style={{ height: "100%", width: "100%" }} /></TouchableOpacity>
+						<TouchableOpacity style={{ borderRadius: 50, height: 50, width: 50, overflow: "hidden", alignItems: "center" }}>
+							<Image source={item?.user?.profile_picture ? {uri:`${item?.user?.profile_picture}`} :  item?.img } resizeMode="cover" style={{ height: "100%", width: "100%" }} />
+							</TouchableOpacity>
 						<View style={{ flexDirection: "column", justifyContent: "center", marginLeft: 10 }}>
-							<Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.secondary - 2, fontFamily: FAMILLY.semibold }}>{item.name}</Text>
-							<Text style={{ lineHeight: 12, color: COLORS.gray, fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.light }}>{item.time}</Text>
+ 	                              <Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.secondary - 2, fontFamily: FAMILLY.semibold }}>{item?.user?.name || item?.name}</Text>
+							<Text style={{ lineHeight: 12, color: COLORS.gray, fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.light }}>{dayjs(new Date(item?.created_at)).fromNow()|| item?.time}</Text>
 						</View>
 					</View>
 
-					<TouchableOpacity onPress={() => setModalVisible(true)} style={{ backgroundColor: "white", height: 25, width: 80, borderRadius: 20, alignItems: "center", justifyContent: "center" }}>
-						<PostScreenDots />
+					<TouchableOpacity onPress={() => {}} style={{ backgroundColor: "white", height: 25, width: 80, borderRadius: 20, alignItems: "center", justifyContent: "center" }}>
+						{/* <PostScreenDots /> */}
 					</TouchableOpacity>
 				</View>
 				<View style={{ marginVertical: 10 }}>
 					<Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.light }}>
-						Lorem ipsum dolor sit amet consectetur. Lorem varius quisque odio nisl tempor sit bibendum pulvinar sed. pharetra sed magnis vitae.
+						{item?.text ||"Lorem ipsum dolor sit amet consectetur. Lorem varius quisque odio nisl tempor sit bibendum pulvinar sed. pharetra sed magnis vitae."}
 					</Text>
 				</View>
-				<TouchableOpacity style={{ height: 200, margin: 0, padding: 0, overflow: "hidden", borderRadius: 20 }}>
-					<Image source={item.postImg} resizeMode="cover" style={{ width: "100%", height: "100%" }} />
+				<TouchableOpacity onPress={() => navigation.navigate("Post", { item })}  style={{ height: 200, margin: 0, padding: 0, overflow: "hidden", borderRadius: 20 }}>
+				<Image source={item?.media?.length > 0 ?  { uri: `https://sdlove-api.altechs.africa/storage/app/private/public/post_media/${item?.media[0]?.url}` } : require("../../assets/images/blog_test.jpg")} resizeMode="cover" style={{ width: "100%", height: "100%" }} />
 				</TouchableOpacity>
 
 			</View>
@@ -533,11 +595,18 @@ const renderLoader = () => {
 				<View>
 					<CustomSemiBoldPoppingText style={{ marginVertical: 20 }} color={"black"} fontSize={TEXT_SIZE.primary + 2} value={"Save post"} />
 					<FlatList
-						data={savePosts}
+						data={allUserSavePost.length>0?allUserSavePost:savePosts}
 						renderItem={renderSavePosts}
-						keyExtractor={(item) => item?.key || item?.id}
-
+						keyExtractor={(item,index) => item?.key || item?.id}
+						horizontal={true}
 						showsHorizontalScrollIndicator={false}
+
+						refreshing={isRefetchingUserSavePost}
+					     onRefresh={() =>queryClient.refetchQueries({queryKey:["userSavePosts"]})}
+					     
+						ListFooterComponent={renderLoader}
+					     onEndReached={loadMoreUserSavePost}
+					     onEndReachedThreshold={0.3}
 					/>
 				</View>
 			)}
@@ -660,7 +729,7 @@ const renderLoader = () => {
 					{/* Actual modal content */}
 					<View style={styles.modalContainer}>
 						<View className={'gap-6 py-8'} style={styles.modalContent}>
-							<TouchableOpacity style={{ alignItems: "center", justifyContent: "flex-start", flexDirection: "row" }} onPress={() => { }}>
+							<TouchableOpacity style={{ alignItems: "center", justifyContent: "flex-start", flexDirection: "row" }} onPress={() => navigation.navigate("PostEdit",{item:activePostItem})}>
 								<ProfileScreenPostEdit />
 								<CustomRegularPoppingText color={null} style={{ marginLeft: 20 }} value={"Edit post"} fontSize={TEXT_SIZE.primary} />
 							</TouchableOpacity>

@@ -28,13 +28,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { CustomRegularPoppingText, CustomSemiBoldPoppingText } from '../../components/text';
 import MessageSender from '../../components/messageSender';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 dayjs.extend(relativeTime);
 
 const BlogPostScreen = () => {
 
-     
+     const queryClient = useQueryClient()
      const { item:mainItem } = useRoute().params;
    
      const [comment, setComment] = useState("");
@@ -285,26 +285,33 @@ const handleLikePost = async() => {
 
 
 
-  const handleBookMark = async (postId) => {
-    try {
-        let token = await AsyncStorage.getItem("user_token");
+  const bookMarkMutation = useMutation({
+    mutationFn:async({postId}) => {
+       let token = await AsyncStorage.getItem("user_token");
       if (token) {
-        await axios.post('/api/save-post', { postId }, {
+        let response = await axios.post('/api/save-post', { postId }, {
           headers: {
             "Authorization": `Bearer ${token}`,
           }
-        }).then((res) => {
-          if (res.data.status === 200) {
-            ToastAndroid.show("Post saved successfully", 1000);
-          }
-        }).catch((err) => {
-          console.log(err, "error in catch");
-        });
+        }) 
+
+        return {status: response.data.status,data:response.data}
       }
-    } catch (err) {
-      console.log(err, "the error");
-    }
+    } ,
+    onError: (error) => {
+          console.error("book mark error:", error);
+          ToastAndroid.show("Failed to save post", ToastAndroid.SHORT);
+        }
+  })
+  const handleBookMark = async (postId) => {
+   let result =  await bookMarkMutation.mutateAsync({postId})
+  if (result.status === 200) {
+        await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['userSavePosts'] })
+      ]);
+  ToastAndroid.show("Post saved successfully", 1000);
   };
+}
 
 
 

@@ -44,6 +44,8 @@ import AccountSecurityScreen from './screens/settings/accountSecurity';
 
 import HolderComponent from './components/holder';
 import { StatusBar } from "expo-status-bar";
+import PostEditHeader from "./components/postEditHeader";
+import PostEdit from "./screens/posts/postEdit";
 
 axios.defaults.baseURL = "https://sdlove-api.altechs.africa";
 axios.defaults.headers.post["Accept"] = "application/json";
@@ -212,6 +214,11 @@ export default function Application() {
 							<Stack.Screen options={{
 								header: ({ navigation }) => <PostAddHeader navigation={navigation} />
 							}} name="PostAdd" component={PostAdd} />
+
+
+							<Stack.Screen options={{
+								header: ({ navigation }) => <PostEditHeader navigation={navigation} />
+							}} name="PostEdit" component={PostEdit} />
 
 							<Stack.Screen name="chatDiscussion" component={ChatDiscussion} options={{
 								headerShown: false,
