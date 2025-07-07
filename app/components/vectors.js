@@ -1101,7 +1101,7 @@ export const MatchProfleSmallFace = () => {
 }
 
 
-export const MatchProfileSmallHeart = () => {
+export const MatchProfileSmallHeart = ({fill, strock}) => {
   return   <Svg
   width={14}
   height={12}
@@ -1111,7 +1111,8 @@ export const MatchProfileSmallHeart = () => {
 >
   <Path
     d="M4.45016 0.900391C2.87636 0.900391 1.60016 2.25639 1.60016 3.92859C1.60016 7.27539 7.00016 11.1004 7.00016 11.1004C7.00016 11.1004 12.4002 7.27539 12.4002 3.92859C12.4002 1.85679 11.124 0.900391 9.55016 0.900391C8.43416 0.900391 7.46816 1.58199 7.00016 2.57439C6.53216 1.58199 5.56616 0.900391 4.45016 0.900391Z"
-    stroke="white"
+    stroke={strock}
+    fill={fill}
     strokeWidth={1.5}
     strokeLinecap="round"
     strokeLinejoin="round"
