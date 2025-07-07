@@ -96,11 +96,11 @@ const BlogPostScreen = () => {
 
   // Sample comments data
   const [comments, setComments] = useState([]);
-
+const [isitemLiked,setItemIsliked] = useState(mainItem?.is_liked)
+const [activePostLikeCount,setActivePostLikeCount] = useState(mainItem?.likes_count)
   const [newComment, setNewComment] = useState('');
   const [isPostLiked, setIsPostLiked] = useState(false);
   const scrollViewRef = useRef();
-
 
  
 
@@ -118,10 +118,12 @@ const handleLikePost = async() => {
             "Authorization": `Bearer ${token}`}
           }).then((res) => {
     console.log(res.data,"in handle like post")
+    setItemIsliked(res.data?.liked)
     ToastAndroid.show(res.data?.message,1000)
+    setActivePostLikeCount(res.data?.likes_count)
   
   }).catch((err) => {
-    console.log(err,"in handle like post cathc..")
+    console.log(err?.request,"in handle like post cathc..")
   })
 
   } catch(err) {
@@ -132,19 +134,19 @@ const handleLikePost = async() => {
 
   const handleLikeComment = async(commentId) => {
 
+try {
     let token = await AsyncStorage.getItem("user_token")
-
+ 
     axios.post(`/api/new-comment-like/${mainItem?.id}/${commentId}`,{type:"regular",target:"comment",postId:mainItem?.id,commentId,targetId:commentId},{headers:{  "Authorization": `Bearer ${token}`}}).then((res) => {
       console.log(res.data,"in like comment---")
-     if(res.data?.status == 400){
-       ToastAndroid.show(res.data.message,1000)
-     } 
-
-    if(res.data?.status == 200) {
-    setLikedComments(prev => ({
+ 
+    
+    setLikedComments(prev => {
+      return {
       ...prev,
       [commentId]: !prev[commentId]
-    }));
+    }
+    });
     
     setComments(prev => prev.map(comment => {
       if (comment.id === commentId) {
@@ -168,12 +170,15 @@ const handleLikePost = async() => {
       return comment;
     }));
 
-     }
+  
 
     }).catch(err => {
       console.log(err?.request,err,"in handle like comment")
     })
 
+} catch(err) {
+  console.log(err," in like comment handle")
+}
   };
 
  
@@ -334,7 +339,7 @@ const handleLikePost = async() => {
                  
   
                
-                  console.log(response.data,"poping-----")
+                  // console.log(response.data,"poping-----")
                     return  response.data
                }
           } catch (err) {
@@ -683,9 +688,9 @@ const handleLikePost = async() => {
             <View style={{flexDirection:"row",justifyContent:"space-between"}}>
               <View style={styles.postActionItem}>
                 <TouchableOpacity onPress={()=> handleLikePost()}>
-                  {mainItem?.is_liked ? <HomeFeedHeart stroke={COLORS.primary} fill={COLORS.primary} />:<HomeFeedHeart stroke={"#2E2E2E"} fill={"white"} />}
+                  {isitemLiked ? <HomeFeedHeart stroke={COLORS.primary} fill={COLORS.primary} />:<HomeFeedHeart stroke={"#2E2E2E"} fill={"white"} />}
                 </TouchableOpacity>
-                <Text style={styles.postActionCount}>{mainItem?.likes_count || 0}</Text>
+                <Text style={styles.postActionCount}>{activePostLikeCount || 0}</Text>
               </View>
               
               <View style={styles.postActionItem}>

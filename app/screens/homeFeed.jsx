@@ -79,6 +79,7 @@ export default function HomeFeed({ navigation }) {
 		}
 	])
 
+	
  
 	const getAllPosts = async ({ pageParam = 1 }) => {
 		try {
@@ -93,13 +94,7 @@ export default function HomeFeed({ navigation }) {
 					{ headers: { "Authorization": `Bearer ${token}` } }
 				);
 
-				const matchResponse = await axios.post(
-					"/api/show-matches",
-					{ offset: pageParam, limit: POST_LIMIT },
-					{ headers: { "Authorization": `Bearer ${token}` } }
-				);
-
-				 
+				
 				 
 				return response.data
 			}
