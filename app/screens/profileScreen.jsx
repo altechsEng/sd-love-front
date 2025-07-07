@@ -335,8 +335,8 @@ const ProfileScreen = ({ navigation }) => {
 							<Image source={item?.user?.user_image ? { uri: `${BaseImageUrl}/${item?.user?.user_image}` } : item?.img} resizeMode="cover" style={{ height: "100%", width: "100%" }} />
 						</TouchableOpacity>
 						<View style={{ flexDirection: "column", justifyContent: "center", marginLeft: 10 }}>
-							<Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.secondary - 2, fontFamily: FAMILLY.semibold }}>{item?.user?.name || item?.name}</Text>
-							<Text style={{ lineHeight: 12, color: COLORS.gray, fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.light }}>{dayjs(new Date(item?.created_at)).fromNow() || item?.time}</Text>
+							<Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.secondary - 2, fontFamily: FAMILLY.semibold }}>{item?.user?.firstname ? `${item?.user?.firstname} ${item?.user?.lastname }`: item?.name}</Text>
+							<Text style={{ lineHeight: 12, color: COLORS.gray, fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.light }}>{dayjs(new Date(item?.created_at)).fromNow()|| item?.time}</Text>
 						</View>
 					</View>
 
@@ -379,8 +379,8 @@ const ProfileScreen = ({ navigation }) => {
 							<Image source={item?.user?.user_image ? { uri: `${BaseImageUrl}/${item?.user?.user_image}` } : item?.img} resizeMode="cover" style={{ height: "100%", width: "100%" }} />
 						</TouchableOpacity>
 						<View style={{ flexDirection: "column", justifyContent: "center", marginLeft: 10 }}>
-							<Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.secondary - 2, fontFamily: FAMILLY.semibold }}>{item?.user?.name || item?.name}</Text>
-							<Text style={{ lineHeight: 12, color: COLORS.gray, fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.light }}>{dayjs(new Date(item?.created_at)).fromNow() || item?.time}</Text>
+ 	                              <Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.secondary - 2, fontFamily: FAMILLY.semibold }}>{item?.user?.firstname ? `${item?.user?.firstname} ${item?.user?.lastname }`: item?.name}</Text>
+							<Text style={{ lineHeight: 12, color: COLORS.gray, fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.light }}>{dayjs(new Date(item?.created_at)).fromNow()|| item?.time}</Text>
 						</View>
 					</View>
 

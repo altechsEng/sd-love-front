@@ -79,6 +79,8 @@ export default function HomeFeed({ navigation }) {
 		}
 	])
 
+	
+ 
 	const getAllPosts = async ({ pageParam = 1 }) => {
 		try {
 
@@ -91,12 +93,8 @@ export default function HomeFeed({ navigation }) {
 					{ headers: { "Authorization": `Bearer ${token}` } }
 				);
 
-				const matchResponse = await axios.post(
-					"/api/show-matches",
-					{ offset: pageParam, limit: POST_LIMIT },
-					{ headers: { "Authorization": `Bearer ${token}` } }
-				);
-
+				
+				 
 				return response.data
 			}
 		} catch (err) {
@@ -261,7 +259,10 @@ export default function HomeFeed({ navigation }) {
 					<View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }} >
 
 						<View style={{ marginRight: 10, flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
-							<TouchableOpacity><HomeFeedHeart stroke={"#2E2E2E"} fill={"white"} /></TouchableOpacity>
+							<TouchableOpacity>
+							 {item?.is_liked ? <HomeFeedHeart stroke={COLORS.primary} fill={COLORS.primary} />:<HomeFeedHeart stroke={"#2E2E2E"} fill={"white"} />}
+								
+							</TouchableOpacity>
 							<Text style={{ fontFamily: FAMILLY.light, marginLeft: 5 }}>{item?.likes_count || 0}</Text>
 						</View>
 
