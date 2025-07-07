@@ -17,12 +17,10 @@ export default function MatchConnection({navigation}) {
 
      const {item} = useRoute().params
      const {userData,image} = useGlobalVariable()
-     const maleImage = item?.match_user?.user_infos[0]?.qP1 === "Homme" ? `${BaseImageUrl}/${item?.match_user?.user_image}` : image
-     const femaleImage = item?.match_user?.user_infos[0]?.qP1 === "Femme" ? `${BaseImageUrl}/${item?.match_user?.user_image}` : image
+     const maleImage = item?.match_user?.user_infos?.qP1 === "Homme" ? `${BaseImageUrl}/${item?.match_user?.user_image}` : image
+     const femaleImage = item?.match_user?.user_infos?.qP1 === "Femme" ? `${BaseImageUrl}/${item?.match_user?.user_image}` : image
      
-     useEffect(()=> {
-          console.log(image,"user data....",item?.score)
-     },[])
+ 
  
      return (
           <View style={{backgroundColor:"white",alignItems:"center",flex:1}}>
@@ -49,7 +47,7 @@ export default function MatchConnection({navigation}) {
           <View style={{top:hp(10),height:500,width:500,borderRadius:"100%",borderColor:'#D7A898',borderWidth:1,borderStyle:"dashed"}}></View>
           </View>
 
-          <CustomSemiBoldPoppingText style={{textAlign:"center",marginVertical:20}} color="#D0917B" fontSize={TEXT_SIZE.title+8} value={ `${item?.score}%` || "89%"}/>
+          <CustomSemiBoldPoppingText style={{textAlign:"center",marginVertical:20}} color="#D0917B" fontSize={TEXT_SIZE.title+8} value={ `${item?.score}%` || "0%"}/>
 
           <View style={{position:"relative",flexDirection:"row",alignItems:"center",justifyContent:"center"}}>
           <View style={{transform:[{rotate:"-4.58deg"}],position:"absolute",top:hp(2),left:40,zIndex:8,overflow:"hidden",height:200,width:150,borderRadius:20,padding:3,backgroundColor:"white"}}>

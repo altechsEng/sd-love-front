@@ -16,29 +16,43 @@ import { useGlobalVariable } from '../../../app/context/global';
    } from "react-native-responsive-screen";
 import {CustomRegularPoppingText} from "../../components/text"
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRoute } from '@react-navigation/native';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window')
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_VIDEO_DURATION = 30; // 30 seconds
 
-const PostAdd = ({ navigation }) => {
+const PostEdit = ({ navigation }) => {
 
    
   const [thoughts,setThoughts] = useState("")
-  const [images, setImages] = useState([
+    const [images, setImages] = useState([
     // { id: "imk1", img: require("../../../assets/images/match_pro1.jpg") },
     // { id: "imk2", img: require("../../../assets/images/match_pro2.jpg") },
     // { id: "imk3", img: require("../../../assets/images/match_pro3.jpg") },
   ]);
+  const {item} = useRoute().params
+
+
   const [cameraPermission, requestCameraPermission] = Camera.useCameraPermissions();
   const [mediaPermission, requestMediaPermission] = MediaLibrary.usePermissions();
   const [isProcessing, setIsProcessing] = useState(false);
-  const {setPostAddData,isLoading} = useGlobalVariable()
+  const {setPostEditData,isLoading,setEditingPostItem} = useGlobalVariable()
+
+    useEffect(() => {
+     
+     setThoughts(item?.text)
+     let image =  item?.media.map((med) =>{
+          return {img: med.url,id:med?.id,isOld:true}
+     })
+     setImages(image)
+     setEditingPostItem(item)
+  },[item])
 
 
   useEffect(()=> {
     
-     setPostAddData((prev) => ({
+     setPostEditData((prev) => ({
           ...prev,
           text:thoughts,
           media:images
@@ -46,6 +60,7 @@ const PostAdd = ({ navigation }) => {
   },[thoughts,images])
 
   const renderImages = ({ item }) => {
+      
     return (
       <View style={{ overflow: "hidden", height: 70, width: 70, marginRight: 5, marginBottom: 5 }}>
         {item.isVideo ? (
@@ -57,7 +72,7 @@ const PostAdd = ({ navigation }) => {
             useNativeControls={false}
           />
         ) : (
-          <Image source={item.img} style={{ height: "100%", width: "100%" }} />
+          <Image source={item?.isOld ? { uri: `https://sdlove-api.altechs.africa/storage/app/private/public/post_media/${item?.img}` } : {uri:item?.img?.uri} } style={{ height: "100%", width: "100%" }} />
         )}
         
         {/* Media type indicator */}
@@ -294,7 +309,7 @@ if (isValidSize) {
 <>
     {isLoading ? <View style={{flex:1,backgroundColor:"white",alignItems:"center",justifyContent:"center"}}>
       <ActivityIndicator size={34} color={COLORS.primary}/>
-      <CustomRegularPoppingText style={{}} color={COLORS.black} fontSize={TEXT_SIZE.primary} value="Loading please wait..."/>
+      <CustomRegularPoppingText style={{}} color={COLORS.black} fontSize={TEXT_SIZE.primary} value="Updating post please wait..."/>
     </View> :     <View style={{ flex: 1, backgroundColor: "white" }}>
       <TextInput
         placeholder='Express your thoughts....'
@@ -356,4 +371,4 @@ if (isValidSize) {
   )
 }
 
-export default PostAdd
+export default PostEdit

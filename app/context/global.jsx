@@ -17,34 +17,37 @@ import { useNavigation } from "@react-navigation/native";
 
 
 
-export const GlobalVariableContext = createContext({
-
-	user: "",
-	setUser: (user) => { },
-	questioniareLevel: "",
-	setQuestionaireLevel: (level) => { },
-	questionnaireProgress: 0,
-	setQuestionnaireProgress: (progress) => { },
-	registrationData: {},
-	setRegistrationData: (data) => { },
-	questionnaireData: {},
-	setQuestionnaireData: (value) => { },
-	err: "",
-	setErr: (value) => { },
-	handleSubmitAddPost: () => { },
-	postAddData: { text: "", media: [] },
-	setPostAddData: (value) => { },
-	activeScreen: "side",
-	setActiveScreen: (value) => { },
-	activeSubCat: "About", setActiveSubCat: (value) => { },
-	isLoading: false, setIsLoading: (val) => { },
-	updateSettingData: "", setUpdateSettingData: (val) => { },
-	settingType: "", setSettingType: (val) => { },
-	userData: {}, setUserData: (val) => { },
-	image: "", setImage: (val) => { },
-	refreshUserData: null, setRefreshUserData: (val) => { }
-
-})
+  export const GlobalVariableContext = createContext({
+    
+    user : "",
+    setUser:(user) => {},
+    questioniareLevel:"",
+    setQuestionaireLevel:(level) => {},
+    questionnaireProgress:0,
+    setQuestionnaireProgress: (progress)=> {},
+    registrationData:{},
+    setRegistrationData:(data) => {},
+    questionnaireData: {},
+    setQuestionnaireData: (value) => {},
+    err:"",
+    setErr:(value) => {},
+    handleSubmitAddPost:() => {},
+    postAddData:{text:"",media:[]},
+    setPostAddData:(value) => {},
+    postEditData:{text:"",media:[]},setPostEditData:(value) => {},
+    activeScreen:"side",
+    setActiveScreen:(value) => {} ,
+    activeSubCat:"About" ,setActiveSubCat: (value) => {},
+    isLoading:false,setIsLoading:(val) => {},
+    updateSettingData:"",setUpdateSettingData:(val) => {},
+    settingType:"",setSettingType:(val) => {},
+    userData:{},setUserData:(val) => {},
+    image:"",setImage:(val) => {},
+    refreshUserData:null,setRefreshUserData:(val) => {},
+    isProfileMenuAcitve:false, setIsProfileMenuActive:(val) => {},
+    editingPostItem:"",setEditingPostItem:(val) => {}
+   
+   })
 
 
 export const useGlobalVariable = () => {
@@ -64,11 +67,12 @@ export const GlobalVariableProvider = ({
 
 
 
-	const [user, setUser] = useState(null);
-	const [questioniareLevel, setQuestionaireLevel] = useState("1/2 Questions générales")
-	const [questionnaireProgress, setQuestionnaireProgress] = useState(0);
-	const [registrationData, setRegistrationData] = useState({})
-	const [err, setErr] = useState("")
+  const [editingPostItem,setEditingPostItem] = useState(null)
+  const [user, setUser] = useState(null);
+  const [questioniareLevel,setQuestionaireLevel] = useState("1/2 Questions générales")
+  const [questionnaireProgress, setQuestionnaireProgress] = useState(0);
+  const [registrationData,setRegistrationData] = useState({})
+  const [err,setErr] = useState("")
 
 	const [questionnaireData, setQuestionnaireData] = useState({
 		answers: {
@@ -142,89 +146,106 @@ export const GlobalVariableProvider = ({
 		}
 	});
 
-	const [postAddData, setPostAddData] = useState({
-		text: "",
-		media: []
-	})
+     
+const [postAddData,setPostAddData] = useState({
+  text:"",
+  media:[]
+})
 
-	const [activeSubCat, setActiveSubCat] = useState('About')
-	const [activeScreen, setActiveScreen] = useState("side")
-	const [isLoading, setIsLoading] = useState(false)
-	const [refreshUserData, setRefreshUserData] = useState(null)
-	const [settingType, setSettingType] = useState(null)
+const [postEditData,setPostEditData] = useState({
+  text:"",
+  media:[]
+})
 
+const [activeSubCat ,setActiveSubCat] = useState('About')
+const [activeScreen,setActiveScreen] = useState("side")
+const [isLoading,setIsLoading] = useState(false)
+const [refreshUserData,setRefreshUserData] = useState(null)
+const [settingType,setSettingType] = useState(null)
+const [isProfileMenuAcitve, setIsProfileMenuActive] = useState(false)
 
 	const [image, setImage] = useState(null)
 	const [userData, setUserData] = useState({}) // load it here once 
 const navigation = useNavigation()
-	const loadData = async () => {
-		try {
-			let result = await AsyncStorage.getItem("user_data")
-			if (!result) {
-				let data = await JSON.parse(result)
-	
-				setUserData({ ...data?.user, userInfo: data.user_info, dob: data?.user_info[0]?.qP2, loveLang: data?.user_info[0]?.qP13, leisures: data?.user_info[0]?.qP16, importantFactor: data?.user_info[0]?.qP15 })
-	
-				if (data?.user_image) setImage(data?.user_image)
-				else setImage(null)
-			navigation.navigate("BottomTabsHome",{screen:"HomeFeed"})
-			}
+const loadData = async() => {
+    try {
+         let result = await AsyncStorage.getItem("user_data")
+         if(result) {
+                   let data = await JSON.parse(result)
+          
+         setUserData({...data?.user,dob:data?.user_info[0]?.qP2})
+       
+      
+         if(data?.user_image) setImage(data?.user_image)
+         else setImage(null)
 
-		} catch (err) {
-			console.log(err, "Eror")
-			throw (err)
-		}
+        return result
 
-	}
+         }
 
-	useEffect(() => {
-		loadData()
-	}, [])
-
-
-	//for updating
-	const [updateSettingData, setUpdateSettingData] = useState({
-		settingType: "",
-		firstname: "",
-		lastname: "",
-		dob: new Date(),
-		country: "Cameroon",
-		city: "",
-		address: "",
-		phone_code: "",
-		phone: "",
-		email: ""
-	})
+       return null
+ 
+    } catch(err) {
+         console.log(err,"Eror")
+         throw(err)
+    }
+         
+    }
+  
+  useEffect(() => {
+  let result = loadData()
+  if(result && navigation){
+    navigation.navigate("BottomTabsHome",{screen:"HomeFeed"})
+  }
+  },[])
 
 
-	return (
-		<GlobalVariableContext.Provider
-			value={{
-				user,
-				setUser,
-				questionnaireProgress,
-				setQuestionnaireProgress,
-				questioniareLevel,
-				setQuestionaireLevel,
-				registrationData,
-				setRegistrationData,
-				questionnaireData,
-				setQuestionnaireData,
-				err,
-				setErr,
-				postAddData,
-				setPostAddData,
-				activeScreen,
-				setActiveScreen,
-				isLoading, setIsLoading,
-				activeSubCat, setActiveSubCat,
-				updateSettingData, setUpdateSettingData,
-				settingType, setSettingType,
-				image, setImage, userData, setUserData,
-				refreshUserData, setRefreshUserData, loadData
-			}}
-		>
-			{children}
-		</GlobalVariableContext.Provider>
-	);
-};
+//for updating
+const [updateSettingData,setUpdateSettingData] = useState({
+            settingType :"",
+            firstname:"",
+            lastname :"",
+            dob :new Date(),
+            country :"Cameroon",
+            city:"",
+            address:"",
+            phone_code :"",
+            phone :"",
+            email :""
+})
+ 
+   
+     return (
+       <GlobalVariableContext.Provider
+         value={{ 
+        user,
+        setUser,
+        questionnaireProgress,
+        setQuestionnaireProgress,
+        questioniareLevel,
+        setQuestionaireLevel,
+        registrationData,
+        setRegistrationData ,
+        questionnaireData,
+        setQuestionnaireData,
+        err,
+        setErr,
+        postAddData,
+        setPostAddData,
+        activeScreen,
+        setActiveScreen,
+        isLoading,setIsLoading,
+        activeSubCat ,setActiveSubCat,
+        updateSettingData,setUpdateSettingData,
+        settingType,setSettingType,
+        image,setImage,userData,setUserData,
+        refreshUserData,setRefreshUserData,loadData,
+        isProfileMenuAcitve, setIsProfileMenuActive,
+        setPostEditData,postEditData,
+        editingPostItem,setEditingPostItem
+          }}
+       >
+         {children}
+       </GlobalVariableContext.Provider>
+     );
+   };

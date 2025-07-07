@@ -10,83 +10,95 @@ import {
    } from "react-native-responsive-screen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState,useEffect } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
  
 
 
 const PostAddHeader = ({navigation}) => { 
 
   const {postAddData,isLoading,setIsLoading,userData,image} = useGlobalVariable()
-
+  const queryClient = useQueryClient()
 
 
 
  
-const createPost = async() => {
-  setIsLoading(true)
-  try {
-    let token = await AsyncStorage.getItem("user_token")
-    let postId = await axios.post("/api/create-post",{text:postAddData?.text},{
-      headers:{
-    'Content-Type': 'multipart/form-data',
-    'Authorization':`Bearer ${token}`
-      }
-    }).then((res) => {
-
-   
-  return res.data?.post?.id
-}).catch(err => {
-  setIsLoading(false)
-  console.log(err,"a problem occured post add")
-})
-
-    return {
-      token,
-      postId
+   const createPostMutation = useMutation({
+    mutationFn: async () => {
+      const token = await AsyncStorage.getItem("user_token");
+      const response = await axios.post(
+        "/api/create-post",
+        { text: postAddData?.text },
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      return { postId: response.data?.post?.id, token };
+    },
+    onError: (error) => {
+      console.log("Post creation error:", error);
+      setIsLoading(false);
+      ToastAndroid.show("Failed to create post", ToastAndroid.SHORT);
     }
+  });
 
-  
+  const uploadImagesMutation = useMutation({
+    mutationFn: async ({ postId, token }) => {
+      const formData = new FormData();
+      formData.append('post_id', postId);
 
-  } catch(err) {
-    console.log(err,"in create post")
-    throw(err)
-  }
-}
-const handleSubmitAddPost = async() => {
- let {postId,token} =  await createPost()
+      postAddData?.media?.forEach((data) => {
+        formData.append('media[]', {
+          uri: data?.img?.uri,
+          name: "uploadImg.jpg",
+          type: "image/jpeg"
+        });
+      });
 
-const formData = new FormData();
-formData.append('post_id', postId)
+      return axios.post('/api/upload-post-images', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+    },
+    onError: (error) => {
+      console.error("Image upload error:", error);
+      setIsLoading(false);
+      ToastAndroid.show("Failed to upload images", ToastAndroid.SHORT);
+    }
+  });
 
- 
-postAddData?.media?.map((data) => {
-   console.log(data,"foram data--dasingle")
-    formData.append('media[]', {
-    uri: data?.img?.uri,
-    name: "uploadImg.jpg",
-    type:  "image/jpeg"
-  })
-})
+  const handleSubmitAddPost = async () => {
+    setIsLoading(true);
+    
+    try {
+      // Step 1: Create the post
+      const { postId, token } = await createPostMutation.mutateAsync();
+      
+      // Step 2: Upload images if they exist
+      if (postAddData?.media?.length > 0) {
+        await uploadImagesMutation.mutateAsync({ postId, token });
+      }
 
-console.log(formData,"Form data")
- 
-await axios.post('/api/upload-post-images', formData, {
-  headers: {
-    'Content-Type': 'multipart/form-data',
-    'Authorization':`Bearer ${token}`
-  }
-}).then((res) => {
-  console.log(res.data,"post images uploaded")
-  setIsLoading(false)
-  ToastAndroid.show("Post created sucessfully",1000)
-  navigation.goBack()
-}).catch(err => {
-  setIsLoading(false)
-  console.log(err,"a problem occured upading post images",err.request,Object.keys(err))
-})
+      // Step 3: Invalidate queries and navigate
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['userPosts'] }),
+        queryClient.invalidateQueries({ queryKey: ['posts'] }),
+        queryClient.invalidateQueries({queryKey:['userPostsImages']})
+      ]);
+      
+      ToastAndroid.show("Post created successfully", ToastAndroid.SHORT);
+      navigation.goBack();
+    } catch (error) {
+      console.error("Error in post creation flow:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-
-
-}
 
 return <View style={{backgroundColor:"white",paddingHorizontal:20}}>
               <View style={{height:50}}></View> 

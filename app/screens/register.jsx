@@ -22,7 +22,7 @@ export default function Register({ navigation }) {
 			...prev,
 			firstname: firstName,
 			lastname: lastName,
-			email,
+			email:email.trim(),
 			phone,
 			phone_code: country.dial_code,
 			country_phone

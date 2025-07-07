@@ -15,13 +15,13 @@ import {
 
    const {width:SCREEN_WIDTH,height:SCREEN_HEIGHT} = Dimensions.get('window')
 
-const MessageSender = ({action,state,setState,placeHolder}) => {
-     return <View style={{paddingHorizontal:2,alignItems:"center",justifyContent:"space-evenly",flexDirection:"row",paddingTop:10}}>
+const MessageSender = ({action,state,setState,placeHolder,ref}) => {
+     return <View style={{paddingHorizontal:2,alignItems:"center",justifyContent:"space-evenly",flexDirection:"row",paddingVertical :10}}>
      <TouchableOpacity> 
           <PostScreenImagePicker/> 
      </TouchableOpacity>
      <View style={{position:"relative",borderRadius:50,paddingVertical:0,paddingHorizontal:36,width:"80%", backgroundColor:"rgba(181, 181, 181, 0.12)"}}>
-     <CustomTextInput RightIconStyles={null} name="comment" placeHolder={placeHolder} LeftIcon={"face"} LeftIconStyles={{position:"absolute",top:9,left:9}} RightIcon={null} setState={setState} state={state}/>
+     <CustomTextInput ref={ref} RightIconStyles={null} name="comment" placeHolder={placeHolder} LeftIcon={"face"} LeftIconStyles={{position:"absolute",top:9,left:9}} RightIcon={null} setState={setState} state={state}/>
      </View>
      <TouchableOpacity onPress={()=> action()} style={{backgroundColor:COLORS.primary,height:35,width:35,borderRadius:50,alignItems:"center",justifyContent:"center"}}>
      <PostScreenSendComment/>
