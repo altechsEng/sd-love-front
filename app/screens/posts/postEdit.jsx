@@ -349,7 +349,7 @@ if (isValidSize) {
         />
       </View>
 
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 10, backgroundColor: "white", borderTopWidth: 2, borderColor: COLORS.light }}>
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, paddingTop:10, paddingBottom:30, backgroundColor: "white", borderTopWidth: 2, borderColor: COLORS.light }}>
         <TouchableOpacity onPress={()=>handleImageUpload()} disabled={isProcessing}>
           <PostScreenMediaImage fill={isProcessing ? COLORS.light : COLORS.dark} />
         </TouchableOpacity>

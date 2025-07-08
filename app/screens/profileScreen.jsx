@@ -329,37 +329,36 @@ const ProfileScreen = ({ navigation }) => {
 
 		return (
 			<View style={{ flex: 1, marginVertical: 10, marginRight: 20, width: wp(90), flexDirection: "column" }}>
-				<View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
+				<View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
 					<View style={{ flex: 2, flexDirection: "row" }}>
-						<TouchableOpacity style={{ borderRadius: 50, height: 50, width: 50, overflow: "hidden", alignItems: "center" }}>
+						<TouchableOpacity style={{ borderRadius: 50, height: 40, width: 40, overflow: "hidden", alignItems: "center" }}>
 							<Image source={item?.user?.user_image ? { uri: `${BaseImageUrl}/${item?.user?.user_image}` } : item?.img} resizeMode="cover" style={{ height: "100%", width: "100%" }} />
 						</TouchableOpacity>
 						<View style={{ flexDirection: "column", justifyContent: "center", marginLeft: 10 }}>
-							<Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.secondary - 2, fontFamily: FAMILLY.semibold }}>{item?.user?.firstname ? `${item?.user?.firstname} ${item?.user?.lastname }`: item?.name}</Text>
-							<Text style={{ lineHeight: 12, color: COLORS.gray, fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.light }}>{dayjs(new Date(item?.created_at)).fromNow()|| item?.time}</Text>
+							<Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.primary, fontFamily: FAMILLY.semibold }}>{item?.user?.firstname ? `${item?.user?.firstname} ${item?.user?.lastname}` : item?.name}</Text>
+							<Text style={{ lineHeight: 12, color: COLORS.gray, fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.light }}>{dayjs(new Date(item?.created_at)).fromNow() || item?.time}</Text>
 						</View>
 					</View>
 
 					<TouchableOpacity onPress={() => {
 						setModalVisible(true)
 						setActivePostItem(item)
-					}} style={{ backgroundColor: "white", height: 25, width: 80, borderRadius: 20, alignItems: "center", justifyContent: "center" }}>
+					}} style={{ backgroundColor: "white", height: 25, borderRadius: 20, paddingHorizontal:10, alignItems: "center", justifyContent: "center" }}>
 						<PostScreenDots />
 					</TouchableOpacity>
 				</View>
-				<View style={{ marginVertical: 10 }}>
-					<Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.light }}>
-						{item?.text || "Lorem ipsum dolor sit amet consectetur. Lorem varius quisque odio nisl tempor sit bibendum pulvinar sed. pharetra sed magnis vitae."}
-					</Text>
-				</View>
 				{/* <TouchableOpacity style={{ height: 200, margin: 0, padding: 0, overflow: "hidden", borderRadius: 20 }}>
 					<Image source={item.postImg} resizeMode="cover" style={{ width: "100%", height: "100%" }} />
-				</TouchableOpacity> */}
+					</TouchableOpacity> */}
 
-				<TouchableOpacity onPress={() => navigation.navigate("Post", { item })} style={{ height: 200, margin: 0, padding: 0, overflow: "hidden", borderRadius: 20 }}>
-					<Image source={item?.media?.length > 0 ? { uri: `https://sdlove-api.altechs.africa/storage/app/private/public/post_media/${item?.media[0]?.url}` } : require("../../assets/images/blog_test.jpg")} resizeMode="cover" style={{ width: "100%", height: "100%" }} />
+				<TouchableOpacity onPress={() => navigation.navigate("Post", { item })} style={{ margin: 0, padding: 0, overflow: "hidden" }}>
+					<View style={{ marginVertical: 10 }}>
+						<Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.primary - 1, fontFamily: FAMILLY.light }}>
+							{item?.text || "Lorem ipsum dolor sit amet consectetur. Lorem varius quisque odio nisl tempor sit bibendum pulvinar sed. pharetra sed magnis vitae."}
+						</Text>
+					</View>
+					<Image source={item?.media?.length > 0 ? { uri: `https://sdlove-api.altechs.africa/storage/app/private/public/post_media/${item?.media[0]?.url}` } : require("../../assets/images/blog_test.jpg")} resizeMode="cover" style={{ width: "100%", height: 300, borderRadius: 20 }} />
 				</TouchableOpacity>
-
 			</View>
 		)
 	}
@@ -375,12 +374,12 @@ const ProfileScreen = ({ navigation }) => {
 
 				<View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
 					<View style={{ flex: 2, flexDirection: "row" }}>
-						<TouchableOpacity style={{ borderRadius: 50, height: 50, width: 50, overflow: "hidden", alignItems: "center" }}>
+						<TouchableOpacity style={{ borderRadius: 50, height: 40, width: 40, overflow: "hidden", alignItems: "center" }}>
 							<Image source={item?.user?.user_image ? { uri: `${BaseImageUrl}/${item?.user?.user_image}` } : item?.img} resizeMode="cover" style={{ height: "100%", width: "100%" }} />
 						</TouchableOpacity>
 						<View style={{ flexDirection: "column", justifyContent: "center", marginLeft: 10 }}>
- 	                              <Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.secondary - 2, fontFamily: FAMILLY.semibold }}>{item?.user?.firstname ? `${item?.user?.firstname} ${item?.user?.lastname }`: item?.name}</Text>
-							<Text style={{ lineHeight: 12, color: COLORS.gray, fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.light }}>{dayjs(new Date(item?.created_at)).fromNow()|| item?.time}</Text>
+							<Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.primary, fontFamily: FAMILLY.semibold }}>{item?.user?.firstname ? `${item?.user?.firstname} ${item?.user?.lastname}` : item?.name}</Text>
+							<Text style={{ lineHeight: 12, color: COLORS.gray, fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.light }}>{dayjs(new Date(item?.created_at)).fromNow() || item?.time}</Text>
 						</View>
 					</View>
 
@@ -389,12 +388,12 @@ const ProfileScreen = ({ navigation }) => {
 					</TouchableOpacity>
 				</View>
 				<View style={{ marginVertical: 10 }}>
-					<Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.light }}>
+					<Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.primary - 2, fontFamily: FAMILLY.light }}>
 						{item?.text || "Lorem ipsum dolor sit amet consectetur. Lorem varius quisque odio nisl tempor sit bibendum pulvinar sed. pharetra sed magnis vitae."}
 					</Text>
 				</View>
-				<TouchableOpacity onPress={() => navigation.navigate("Post", { item })} style={{ height: 200, margin: 0, padding: 0, overflow: "hidden", borderRadius: 20 }}>
-					<Image source={item?.media?.length > 0 ? { uri: `https://sdlove-api.altechs.africa/storage/app/private/public/post_media/${item?.media[0]?.url}` } : require("../../assets/images/blog_test.jpg")} resizeMode="cover" style={{ width: "100%", height: "100%" }} />
+				<TouchableOpacity onPress={() => navigation.navigate("Post", { item })} style={{ margin: 0, padding: 0, overflow: "hidden", borderRadius: 20 }}>
+					<Image source={item?.media?.length > 0 ? { uri: `https://sdlove-api.altechs.africa/storage/app/private/public/post_media/${item?.media[0]?.url}` } : require("../../assets/images/blog_test.jpg")} resizeMode="cover" style={{ width: "100%", height: 300 }} />
 				</TouchableOpacity>
 
 			</View>
@@ -405,7 +404,7 @@ const ProfileScreen = ({ navigation }) => {
 		<View style={{ flex: 1, backgroundColor: "white", paddingHorizontal: 20, paddingTop: 10 }}>
 
 			{activeSubCat != "account" &&
-				<View className='py-4' style={{ flexDirection: "row", justifyContent: "space-between"}}>
+				<View className='py-4' style={{ flexDirection: "row", justifyContent: "space-between" }}>
 					<View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
 						{['About', "Posts", "Photos"].map((cat) => (
 							<TouchableOpacity key={cat} onPress={() => setActiveSubCat(cat)} className='py-2 px-5' style={{ marginRight: 10, backgroundColor: activeSubCat == cat ? COLORS.primary : "#F5F6FC", borderRadius: 20, alignItems: "center", justifyContent: "center" }}>
@@ -540,21 +539,18 @@ const ProfileScreen = ({ navigation }) => {
 
 				{activeSubCat == "Posts" && (
 					<FlatList
+						className='mt-4'
 						refreshing={isRefetching}
 						onRefresh={() => queryClient.refetchQueries({ queryKey: ["userPosts"] })}
 						data={allPosts.length > 0 ? allPosts : posts}
 						renderItem={renderPosts}
 						keyExtractor={(item) => item?.key || item?.id}
-						horizontal={true}
-
+						horizontal={false}
 						showsHorizontalScrollIndicator={false}
 						ListFooterComponent={renderLoader}
 						onEndReached={loadMorePosts}
 						onEndReachedThreshold={0.3}
 						ListFooterComponentStyle={{ alignItems: "center", justifyContent: "center" }}
-
-
-
 					/>
 				)}
 
@@ -592,7 +588,7 @@ const ProfileScreen = ({ navigation }) => {
 							data={allUserSavePost.length > 0 ? allUserSavePost : savePosts}
 							renderItem={renderSavePosts}
 							keyExtractor={(item, index) => item?.key || item?.id}
-							horizontal={true}
+							horizontal={false}
 							showsHorizontalScrollIndicator={false}
 
 							refreshing={isRefetchingUserSavePost}
@@ -743,7 +739,6 @@ const ProfileScreen = ({ navigation }) => {
 			</ScrollView>
 		</View>
 	)
-
 }
 
 

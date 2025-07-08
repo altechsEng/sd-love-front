@@ -5,18 +5,19 @@ import {
 	widthPercentageToDP as wp,
 	heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { HomeFeedBell, HomeFeedComment, HomeFeedGradient, HomeFeedHeart, HomeFeedSearch, HomeFeedShare, HomeFeedSmallArrowRight, HomeFeedThreeDots, LogoSmall, PostAddIcon } from "../components/vectors.js";
+import { HomeFeedBell, HomeFeedComment, HomeFeedGradient, HomeFeedHeart, HomeFeedSearch, HomeFeedShare, HomeFeedSmallArrowRight, HomeFeedThreeDots, LogoSmall, PostAddIcon, PostScreenBookMark, PostScreenDots } from "../components/vectors.js";
 import { BaseImageUrl, COLORS, FAMILLY, POST_LIMIT, TEXT_SIZE } from "../../utils/constants.js";
 import { LinearGradient } from "react-native-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import axios from "axios";
-import { useInfiniteQuery } from "@tanstack/react-query"
+import { useInfiniteQuery, useMutation } from "@tanstack/react-query"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime"
 import CustomPostLoader from "../components/customPostLoader.jsx";
 import CustomMatchLoader from "../components/customMatchLoader.jsx";
 import { calculateAge } from "../../utils/functions.js";
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 dayjs.extend(relativeTime)
 
@@ -79,8 +80,6 @@ export default function HomeFeed({ navigation }) {
 		}
 	])
 
-	
- 
 	const getAllPosts = async ({ pageParam = 1 }) => {
 		try {
 
@@ -93,8 +92,8 @@ export default function HomeFeed({ navigation }) {
 					{ headers: { "Authorization": `Bearer ${token}` } }
 				);
 
-				
-				 
+
+
 				return response.data
 			}
 		} catch (err) {
@@ -173,6 +172,35 @@ export default function HomeFeed({ navigation }) {
 		}
 	};
 
+	const bookMarkMutation = useMutation({
+		mutationFn: async ({ postId }) => {
+			let token = await AsyncStorage.getItem("user_token");
+			if (token) {
+				let response = await axios.post('/api/save-post', { postId }, {
+					headers: {
+						"Authorization": `Bearer ${token}`,
+					}
+				})
+
+				return { status: response.data.status, data: response.data }
+			}
+		},
+		onError: (error) => {
+			console.error("book mark error:", error);
+			ToastAndroid.show("Failed to save post", ToastAndroid.SHORT);
+		}
+	})
+
+	const handleBookMark = async (postId) => {
+		let result = await bookMarkMutation.mutateAsync({ postId })
+		if (result.status === 200) {
+			await Promise.all([
+				queryClient.invalidateQueries({ queryKey: ['userSavePosts'] })
+			]);
+			ToastAndroid.show("Post saved successfully", 1000);
+		};
+	}
+
 	const renderLoaderMatch = () => {
 		return isFetchingMatch ? (
 			<ActivityIndicator size="large" color={COLORS.blue} />
@@ -218,30 +246,30 @@ export default function HomeFeed({ navigation }) {
 		}
 
 		return (
-			<View key={item?.key} style={{ flex: 1, marginVertical: 10, marginRight: 20, width: wp(80), flexDirection: "column" }}>
+			<View key={item?.key} style={{ flex: 1, marginVertical: 20, marginRight: 20, flexDirection: "column" }}>
 				<View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
-					<View style={{ flex: 2, flexDirection: "row" }}>
-						<TouchableOpacity style={{ borderRadius: 50, height: 50, width: 50, overflow: "hidden", alignItems: "center" }}><Image source={item?.user?.user_image ? { uri: `${BaseImageUrl}/${item?.user?.user_image}` } : require("../../assets/images/test_person1.png")} resizeMode="cover" style={{ height: "100%", width: "100%" }} /></TouchableOpacity>
-						<View style={{ flexDirection: "column", justifyContent: "center", marginLeft: 10 }}>
-							<Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.secondary - 2, fontFamily: FAMILLY.semibold }}>{item?.user?.firstname || "Johan mark"}</Text>
+					<View clasName='' style={{ flex: 2, flexDirection: "row" }}>
+						<TouchableOpacity style={{ borderRadius: 50, height: 40, width: 40, overflow: "hidden", alignItems: "center" }}><Image source={item?.user?.user_image ? { uri: `${BaseImageUrl}/${item?.user?.user_image}` } : require("../../assets/images/test_person1.png")} resizeMode="cover" style={{ height: "100%", width: "100%" }} /></TouchableOpacity>
+						<View className='justify-center' style={{ marginLeft: 10 }}>
+							<Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.primary, fontFamily: FAMILLY.semibold, lineHeight: 20 }}>{item?.user?.firstname} {item?.user?.lastname}</Text>
 							<Text style={{ color: COLORS.gray, fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.light }}>{dayjs(item?.created_at).fromNow() || "2h ago"}</Text>
 						</View>
 					</View>
-
-					<View style={{ backgroundColor: COLORS.primary, height: 25, width: 80, borderRadius: 20, alignItems: "center", justifyContent: "center" }}><Text style={{ color: "white", fontSize: TEXT_SIZE.secondary - 2 }}>SD Academy</Text></View>
-				</View>
-				<View style={{ marginVertical: 10 }}>
-					<Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.light }}>
-						{item?.text || "Lorem ipsum dolor sit amet consectetur. Lorem varius quisque odio nisl tempor sit bibendum pulvinar sed. pharetra sed magnis vitae."}
-					</Text>
+					<TouchableOpacity >
+						<PostScreenDots />
+					</TouchableOpacity>
 				</View>
 
-				<TouchableOpacity onPress={() => navigation.navigate("Post", { item })} style={{ height: 200, margin: 0, padding: 0, overflow: "hidden", borderRadius: 20 }}>
-					<Image source={item?.media?.length > 0 ? { uri: `https://sdlove-api.altechs.africa/storage/app/private/public/post_media/${item?.media[0]?.url}` } : require("../../assets/images/blog_test.jpg")} resizeMode="cover" style={{ width: "100%", height: "100%" }} />
+				<TouchableOpacity onPress={() => navigation.navigate("Post", { item })} style={{ margin: 0, padding: 0, overflow: "hidden" }}>
+					<View style={{ marginVertical: 10 }}>
+						<Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.primary, fontFamily: FAMILLY.light }}>
+							{item?.text || "Lorem ipsum dolor sit amet consectetur. Lorem varius quisque odio nisl tempor sit bibendum pulvinar sed. pharetra sed magnis vitae."}
+						</Text>
+					</View>
+					{item?.media?.length > 0 &&
+						<Image source={item?.media?.length > 0 ? { uri: `https://sdlove-api.altechs.africa/storage/app/private/public/post_media/${item?.media[0]?.url}` } : require("../../assets/images/blog_test.jpg")} resizeMode="cover" style={{ width: "100%", height: 280, borderRadius: 20 }} />
+					}
 				</TouchableOpacity>
-
-
-
 
 				{/* <FlatList
                     data={item.media || [{url:null}]}
@@ -257,30 +285,29 @@ export default function HomeFeed({ navigation }) {
 				<View style={{ height: 30, flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 10 }}>
 
 					<View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }} >
-
-						<View style={{ marginRight: 10, flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+						<View style={{ marginRight: 15, flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
 							<TouchableOpacity>
-							 {item?.is_liked ? <HomeFeedHeart stroke={COLORS.primary} fill={COLORS.primary} />:<HomeFeedHeart stroke={"#2E2E2E"} fill={"white"} />}
-								
+								{item?.is_liked ? <HomeFeedHeart stroke={COLORS.primary} fill={COLORS.primary} /> : <HomeFeedHeart stroke={"gray"} fill={"white"} />}
 							</TouchableOpacity>
 							<Text style={{ fontFamily: FAMILLY.light, marginLeft: 5 }}>{item?.likes_count || 0}</Text>
 						</View>
 
-						<View style={{ marginRight: 10, flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
-							<TouchableOpacity onPress={() => navigation.navigate("Post", { item })}><HomeFeedComment stroke={"#2E2E2E"} fill={"white"} /></TouchableOpacity>
+						<View style={{ marginRight: 15, flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+							<TouchableOpacity onPress={() => navigation.navigate("Post", { item })}><HomeFeedComment stroke={"gray"} fill={"white"} /></TouchableOpacity>
 							<Text style={{ fontFamily: FAMILLY.light, marginLeft: 5 }}>{item?.comment_count || 0}</Text>
 						</View>
 
-						<View style={{ marginRight: 10, flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
-							<TouchableOpacity><HomeFeedShare fill={"#2E2E2E"} /></TouchableOpacity>
-							<Text style={{ fontFamily: FAMILLY.light, marginLeft: 5 }}>825</Text>
+						<View style={{ marginRight: 15, flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+							<TouchableOpacity><HomeFeedShare fill={"gray"} /></TouchableOpacity>
+							<Text style={{ fontFamily: FAMILLY.light, marginLeft: 8 }}>825</Text>
 						</View>
-
 					</View>
 
-					<View>
-						<TouchableOpacity><HomeFeedThreeDots fill={"#5E5E5E"} /></TouchableOpacity>
-					</View>
+					<TouchableOpacity
+						onPress={() => handleBookMark(item?.id)}
+					>
+						<PostScreenBookMark />
+					</TouchableOpacity>
 
 				</View>
 			</View>
@@ -329,7 +356,7 @@ export default function HomeFeed({ navigation }) {
 					/>
 				</View>
 
-				<View style={{ paddingLeft: 20 }}>
+				{/* <View style={{ paddingLeft: 20 }}>
 					<FlatList
 						data={allPosts.length == 0 ? posts : allPosts}
 						renderItem={renderPosts}
@@ -341,13 +368,13 @@ export default function HomeFeed({ navigation }) {
 						ListFooterComponent={renderLoader}
 						ListFooterComponentStyle={{ alignItems: "center", justifyContent: "center" }}
 					/>
-				</View>
+				</View> */}
 				<View style={{ paddingLeft: 20 }}>
 					<FlatList
 						data={allPosts.length == 0 ? posts : allPosts}
 						renderItem={renderPosts}
 						keyExtractor={(item) => item?.key || item?.id}
-						horizontal={true}
+						horizontal={false}
 						showsHorizontalScrollIndicator={false}
 						onEndReached={loadMoreMatch}
 						onEndReachedThreshold={0.5}

@@ -46,6 +46,7 @@ import HolderComponent from './components/holder';
 import { StatusBar } from "expo-status-bar";
 import PostEditHeader from "./components/postEditHeader";
 import PostEdit from "./screens/posts/postEdit";
+import EngagementRequestSent from "./screens/dating/engagementRequestSent";
 
 axios.defaults.baseURL = "https://sdlove-api.altechs.africa";
 axios.defaults.headers.post["Accept"] = "application/json";
@@ -176,10 +177,13 @@ export default function Application() {
 								)
 							}} name="Questionaire2" component={Questionaire2} />
 
-
 							<Stack.Screen options={{
 								headerShown: false
 							}} name="MatchConnection" component={MatchConnection} />
+
+							<Stack.Screen options={{
+								headerShown: false
+							}} name="EngagementRequestSent" component={EngagementRequestSent} />
 
 							<Stack.Screen options={{
 								header: ({ navigation }) => <View style={{ height: 50, backgroundColor: "white" }}></View>
@@ -203,7 +207,7 @@ export default function Application() {
 
 							<Stack.Screen options={{
 								header: ({ navigation }) => {
-									return <View style={{ height: 70, justifyContent: "center", backgroundColor: "white", paddingLeft: 20, paddingTop: 20,borderBottomColor:COLORS.light,borderBottomWidth:2 }}>
+									return <View style={{ height: 90, justifyContent: "center", backgroundColor: "white", paddingLeft: 20, paddingTop: 40,borderBottomColor:COLORS.light,borderBottomWidth:2 }}>
 										<TouchableOpacity onPress={() => navigation.goBack()} style={{}}>
 											<HeaderBackArrowBlack />
 										</TouchableOpacity>

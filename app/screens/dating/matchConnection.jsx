@@ -74,7 +74,7 @@ export default function MatchConnection({ navigation }) {
                          value={`You and ${item?.match_user?.firstname} ${item?.match_user?.lastname} have matched, start a conversation with each other now.`} color="#5E5E5E" fontSize={TEXT_SIZE.medium} />
                </View>
 
-               <TouchableOpacity style={{ marginTop: 50, width: "80%", paddingVertical: 10, borderRadius: 20, backgroundColor: COLORS.primary }}>
+               <TouchableOpacity onPress={() => navigation.navigate("EngagementRequestSent", { item })} style={{ marginTop: 50, width: "80%", paddingVertical: 10, borderRadius: 20, backgroundColor: COLORS.primary }}>
                     <CustomRegularPoppingText fontSize={TEXT_SIZE.small + 2} value={`Engage with ${item?.match_user?.firstname}`} style={{ textAlign: "center" }} color={"white"} />
                </TouchableOpacity>
 
