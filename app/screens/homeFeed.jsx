@@ -92,8 +92,6 @@ export default function HomeFeed({ navigation }) {
 					{ headers: { "Authorization": `Bearer ${token}` } }
 				);
 
-
-
 				return response.data
 			}
 		} catch (err) {

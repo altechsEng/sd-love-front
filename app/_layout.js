@@ -47,8 +47,10 @@ import { StatusBar } from "expo-status-bar";
 import PostEditHeader from "./components/postEditHeader";
 import PostEdit from "./screens/posts/postEdit";
 import EngagementRequestSent from "./screens/dating/engagementRequestSent";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 axios.defaults.baseURL = "https://sdlove-api.altechs.africa";
+// axios.defaults.baseURL = "http://127.0.0.1:8000";
 axios.defaults.headers.post["Accept"] = "application/json";
 axios.defaults.headers.post["Content-Type"] = "application/json";
 axios.defaults.headers.post["Content-Type"] = "multipart/form-data";
@@ -59,8 +61,6 @@ axios.defaults.withXSRFToken = true;
 const queryClient = new QueryClient();
 
 const Stack = createStackNavigator();
-
-
 
 export default function Application() {
 	const { questionnaireProgress, questioniareLevel, setQuestionaireLevel } = useGlobalVariable()
@@ -82,7 +82,9 @@ export default function Application() {
 		loadFonts().then(() => {
 			console.log("font loaded")
 			setFontsLoaded(true)
-
+			if (!AsyncStorage.getItem('user_data')) {
+				navigation.navigate("Login")
+			}
 		});
 	}, []);
 

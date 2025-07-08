@@ -321,6 +321,14 @@ const ProfileScreen = ({ navigation }) => {
 		) : null;
 	};
 
+	const logout = () => {
+		AsyncStorage.removeItem("user_data").then(() => {
+			AsyncStorage.removeItem("user_token").then(() => {
+				navigation.navigate("Login")
+			})
+		});
+	}
+
 	const renderPosts = ({ item }) => {
 
 		if (isFetching) {
@@ -693,7 +701,7 @@ const ProfileScreen = ({ navigation }) => {
 
 							<View style={{ height: 2, backgroundColor: COLORS.light, width: "100%" }}></View>
 
-							<TouchableOpacity style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+							<TouchableOpacity onPress={() => logout()} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
 								<View style={{ flexDirection: "row", alignItems: "center" }}>
 									<View style={{ alignItems: "center", marginRight: 20, justifyContent: "center", height: 35, width: 35, borderRadius: 30, backgroundColor: COLORS.light }}>
 										<ProfileScreenLogOut />
