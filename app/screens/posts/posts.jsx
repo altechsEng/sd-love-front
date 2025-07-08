@@ -37,7 +37,7 @@ const BlogPostScreen = () => {
 
      const queryClient = useQueryClient()
      const { item:mainItem } = useRoute().params;
-   
+     
      const [comment, setComment] = useState("");
      const [showComment, setShowComment] = useState(false);
       
