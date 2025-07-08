@@ -119,9 +119,9 @@ const Card = ({
 						<Text style={{ fontFamily: FAMILLY.semibold, color: "white", textTransform: "capitalize", fontSize: TEXT_SIZE.small }}> Los angeles - 7km </Text>
 					</View>
 					<View style={{ flexDirection: "column", alignItems: "center", justifyContent: "space-evenly", position: "absolute", bottom: 28, right: 20, zIndex: 11 }}>
-						<TouchableOpacity style={{ backgroundColor: "#E55E6F", alignItems: "center", justifyContent: "center", height: 50, width: 50, borderRadius: 50, marginTop: 10 }}><MatchScreenFace /></TouchableOpacity>
+						{/* <TouchableOpacity style={{ backgroundColor: "#E55E6F", alignItems: "center", justifyContent: "center", height: 50, width: 50, borderRadius: 50, marginTop: 10 }}><MatchScreenFace /></TouchableOpacity> */}
 						<TouchableOpacity style={{ backgroundColor: "#D7A898", alignItems: "center", justifyContent: "center", height: 50, width: 50, borderRadius: 50, marginTop: 10 }}><MatchScreenHeartWhite /></TouchableOpacity>
-						{/* <TouchableOpacity style={{ backgroundColor: "white", alignItems: "center", justifyContent: "center", height: 50, width: 50, borderRadius: 50, marginTop: 10 }}><MatchScreenXmark /></TouchableOpacity> */}
+						<TouchableOpacity style={{ backgroundColor: "white", alignItems: "center", justifyContent: "center", height: 50, width: 50, borderRadius: 50, marginTop: 10 }}><MatchScreenXmark /></TouchableOpacity>
 					</View>
 
 					<LinearGradient colors={["rgba(215, 168, 152, 0)", "rgba(215, 168, 152, 1)"]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={{ height: 85, alignSelf: "flex-start", position: "absolute", zIndex: 10, bottom: -2, width: "100%" }} >

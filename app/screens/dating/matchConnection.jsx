@@ -142,7 +142,6 @@ export default function MatchConnection({ navigation }) {
                          <View style={{ top: hp(22), height: 330, width: 330, borderRadius: "100%", borderColor: '#D7A898', borderWidth: 1 }}></View>
                     </View>
 
-
                     <View style={{ position: "absolute", alignSelf: "center" }}>
                          <View style={{ top: hp(10), height: 580, width: 580, borderRadius: "100%", borderColor: '#D7A898', borderWidth: 1, borderStyle: "dashed" }}></View>
                     </View>
