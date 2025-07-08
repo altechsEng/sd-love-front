@@ -121,7 +121,7 @@ const Card = ({
 					<View style={{ flexDirection: "column", alignItems: "center", justifyContent: "space-evenly", position: "absolute", bottom: 28, right: 20, zIndex: 11 }}>
 						<TouchableOpacity style={{ backgroundColor: "#E55E6F", alignItems: "center", justifyContent: "center", height: 50, width: 50, borderRadius: 50, marginTop: 10 }}><MatchScreenFace /></TouchableOpacity>
 						<TouchableOpacity style={{ backgroundColor: "#D7A898", alignItems: "center", justifyContent: "center", height: 50, width: 50, borderRadius: 50, marginTop: 10 }}><MatchScreenHeartWhite /></TouchableOpacity>
-						{/* <TouchableOpacity style={{ backgroundColor: "white", alignItems: "center", justifyContent: "center", height: 50, width: 50, borderRadius: 50, marginTop: 10 }}><MatchScreenXmark /></TouchableOpacity> */}
+						<TouchableOpacity style={{ backgroundColor: "white", alignItems: "center", justifyContent: "center", height: 50, width: 50, borderRadius: 50, marginTop: 10 }}><MatchScreenXmark /></TouchableOpacity>
 					</View>
 
 					<LinearGradient colors={["rgba(215, 168, 152, 0)", "rgba(215, 168, 152, 1)"]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={{ height: 85, alignSelf: "flex-start", position: "absolute", zIndex: 10, bottom: -2, width: "100%" }} >
@@ -134,7 +134,7 @@ const Card = ({
 							</View>
 						</View>
 					</LinearGradient>
-					<Pressable style={{ backgroundColor: "rgba(215, 168, 152, 0.5)" }} onPress={() => navigation.navigate("MatchConnection", { item })}>
+					<Pressable style={{backgroundColor: "rgba(215, 168, 152, 0.5)"}} onPress={() => navigation.navigate("MatchConnection", { item })}>
 						<Animated.Image
 							source={{ uri: `${BaseImageUrl}/${item?.match_user?.user_image}` } || item?.image}
 							style={{ height: "100%", width: "100%", borderRadius: 20 }}

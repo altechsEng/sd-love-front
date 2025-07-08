@@ -1,7 +1,7 @@
 import "../global.css";
 import React, { useEffect, useState } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import Welcome from './welcome';
+import Welcome from './screens/welcome';
 import * as Font from "expo-font";
 import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
 import Login from './screens/login';
@@ -44,9 +44,7 @@ import AccountSecurityScreen from './screens/settings/accountSecurity';
 
 import HolderComponent from './components/holder';
 import { StatusBar } from "expo-status-bar";
-import PostEditHeader from "./components/postEditHeader";
-import PostEdit from "./screens/posts/postEdit";
-import EngagementRequestSent from "./screens/dating/engagementRequestSent";
+import RegistrationComplete from "./screens/RegistrationComplete";
 
 axios.defaults.baseURL = "https://sdlove-api.altechs.africa";
 axios.defaults.headers.post["Accept"] = "application/json";
@@ -131,6 +129,10 @@ export default function Application() {
 							}} name="Register" component={Register} />
 
 							<Stack.Screen options={{
+								headerShown: false
+							}} name="RegistrationComplete" component={RegistrationComplete} />
+
+							<Stack.Screen options={{
 								header: ({ navigation }) => <View style={{ height: 140, backgroundColor: "white" }}>
 									<View style={{ flex: 2, alignItems: "flex-start", justifyContent: "center", flexDirection: "column" }}>
 										<TouchableOpacity style={{ marginLeft: 20, flexDirection: "row", padding: 5, alignItems: "center", justifyContent: "center", borderRadius: 20, height: hp(4), width: wp(20), backgroundColor: COLORS.primary }} onPress={() => navigation.goBack()}>
@@ -177,13 +179,10 @@ export default function Application() {
 								)
 							}} name="Questionaire2" component={Questionaire2} />
 
-							<Stack.Screen options={{
-								headerShown: false
-							}} name="MatchConnection" component={MatchConnection} />
 
 							<Stack.Screen options={{
 								headerShown: false
-							}} name="EngagementRequestSent" component={EngagementRequestSent} />
+							}} name="MatchConnection" component={MatchConnection} />
 
 							<Stack.Screen options={{
 								header: ({ navigation }) => <View style={{ height: 50, backgroundColor: "white" }}></View>
@@ -207,22 +206,19 @@ export default function Application() {
 
 							<Stack.Screen options={{
 								header: ({ navigation }) => {
-									return <View style={{ height: 90, justifyContent: "center", backgroundColor: "white", paddingLeft: 20, paddingTop: 40,borderBottomColor:COLORS.light,borderBottomWidth:2 }}>
-										<TouchableOpacity onPress={() => navigation.goBack()} style={{}}>
-											<HeaderBackArrowBlack />
-										</TouchableOpacity>
-									</View>
+									return (
+										<View style={{ height: 90, justifyContent: "center", backgroundColor: "white", paddingLeft: 20, paddingTop: 40 }}>
+											<TouchableOpacity onPress={() => navigation.goBack()} style={{}}>
+												<HeaderBackArrowBlack />
+											</TouchableOpacity>
+										</View>
+									)
 								}
 							}} name="Post" component={PostScreen} />
 
 							<Stack.Screen options={{
 								header: ({ navigation }) => <PostAddHeader navigation={navigation} />
 							}} name="PostAdd" component={PostAdd} />
-
-
-							<Stack.Screen options={{
-								header: ({ navigation }) => <PostEditHeader navigation={navigation} />
-							}} name="PostEdit" component={PostEdit} />
 
 							<Stack.Screen name="chatDiscussion" component={ChatDiscussion} options={{
 								headerShown: false,

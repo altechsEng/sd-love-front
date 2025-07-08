@@ -8,17 +8,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 export default function App() {
-
- 
-    
-  
-	return ( 
-		// <SafeAreaView>
-			<GestureHandlerRootView style={{flex:1}}>
-				<Application />
-			</GestureHandlerRootView>
-		// </SafeAreaView>
- 
+	return (
+		<GestureHandlerRootView>
+			<Application />
+		</GestureHandlerRootView>
 	);
 }
 
@@ -30,6 +23,3 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 });
-
-
- 

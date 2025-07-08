@@ -18,6 +18,10 @@ const Login = ({ navigation }) => {
 	const [password, setPassword] = useState("")
 
 	useEffect(() => {
+		// let user_id = AsyncStorage.getItem('user_id');
+		// if(user_id) {
+		// 	return navigation.navigate("BottomTabsHome");
+		// }
 		setTimeout(() => setErr(""), 5000)
 	}, [err])
 
@@ -30,9 +34,6 @@ const Login = ({ navigation }) => {
 		const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Basic email regex
 		return regex.test(email);
 	};
-
-
-
 
 	const handleSubmission = async () => {
 
@@ -54,19 +55,15 @@ const Login = ({ navigation }) => {
 		let data = { email: email.trim(), password: password.trim(), device_name: deviceName }
 		console.log(data, "datapppop")
 
-
 		await axios.get("/sanctum/csrf-cookie").then((response) => {
 			axios
 				.post(`/api/login/en`, data)
 				.then(async (res) => {
-
-
 					if (res.data.error || res.data.status == 500 || res.data.status === 401) {
 						setErr(res.data.message)
 						setIsLoading(false)
 
 					} else if (res.data.status === 200) {
-
 						await AsyncStorage.setItem("user_id", JSON.stringify(res.data?.user_id));
 						let id = JSON.stringify(res.data?.device_id)
 						await AsyncStorage.setItem(
@@ -80,9 +77,6 @@ const Login = ({ navigation }) => {
 							user_image: `https://sdlove-api.altechs.africa/storage/app/private/public/user_images/${res.data?.user_image}` || null
 						})
 						await AsyncStorage.setItem("user_data", info)
-
-
-
 						navigation.navigate("BottomTabsHome")
 						setIsLoading(false)
 					}
@@ -91,10 +85,8 @@ const Login = ({ navigation }) => {
 					console.log(error.message, error, " in login", error.response, Object.keys(error))
 					setErr(error.message)
 					setIsLoading(false)
-
 				});
 		});
-
 	}
 
 	return (

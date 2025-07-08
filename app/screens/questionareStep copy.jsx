@@ -17,7 +17,6 @@ import {
 import { getEmojiFlag } from "countries-list";
 
 import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 
@@ -602,40 +601,32 @@ export function Questionaire2({ navigation }) {
 
 
 	const handleSubmission = async () => {
-		let token = await AsyncStorage.getItem("user_token")
 		setIsLoading(true)
 		const data = {
 			...registrationData,
 			...questionnaireData?.answers,
+			qS10: JSON.stringify(questionnaireData?.answers.qS10),
 			qP13: JSON.stringify(questionnaireData?.answers.qP13),
 			qP15: JSON.stringify(questionnaireData?.answers.qP15),
 			qP16: JSON.stringify(questionnaireData?.answers.qP16),
-			qS10: JSON.stringify(questionnaireData?.answers.qS10),
 		}
-
-		 
-		await axios.post("/api/register/en", data,
-          { headers: { "Authorization": `Bearer ${token}` } }
-		).then((res) => {
+		await axios.post("/api/register/en", data).then((res) => {
 			console.log(res.data, "resdata")
 			if (res.data.errors) {
-				setErr(`address: ${res.data.errors?.address}` || `city: ${res.data.errors?.city}`)
+				// setErr(`address: ${res.data.errors?.address}` || `city: ${res.data.errors?.city}`)
+				setErr(res.data.errors)
 			} else if (res.data.status === 401) {
 				setErr(`email error : ${res.data.message}`)
 			} else {
-
-				navigation.navigate("BottomTabsHome")
+				navigation.navigate("RegistrationComplete")
 			}
 			setIsLoading(false)
 		}).catch((err) => {
-			console.log(err?.request, "opppp")
+			console.log(err, "Server error, something went wrong")
 			setErr(err)
 			setIsLoading(false)
-
 		})
 	}
-
-
 
 	const MultiSelectAnswer = ({
 		questionKey,
