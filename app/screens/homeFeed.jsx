@@ -80,6 +80,35 @@ export default function HomeFeed({ navigation }) {
 		}
 	])
 
+
+  const [contentHeight, setContentHeight] = useState(0);
+  const [scrollViewHeight, setScrollViewHeight] = useState(0);
+  // Calculate if user has scrolled to the bottom
+  const handleScroll = useCallback((event) => {
+    const offsetY = event.nativeEvent.contentOffset.y;
+    const contentHeight = event.nativeEvent.contentSize.height;
+    const scrollViewHeight = event.nativeEvent.layoutMeasurement.height;
+
+    // Trigger load more when 50px from bottom
+    if (contentHeight - (offsetY + scrollViewHeight) < 50 && 
+        hasNextPage && 
+        !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  // Measure content height when it changes
+  const handleContentSizeChange = useCallback((w, h) => {
+    setContentHeight(h);
+  }, []);
+
+  // Measure ScrollView height
+  const handleLayout = useCallback((event) => {
+    setScrollViewHeight(event.nativeEvent.layout.height);
+  }, []);
+
+
+
 	const getAllPosts = async ({ pageParam = 1 }) => {
 		try {
 
@@ -93,7 +122,7 @@ export default function HomeFeed({ navigation }) {
 				);
 
 
-
+console.log(response.data,"resposne.data")
 				return response.data
 			}
 		} catch (err) {
@@ -315,7 +344,7 @@ export default function HomeFeed({ navigation }) {
 	}
 
 	return (
-		<View clasName={'bg-green-100'} style={{ flex: 1 }}>
+		<View clasName={'bg-green-100'} style={{ flex: 1, backgroundColor: "white" }}>
 			<View clasName={'flex flex-row items-center justify-between py-4'} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 10, backgroundColor: "white", position: "relative", borderBottomWidth: 0, borderColor: COLORS.light }}>
 				<View style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "flex-start", paddingLeft: 20 }}>
 					<LogoSmall />
@@ -329,7 +358,13 @@ export default function HomeFeed({ navigation }) {
 					<TouchableOpacity onPress={() => navigation.navigate("Notifications")} style={{ marginLeft: 20, }}><HomeFeedBell /></TouchableOpacity>
 				</View>
 			</View>
-			<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ backgroundColor: "white", position: "relative" }}>
+			<ScrollView       
+	 onScroll={handleScroll}
+      scrollEventThrottle={16}
+      onContentSizeChange={handleContentSizeChange}
+      onLayout={handleLayout} 
+	 showsVerticalScrollIndicator={false} 
+	 contentContainerStyle={{ backgroundColor: "white", position: "relative" }}>
 
 				<View style={{ flexDirection: "row", height: 40, alignContent: "center", alignItems: "center", justifyContent: "space-between", marginVertical: 0, paddingHorizontal: 20 }}>
 					<View ><Text style={{ fontSize: TEXT_SIZE.title, color: COLORS.gray, fontWeight: "bold", fontFamily: FAMILLY.semibold }}>New Matches</Text></View>
@@ -356,25 +391,14 @@ export default function HomeFeed({ navigation }) {
 					/>
 				</View>
 
-				{/* <View style={{ paddingLeft: 20 }}>
-					<FlatList
-						data={allPosts.length == 0 ? posts : allPosts}
-						renderItem={renderPosts}
-						keyExtractor={(item) => item?.key || item?.id}
-						horizontal={true}
-						showsHorizontalScrollIndicator={false}
-						onEndReached={loadMorePost}
-						onEndReachedThreshold={0.5}
-						ListFooterComponent={renderLoader}
-						ListFooterComponentStyle={{ alignItems: "center", justifyContent: "center" }}
-					/>
-				</View> */}
+ 
 				<View style={{ paddingLeft: 20 }}>
 					<FlatList
 						data={allPosts.length == 0 ? posts : allPosts}
 						renderItem={renderPosts}
 						keyExtractor={(item) => item?.key || item?.id}
 						horizontal={false}
+						scrollEnabled={false}
 						showsHorizontalScrollIndicator={false}
 						onEndReached={loadMoreMatch}
 						onEndReachedThreshold={0.5}

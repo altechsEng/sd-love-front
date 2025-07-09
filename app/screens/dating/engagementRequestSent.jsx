@@ -13,7 +13,7 @@ import { useGlobalVariable } from '../../context/global';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window')
 
-export default function engagementRequestSent({ navigation }) {
+export default function EngagementRequestSent({ navigation }) {
 
      const { item } = useRoute().params
      const { userData, image } = useGlobalVariable()
