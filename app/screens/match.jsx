@@ -50,8 +50,6 @@ const MatchScreen = ({ navigation }) => {
                     { page: pageParam },
                     { headers: { "Authorization": `Bearer ${token}` } }
                 );
-
-
                 return response.data
             }
         } catch (err) {

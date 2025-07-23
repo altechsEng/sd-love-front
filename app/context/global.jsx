@@ -179,6 +179,8 @@ export const GlobalVariableProvider = ({
         else setImage(null)
         return result
 
+      } else {
+        navigation.navigate("Home")
       }
 
       return null

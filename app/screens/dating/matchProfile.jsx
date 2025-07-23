@@ -3,7 +3,9 @@ import { MatchProfileArrowBack, MatchProfileBirthDay, MatchProfileEducation, Mat
 import { COLORS, TEXT_SIZE, FAMILLY, BaseImageUrl, POST_LIMIT, BasePostImageUrl } from "../../../utils/constants";
 import React, { useEffect, useRef, useState } from "react"
 import { View, Text, Image, TouchableOpacity, Dimensions, ScrollView, FlatList } from "react-native"
-
+import AntDesign from '@expo/vector-icons/AntDesign';
+import Feather from '@expo/vector-icons/Feather';
+import Foundation from '@expo/vector-icons/Foundation';
 import {
 	widthPercentageToDP as wp,
 	heightPercentageToDP as hp,
@@ -25,12 +27,231 @@ export default function MatchProfile({ navigation }) {
 	const { item } = useRoute().params
 	const [interest, setInterest] = useState(["Travel", "Music", "Fishing", "Gym", "Bible", "Dance"])
 	const [churchOccupations, setchurchOccupations] = useState(["Travel", "Music", "Fishing", "Gym", "Bible", "Dance"])
+	const [buttonLoading, setButtonLoading] = useState(false);
+	const [isFollowing, setIsFollowing] = useState(false);
+	const [followData, setFollowData] = useState();
+	const [isLiking, setIsLiking] = useState(false);
+	const [likeData, setLikeData] = useState();
+	const [hasEngagementRequest, setHasEngagementRequest] = useState(false);
+	const [engagementRequest, setEngagementRequest] = useState();
+	const [err, setErr] = useState("");
+
 	useEffect(() => {
 		let data = JSON.parse(item?.match_user?.user_infos?.qP16)
 		setInterest(data)
 		setchurchOccupations(JSON.parse(item?.match_user?.user_infos?.qS10) || ["Travel", "Music", "Fishing", "Gym", "Bible", "Dance"])
 		console.log(item?.match_user?.firstname, "poppp---")
+		checkEngagement();
+		checkProfileLiked();
+		checkIfFollowing();
 	}, [])
+
+
+	const requestEgagement = async () => {
+		let token = await AsyncStorage.getItem("user_token");
+		let data = { matchId: item.match_id }
+
+		setButtonLoading(true);
+
+		if (token) {
+			axios
+				.post(`/api/request-engagement`, data, { headers: { "Authorization": `Bearer ${token}` } })
+				.then(async (res) => {
+					if (res.data.error || res.data.status == 500 || res.data.status === 401) {
+						setErr(res.data.message)
+						setButtonLoading(false)
+
+					} else if (res.data.status === 200) {
+						setButtonLoading(false)
+						setHasEngagementRequest(true)
+						setEngagementRequest(res.data?.engagement_request)
+						navigation.navigate("EngagementRequestSent", { item })
+					}
+				})
+				.catch(function (error) {
+					console.log(error.message, error, " in request engagement", error.response, Object.keys(error))
+					setButtonLoading(false)
+				});
+		} else {
+			console.log('Not logged it');
+		}
+	}
+
+	const cancelEgagementReauest = async () => {
+		let token = await AsyncStorage.getItem("user_token");
+		let data = { requestId: engagementRequest.id }
+
+		setButtonLoading(true);
+
+		if (token) {
+			axios
+				.post(`/api/cancel-engagement-request`, data, { headers: { "Authorization": `Bearer ${token}` } })
+				.then(async (res) => {
+					if (res.data.error || res.data.status == 500 || res.data.status === 401) {
+						setErr(res.data.message)
+						setButtonLoading(false)
+
+					} else if (res.data.status === 200) {
+						setButtonLoading(false)
+						setEngagementRequest([])
+						setHasEngagementRequest(false)
+					} else if (res.data.status === 404) {
+						setButtonLoading(false)
+						setErr(res.data.message)
+					}
+				})
+				.catch(function (error) {
+					console.log(error.message, error, " in request engagement", error.response, Object.keys(error))
+					setButtonLoading(false)
+				});
+		} else {
+			console.log('Not logged it');
+		}
+	}
+
+	const checkEngagement = async () => {
+		let token = await AsyncStorage.getItem("user_token");
+		let data = { matchId: item.match_id }
+
+		setButtonLoading(true);
+
+		if (token) {
+			axios
+				.post(`/api/check-engagement-request`, data, { headers: { "Authorization": `Bearer ${token}` } })
+				.then(async (res) => {
+					if (res.data.status == 200) {
+						setHasEngagementRequest(true)
+						setEngagementRequest(res.data?.engagement_request)
+						setButtonLoading(false)
+					} else if (res.data.status == 404) {
+						setHasEngagementRequest(false)
+						setButtonLoading(false)
+					}
+				})
+				.catch(function (error) {
+					console.log(error.message, error, " in request engagement", error.response, Object.keys(error))
+					setButtonLoading(false)
+				});
+		} else {
+			console.log('Not logged it');
+		}
+	}
+
+	const followProfile = async () => {
+		let token = await AsyncStorage.getItem("user_token");
+		let data = { matchId: item.match_id }
+
+		// setButtonLoading(true);
+
+		if (token) {
+			axios
+				.post(`/api/follow-profile`, data, { headers: { "Authorization": `Bearer ${token}` } })
+				.then(async (res) => {
+					if (res.data.status == 200) {
+						setIsFollowing(true)
+						setFollowData(res.data?.followData)
+						// setButtonLoading(false)
+					} else if (res.data.status == 404) {
+						setIsFollowing(false)
+						// setButtonLoading(false)
+					}
+				})
+				.catch(function (error) {
+					console.log(error.message, error, " in request engagement", error.response, Object.keys(error))
+					// setButtonLoading(false)
+				});
+		} else {
+			console.log('Not logged it');
+		}
+	}
+
+	const checkIfFollowing = async () => {
+		let token = await AsyncStorage.getItem("user_token");
+		let data = { matchId: item.match_id }
+
+		// setButtonLoading(true);
+
+		if (token) {
+			axios
+				.post(`/api/check-if-following`, data, { headers: { "Authorization": `Bearer ${token}` } })
+				.then(async (res) => {
+					if (res.data.status == 200) {
+						setIsFollowing(true)
+						setFollowData(res.data?.followData)
+						// setButtonLoading(false)
+					} else if (res.data.status == 404) {
+						setIsFollowing(false)
+						// setButtonLoading(false)
+					}
+				})
+				.catch(function (error) {
+					console.log(error.message, error, " in request engagement", error.response, Object.keys(error))
+					// setButtonLoading(false)
+				});
+		} else {
+			console.log('Not logged it');
+		}
+	}
+
+	const unFollowProfile = async () => {
+		console.log("unfollow profile called");
+	}
+
+	const likeProfile = async () => {
+		let token = await AsyncStorage.getItem("user_token");
+		let data = { matchId: item.match_id, likeType: "regular" }
+
+		// setButtonLoading(true);
+
+		if (token) {
+			axios
+				.post(`/api/like-match-profile`, data, { headers: { "Authorization": `Bearer ${token}` } })
+				.then(async (res) => {
+					if (res.data.status == 200) {
+						setIsLiking(true)
+						setLikeData(res.data?.likeData)
+						// setButtonLoading(false)
+					} else if (res.data.status == 400) {
+						setIsLiking(false)
+						// setButtonLoading(false)
+					}
+				})
+				.catch(function (error) {
+					console.log(error.message, error, " in request engagement", error.response, Object.keys(error))
+					// setButtonLoading(false)
+				});
+		} else {
+			console.log('Not logged it');
+		}
+	}
+
+	const checkProfileLiked = async () => {
+		let token = await AsyncStorage.getItem("user_token");
+		let data = { matchId: item.match_id }
+
+		// setButtonLoading(true);
+
+		if (token) {
+			axios
+				.post(`/api/check-profile-liked`, data, { headers: { "Authorization": `Bearer ${token}` } })
+				.then(async (res) => {
+					if (res.data.status == 200) {
+						setIsLiking(true)
+						setLikeData(res.data?.likeData)
+						// setButtonLoading(false)
+					} else if (res.data.status == 404) {
+						setIsLiking(false)
+						// setButtonLoading(false)
+					}
+				})
+				.catch(function (error) {
+					console.log(error.message, error, " in request engagement", error.response, Object.keys(error))
+					// setButtonLoading(false)
+				});
+		} else {
+			console.log('Not logged it');
+		}
+	}
 
 	const isSearching = useRef(false);
 	const getMatchPost = async ({ pageParam = 0 }) => {
@@ -171,19 +392,53 @@ export default function MatchProfile({ navigation }) {
 			</View>
 
 			<View className='gap-3 mt-4' style={{ flexDirection: "row", alignItems: "center" }}>
-				<TouchableOpacity className='border border-[#D7A898] rounded-3xl px-6 py-3' style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", alignSelf: "flex-start" }}>
-					<View style={{ marginRight: 5 }}>
-						<MatchProfilePlus />
-					</View>
-					<CustomMeduimPoppingText style={{ textTransform: "capitalize", lineHeight: 18 }} color={COLORS.primary} fontSize={TEXT_SIZE.medium} value="Follow" />
-				</TouchableOpacity>
-				<TouchableOpacity className='border border-[#D7A898] bg-[#D7A898] rounded-3xl px-6 py-3' style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", alignSelf: "flex-start" }}>
-					{/* <View style={{ marginRight: 5 }}>
-						<MatchProfilePlus />
-					</View> */}
-					<CustomMeduimPoppingText style={{ textTransform: "capitalize", lineHeight: 18 }} color={'white'} fontSize={TEXT_SIZE.medium} value="Request engagement" />
-				</TouchableOpacity>
-				<TouchableOpacity className='border border-[#D7A898]' style={{ alignItems: "center", justifyContent: "center", height: 42, width: 42, borderRadius: 22 }}><MatchProfileSmallHeart strock='#D7A898' /></TouchableOpacity>
+				{isFollowing
+					?
+					<TouchableOpacity className='border border-[#D7A898] rounded-3xl px-6 py-3' onPress={() => unFollowProfile()} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", alignSelf: "flex-start" }}>
+						{/* <View style={{ marginRight: 5 }}>
+							<MatchProfilePlus />
+						</View> */}
+						<CustomMeduimPoppingText style={{ textTransform: "capitalize", lineHeight: 18 }} color={COLORS.primary} fontSize={TEXT_SIZE.medium} value="Following" />
+					</TouchableOpacity>
+					:
+					<TouchableOpacity className='border border-[#D7A898] rounded-3xl px-6 py-3' onPress={() => followProfile()} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", alignSelf: "flex-start" }}>
+						<View style={{ marginRight: 5 }}>
+							<MatchProfilePlus />
+						</View>
+						<CustomMeduimPoppingText style={{ textTransform: "capitalize", lineHeight: 18 }} color={COLORS.primary} fontSize={TEXT_SIZE.medium} value="Follow" />
+					</TouchableOpacity>
+				}
+				{hasEngagementRequest
+					?
+					<TouchableOpacity className='grow border border-[#D7A898] bg-[#D7A898] rounded-3xl px-6 py-3' onPress={() => cancelEgagementReauest()} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", alignSelf: "flex-start" }}>
+						{buttonLoading ?
+							<AntDesign className='animate-spin' name="loading2" size={18} color="white" />
+							:
+							<View className='flex flex-row justify-center gap-1'>
+								<Feather name="x" size={18} color="white" />
+								<CustomRegularPoppingText fontSize={TEXT_SIZE.medium} value={`Cancel request`} style={{ textTransform: "capitalize", lineHeight: 18 }} color={"white"} />
+							</View>
+						}
+					</TouchableOpacity>
+					:
+					<TouchableOpacity onPress={() => requestEgagement()} className='grow border border-[#D7A898] bg-[#D7A898] rounded-3xl px-6 py-3' style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", alignSelf: "flex-start" }}>
+						{buttonLoading ?
+							<AntDesign className='animate-spin' name="loading2" size={18} color="white" />
+							:
+							<CustomMeduimPoppingText style={{ textTransform: "capitalize", lineHeight: 18 }} color={'white'} fontSize={TEXT_SIZE.medium} value="Request engagement" />
+						}
+					</TouchableOpacity>
+				}
+				{isLiking
+					?
+					<TouchableOpacity onPress={() => likeProfile()} className='' style={{ alignItems: "center", justifyContent: "center", height: 42, width: 42, borderRadius: 22, backgroundColor: COLORS.red }}>
+						<Foundation name="heart" size={24} color="white" />
+					</TouchableOpacity>
+					:
+					<TouchableOpacity onPress={() => likeProfile()} className='border border-[#D7A898]' style={{ alignItems: "center", justifyContent: "center", height: 42, width: 42, borderRadius: 22 }}>
+						<MatchProfileSmallHeart strock='#D7A898' />
+					</TouchableOpacity>
+				}
 			</View>
 
 			<View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 30, borderBottomWidth: 2, borderBottomColor: "#F5F6FC" }}>

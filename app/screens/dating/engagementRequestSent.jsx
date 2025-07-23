@@ -29,9 +29,9 @@ export default function EngagementRequestSent({ navigation }) {
                <LinearGradient colors={["rgba(215, 168, 152, 1)", "rgba(255, 255, 255, 0.03)"]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={{ height: SCREEN_HEIGHT * 0.6, width: "100%", position: "relative" }} >
                     <View style={{ paddingHorizontal: 20, backgroundColor: "" }}>
                          <View style={{ height: 60 }}></View>
-                         {/* <TouchableOpacity onPress={() => navigation.goBack()} style={{ alignItems: "flex-start", justifyContent: "flex-start" }}>
+                         <TouchableOpacity onPress={() => navigation.goBack()} style={{ alignItems: "flex-start", justifyContent: "flex-start" }}>
                               <MatchConnectionBackArrow />
-                         </TouchableOpacity> */}
+                         </TouchableOpacity>
                     </View>
 
                     <View style={{ position: "absolute", alignSelf: "center" }}>
@@ -63,7 +63,7 @@ export default function EngagementRequestSent({ navigation }) {
 
                <TouchableOpacity onPress={() => navigation.navigate("MatchProfile",{item})} style={{ marginTop: 20, width: "80%", paddingVertical: 10, borderRadius: 20, backgroundColor: "rgba(215, 168, 152, 0.13)" }}>
                     <CustomRegularPoppingText fontSize={TEXT_SIZE.small + 2} value="View profile" style={{ textAlign: "center" }} color={COLORS.primary} />
-               </TouchableOpacity>
+               </TouchableOpacity> 
           </View>
      )
 }
