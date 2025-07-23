@@ -12,7 +12,9 @@ import {
   TextInput,
   Dimensions,
   ToastAndroid,
-  ActivityIndicator
+  ActivityIndicator,
+  Modal,
+  Pressable
 } from 'react-native';
 import dayjs from 'dayjs';
 import {
@@ -23,7 +25,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { useRoute } from '@react-navigation/native';
 import { useGlobalVariable } from '../../context/global';
 import { BaseImageUrl, COLORS,FAMILLY,POST_LIMIT,TEXT_SIZE } from '../../../utils/constants';
-import { HomeFeedComment, HomeFeedHeart, HomeFeedShare, PostScreenBigComment, PostScreenBookMark, PostScreenDots, PostScreenMiniHeart } from '../../components/vectors';
+import { HomeFeedComment, HomeFeedHeart, HomeFeedShare, PostScreenBigComment, PostScreenBookMark, PostScreenDots, PostScreenMiniHeart, ProfileScreenPostDelete, ProfileScreenPostEdit } from '../../components/vectors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { CustomRegularPoppingText, CustomSemiBoldPoppingText } from '../../components/text';
@@ -33,7 +35,7 @@ import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 dayjs.extend(relativeTime);
 
-const BlogPostScreen = () => {
+const BlogPostScreen = ({navigation}) => {
 
      const queryClient = useQueryClient()
      const { item:mainItem } = useRoute().params;
@@ -70,6 +72,7 @@ const BlogPostScreen = () => {
         },
       ]
      
+      const [activePostItem, setActivePostItem] = useState(null)
      const [likedComments, setLikedComments] = useState({});
      const [replyingTo, setReplyingTo] = useState(null);
      
@@ -101,7 +104,7 @@ const [activePostLikeCount,setActivePostLikeCount] = useState(mainItem?.likes_co
   const [newComment, setNewComment] = useState('');
   const [isPostLiked, setIsPostLiked] = useState(false);
   const scrollViewRef = useRef();
-
+  const [modalVisible, setModalVisible] = useState(false)
  
 
   // Handle post like
@@ -142,6 +145,7 @@ try {
  
     
     setLikedComments(prev => {
+     
       return {
       ...prev,
       [commentId]: !prev[commentId]
@@ -291,7 +295,7 @@ try {
  
 
 
-
+const [isLoading, setIsLoading] = useState(false)
   const bookMarkMutation = useMutation({
     mutationFn:async({postId}) => {
        let token = await AsyncStorage.getItem("user_token");
@@ -301,8 +305,9 @@ try {
             "Authorization": `Bearer ${token}`,
           }
         }) 
+ 
 
-        return {status: response.data.status,data:response.data}
+        return {status: response.data.status,data:response.data,message:response.data?.message}
       }
     } ,
     onError: (error) => {
@@ -310,17 +315,50 @@ try {
           ToastAndroid.show("Failed to save post", ToastAndroid.SHORT);
         }
   })
-  const handleBookMark = async (postId) => {
-   let result =  await bookMarkMutation.mutateAsync({postId})
-  if (result.status === 200) {
+  const handleBookMark = async (post) => {
+ 
+    if(userData.id === post?.user?.id){
+      console.log("cannot book mark your own post")
+     return 
+    }
+   let result =  await bookMarkMutation.mutateAsync({postId:post?.id})
+  
+     if (result.status === 200) {
         await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['userSavePosts'] })
       ]);
-  ToastAndroid.show("Post saved successfully", 1000);
-  };
+  ToastAndroid.show(result?.message, 1000);
+  } 
 }
 
+  const deletePostMutation = useMutation({
+    mutationFn: async (postId) => {
+      const token = await AsyncStorage.getItem("user_token");
+      const formData = new FormData();
+      formData.append("post_id", postId);
+      return axios.post("/api/delete-post", formData, {
+        headers: { "Authorization": `Bearer ${token}` }
+      }).then(res => {
+        console.log(res.data, "Data----")
+        ToastAndroid.show("Post deleted", 1000)
 
+      }).catch(err => {
+        console.log(err?.request, "opo")
+      })
+    },
+
+    onSuccess: () => {
+      setModalVisible(false);
+      queryClient.invalidateQueries({ queryKey: ['userPosts'] });
+    },
+    onError: (error) => {
+      console.error("Error deleting post:", error);
+    }
+  });
+
+  const handleDeletePost = (post) => {
+    deletePostMutation.mutate(post.id)
+  };
 
     
      const getAllComments = async ({ pageParam = 1}) => {
@@ -641,7 +679,14 @@ try {
             <Text style={styles.postTime}>{dayjs(new Date(mainItem?.created_at)).fromNow() || "12 hours ago"}</Text>
           </View>
 
-          <TouchableOpacity >
+          <TouchableOpacity onPress={()=> {
+
+            if(userData?.id == mainItem?.user?.id) {
+            setModalVisible(true)
+						setActivePostItem(mainItem)
+            }
+
+          }}>
             <PostScreenDots />
           </TouchableOpacity>
         </View>
@@ -711,7 +756,7 @@ try {
             
             <TouchableOpacity 
               style={styles.bookmarkButton}
-              onPress={() => handleBookMark(mainItem?.id)}
+              onPress={() => handleBookMark(mainItem)}
             >
               <PostScreenBookMark />
             </TouchableOpacity>
@@ -790,6 +835,35 @@ try {
       </View>
 
       </View>
+
+              <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+              >
+                {/* Semi-transparent overlay (simulates blur effect) */}
+                <Pressable
+                  style={styles.overlay}
+                  onPress={() => setModalVisible(false)}
+                >
+                  {/* Actual modal content */}
+                  <View style={styles.modalContainer}>
+                    <View className={'gap-6 py-8'} style={styles.modalContent}>
+                      <TouchableOpacity style={{ alignItems: "center", justifyContent: "flex-start", flexDirection: "row" }} onPress={() => navigation.navigate("PostEdit", { item: activePostItem })}>
+                        <ProfileScreenPostEdit />
+                        <CustomRegularPoppingText color={null} style={{ marginLeft: 20 }} value={"Edit post"} fontSize={TEXT_SIZE.primary} />
+                      </TouchableOpacity>
+      
+      
+                      <TouchableOpacity onPress={() => handleDeletePost(activePostItem)} style={{ alignItems: "center", justifyContent: "flex-start", flexDirection: "row" }}>
+                        <ProfileScreenPostDelete />
+                        {isLoading ? <ActivityIndicator color={COLORS.primary} /> : <CustomRegularPoppingText color={null} style={{ marginLeft: 20 }} value={"Delete post"} fontSize={TEXT_SIZE.primary} />}
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </Pressable>
+              </Modal>
     </SafeAreaView>
   );
 };
@@ -1093,6 +1167,60 @@ paddingHorizontal: 10
         fontSize: TEXT_SIZE.small,
         color: COLORS.gray,
       },
+
+
+
+      	button: {
+		backgroundColor: '#2196F3',
+		padding: 15,
+		borderRadius: 10,
+	},
+	buttonText: {
+		color: 'white',
+		fontSize: 16,
+		fontWeight: 'bold',
+	},
+	overlay: {
+		flex: 1,
+		justifyContent: 'flex-end',
+		backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent black
+	},
+	modalContainer: {
+		width: '100%',
+		// height: SCREEN_HEIGHT * 0.89,
+		borderTopLeftRadius: 20,
+		borderTopRightRadius: 20,
+		overflow: 'hidden',
+	},
+	modalContent: {
+		backgroundColor: 'white',
+		padding: 20,
+		// height: '100%',
+		// justifyContent: 'flex-start',
+		// alignItems: 'flex-start',
+		borderTopLeftRadius: 20,
+		borderTopRightRadius: 20,
+	},
+	modalTitle: {
+		fontSize: 20,
+		fontWeight: 'bold',
+		marginBottom: 15,
+	},
+	modalText: {
+		fontSize: 16,
+		marginBottom: 20,
+	},
+	closeButton: {
+		backgroundColor: '#2196F3',
+		padding: 10,
+		borderRadius: 10,
+		alignItems: 'center',
+	},
+	closeButtonText: {
+		color: 'white',
+		fontSize: 16,
+		fontWeight: 'bold',
+	},
 });
 
 export default BlogPostScreen;

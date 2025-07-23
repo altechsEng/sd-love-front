@@ -35,10 +35,10 @@ const ProfileScreen = ({ navigation }) => {
 
 	useEffect(() => {
 		setchurchOccupations(JSON.parse(userData.user_infos?.qS10) || ["Travel", "Music", "Fishing", "Gym", "Bible", "Dance"])
-		console.log(userData);
+		// console.log(userData);
 		// console.log(interests);
-		console.log(userData.user_infos);
-		console.log(JSON.parse(userData.user_infos.qP16));
+		// console.log(userData.user_infos);
+		// console.log(JSON.parse(userData.user_infos.qP16));
 		// loadData()
 	}, [])
 
@@ -71,32 +71,7 @@ const ProfileScreen = ({ navigation }) => {
 
 	const [activePostItem, setActivePostItem] = useState(null)
 	const [isLoading, setIsLoading] = useState(false)
-	// const handleDeletePost = async(post) => {
-
-	// 	try {
-	// 		setIsLoading(true)
-	// 		let token = await AsyncStorage.getItem("user_token")
-	// 		console.log(post,"active post")
-	// 		let formData = new FormData()
-	// 		formData.append("post_id",post?.id || 55)
-	// 	     await axios.post("/api/delete-post",formData,{headers: {"Authorization": `Bearer ${token}`}}).
-	// 		then(res => {
-	// 			console.log(res.data,"response data")	
-	// 		setIsLoading(false)
-
-	// 		}).catch(err => {
-	// 			console.log(err.request,"eror in cathc",err)
-	// 		setIsLoading(false)
-
-	// 		})
-
-	// 	}catch(err) {
-	// 		console.log(err,"erorr in handle delte post try catch")
-	// 		setIsLoading(false)
-
-	// 	}
-
-	// }
+ 
 
 
 
@@ -128,6 +103,35 @@ const ProfileScreen = ({ navigation }) => {
 	const handleDeletePost = (post) => {
 		deletePostMutation.mutate(post.id)
 	};
+
+	const removeFromFavouritePostMutation = useMutation({
+		mutationFn: async (postId) => {
+			const token = await AsyncStorage.getItem("user_token");
+			const formData = new FormData();
+			formData.append("post_id", postId);
+			return axios.post("/api/remove-favourite-post", formData, {
+				headers: { "Authorization": `Bearer ${token}` }
+			}).then(res => {
+				console.log(res.data, "Data----")
+				ToastAndroid.show("Post removed", 1000)
+
+			}).catch(err => {
+				console.log(err?.request, "opo")
+			})
+		},
+
+		onSuccess: () => {
+			setModalVisible(false);
+			queryClient.invalidateQueries({ queryKey: ['userSavePosts'] });
+		},
+		onError: (error) => {
+			console.error("Error removing from favourite post:", error);
+		}
+	});
+
+	const handleRemoveFavourite = (post) => {
+		removeFromFavouritePostMutation.mutate(post.id)
+	}
 
 	//interest
 	const [interest, setInterest] = useState(["Travel", "Music", "Fishing", "Gym", "Bible", "Dance"])
@@ -383,8 +387,11 @@ const ProfileScreen = ({ navigation }) => {
 						</View>
 					</View>
 
-					<TouchableOpacity onPress={() => { }} style={{ backgroundColor: "white", height: 25, width: 80, borderRadius: 20, alignItems: "center", justifyContent: "center" }}>
-						{/* <PostScreenDots /> */}
+					<TouchableOpacity onPress={() => {
+						setModalVisible(true)
+						setActivePostItem(item)
+					 }} style={{ backgroundColor: "white", height: 25, width: 80, borderRadius: 20, alignItems: "center", justifyContent: "center" }}>
+						<PostScreenDots /> 
 					</TouchableOpacity>
 				</View>
 				<View style={{ marginVertical: 10 }}>
@@ -721,6 +728,8 @@ const ProfileScreen = ({ navigation }) => {
 						{/* Actual modal content */}
 						<View style={styles.modalContainer}>
 							<View className={'gap-6 py-8'} style={styles.modalContent}>
+								{activeSubCat == "Posts" && (
+									<>
 								<TouchableOpacity style={{ alignItems: "center", justifyContent: "flex-start", flexDirection: "row" }} onPress={() => navigation.navigate("PostEdit", { item: activePostItem })}>
 									<ProfileScreenPostEdit />
 									<CustomRegularPoppingText color={null} style={{ marginLeft: 20 }} value={"Edit post"} fontSize={TEXT_SIZE.primary} />
@@ -731,6 +740,17 @@ const ProfileScreen = ({ navigation }) => {
 									<ProfileScreenPostDelete />
 									{isLoading ? <ActivityIndicator color={COLORS.primary} /> : <CustomRegularPoppingText color={null} style={{ marginLeft: 20 }} value={"Delete post"} fontSize={TEXT_SIZE.primary} />}
 								</TouchableOpacity>
+									</>
+								)}
+
+								{activeSubCat == "savePost" && (
+									<>
+								<TouchableOpacity onPress={() => handleRemoveFavourite(activePostItem)} style={{ alignItems: "center", justifyContent: "flex-start", flexDirection: "row" }}>
+									<ProfileScreenPostDelete />
+									{isLoading ? <ActivityIndicator color={COLORS.primary} /> : <CustomRegularPoppingText color={null} style={{ marginLeft: 20 }} value={"Remove from favourite"} fontSize={TEXT_SIZE.primary} />}
+								</TouchableOpacity>
+									</>
+								)}
 							</View>
 						</View>
 					</Pressable>

@@ -61,7 +61,7 @@ export default function EngagementRequestSent({ navigation }) {
                     <CustomRegularPoppingText fontSize={TEXT_SIZE.small + 2} value={`Engage with ${item?.match_user?.firstname}`} style={{ textAlign: "center" }} color={"white"} />
                </TouchableOpacity> */}
 
-               <TouchableOpacity onPress={() => navigation.navigate("Match")} style={{ marginTop: 20, width: "80%", paddingVertical: 10, borderRadius: 20, backgroundColor: "rgba(215, 168, 152, 0.13)" }}>
+               <TouchableOpacity onPress={() => navigation.navigate("MatchProfile",{item})} style={{ marginTop: 20, width: "80%", paddingVertical: 10, borderRadius: 20, backgroundColor: "rgba(215, 168, 152, 0.13)" }}>
                     <CustomRegularPoppingText fontSize={TEXT_SIZE.small + 2} value="View profile" style={{ textAlign: "center" }} color={COLORS.primary} />
                </TouchableOpacity>
           </View>

@@ -1,0 +1,192 @@
+    
+    public function sendMessage(Request $request)
+    {
+
+        $request->validate([
+            // 'content' => 'required',
+            'sender_id' => 'required',
+            'recipient_id' => 'required',
+            'image' => 'nullable|image|max:2048',
+        ]);
+
+        $sender = User::where('id', $request->sender_id)->first();
+        $recipient = User::where('id', $request->recipient_id)->first();
+        
+        $message_contact = [];
+
+        if ($sender !== null) {
+            if ($recipient !== null) {
+                
+                 if ($request->hasFile('image')) {
+                      $file = $request->file('image');
+                        $contentImage = uniqid() . '_' . $file->getClientOriginalName();
+                        $file->storeAs('public/chat_files', $contentImage);
+            
+                  $message = Message::create([
+                        'contentImage' => $contentImage,
+                        'sender_id' => $request->sender_id,
+                        'recipient_id' => $request->recipient_id,
+                    ]); 
+              }  else if ($request->hasFile('document')) {
+                        $file = $request->file('document');
+                        $contentDocument = $file->getClientOriginalName();
+                        $file->storeAs('public/chat_files', $contentDocument);
+            
+                  $message = Message::create([
+                        'contentDocument' => $contentDocument,
+                        'sender_id' => $request->sender_id,
+                        'recipient_id' => $request->recipient_id,
+                    ]); 
+              }  else if ($request->hasFile('audio')) {
+                        $file = $request->file('audio');
+                        $contentAudio = $file->getClientOriginalName();
+                        $file->storeAs('public/chat_files', $contentAudio);
+            
+                  $message = Message::create([
+                        'contentAudio' => $contentAudio,
+                        'sender_id' => $request->sender_id,
+                        'recipient_id' => $request->recipient_id,
+                    ]); 
+              }  else if ($request->contactName) {
+                       
+                  $message = Message::create([
+                        'sender_id' => $request->sender_id,
+                        'recipient_id' => $request->recipient_id,
+                    ]); 
+            
+                  $message_contact = MessageContact::create([
+                        'name' => $request->contactName,
+                        'phone' => $request->contactPhone,
+                        'message_id' => $message->id,
+                    ]); 
+
+                    $message = Message::where('id', $message->id)->first();
+                 } else{
+                  $message = Message::create([
+                        'content' => $request->content,
+                        'sender_id' => $request->sender_id,
+                        'recipient_id' => $request->recipient_id,
+                    ]); 
+                 }
+                 
+                //  dd($content);
+
+
+                $id = $message->id;
+                $created_at = $message->created_at;
+                $date = $message->date;
+                $content = $message->content;
+                $contentImage = $message->contentImage;
+                $contentDocument = $message->contentDocument;
+                $contentAudio = $message->contentAudio;
+                
+                // if($message_contacts){
+                //     $message_contacts = $message_contacts;
+                // }else{
+                //     $message_contacts = null;
+                // }
+
+                 event(new MessageSent($id, $request->sender_id, $content, $contentImage, $contentDocument, $contentAudio, $message_contact, $request->recipient_id, $date, $created_at));
+                //   broadcast(new MessageSent($message))->toOthers();
+
+                return response()->json([
+                    'status' => 200,
+                    'message' => $message,
+                ]);
+                
+            } else {
+
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'recipient not found',
+                ]);
+            }
+        } else {
+
+            return response()->json([
+                'status' => 404,
+                'message' => 'sender not found',
+            ]);
+        }
+    }
+
+
+
+        public function getConversation(Request $request)
+    {
+    $sender_id = $request->sender_id;
+    $recipient_id = $request->recipient_id;
+    
+    
+    
+    $conversation = Message::with(['sender', 'recipient'])
+    ->where(function ($query) use ($sender_id, $recipient_id) {
+            $query->where('sender_id', $sender_id)
+                  ->where('recipient_id', $recipient_id);
+        })
+        ->orWhere(function ($query) use ($sender_id, $recipient_id) {
+            $query->where('sender_id', $recipient_id)
+                  ->where('recipient_id', $sender_id);
+        })
+  
+        ->orderBy('date', 'asc')
+        ->orderBy('created_at', 'asc')
+        ->get()
+        ->groupBy('date');
+        ;
+        
+    //      foreach ($conversation as $conversation) {
+        
+    //     //   $conversation->is_read = $request->is_read;
+    //     //   $conversation->save();
+    // Message::where('is_read', !$request->is_read )->update([
+    //                 'is_read' =>  $request->is_read
+    //             ]); 
+    //     }
+        
+        $conversation->groupBy('date');
+            
+      return response()->json([
+                    'status' => 200,
+                    'conversation' => $conversation,
+                ]);
+    }
+    
+    
+     public function getConv(Request $request)
+    {
+    $sender_id = $request->sender_id;
+    $recipient_id = $request->recipient_id;
+    
+    
+    Message::with(['sender', 'recipient'])
+    ->where(function ($query) use ($sender_id, $recipient_id) {
+            $query->where('sender_id',  $recipient_id)
+                  ->where('recipient_id', $sender_id);
+        })
+        // ->where('is_read', 1 )
+        ->update(['is_read' => 0]);
+        
+  
+        
+            $conversation = Message::with(['sender', 'recipient'])
+    ->where(function ($query) use ($sender_id, $recipient_id) {
+            $query->where('sender_id', $sender_id)
+                  ->where('recipient_id', $recipient_id);
+        })
+        ->orWhere(function ($query) use ($sender_id, $recipient_id) {
+            $query->where('sender_id', $recipient_id)
+                  ->where('recipient_id', $sender_id);
+        })
+  
+        ->orderBy('date', 'asc')
+        ->orderBy('created_at', 'asc')
+        ->get()
+        ->groupBy('date');
+        
+            
+      return response()->json([
+                    'status' => 200,
+                    'conversation' => $conversation,
+                ]);
+    }

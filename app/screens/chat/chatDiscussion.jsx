@@ -7,6 +7,9 @@ import React, { useState } from "react"
 import { View, FlatList, Image, StyleSheet, TouchableOpacity } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { StatusBar } from "expo-status-bar"
+import Pusher from 'pusher-js'
+import { useEffect } from 'react'
+import axios from "axios"
 
 const ChatDiscussion = ({ navigation }) => {
 	const [data, setData] = useState("")
@@ -57,6 +60,58 @@ const ChatDiscussion = ({ navigation }) => {
 			prohibited: true
 		}
 	])
+	 
+    const [receiver, setReceiver] = useState();
+
+
+	  const sendMessage = () => {
+    const data = {
+        receiver_id: receiver.id,
+        message: data,
+    };
+
+    console.log(data);
+
+    axios
+      .post(`/api/store-message`, data)
+      .then((res) => {
+ 
+        console.log(res.data);
+       
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
+
+
+	  useEffect(() => {
+	    const pusher = new Pusher("eb6c70a861cda9345f53", { cluster: "eu" });
+	    const channel = pusher.subscribe("chat");
+	
+	    channel.bind("message", (data) => {
+		 setMessages((prevMessages) => [...prevMessages, data]);
+	    });
+	
+	    return () => {
+		 channel.unbind_all();
+		 channel.unsubscribe();
+	    };
+	  }, []);
+
+
+ useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const response = await api.get(`/messages/${receiver.id}`);
+        setMessages(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    
+    fetchMessages();
+  }, [receiver.id]);
 
 	const renderMessages = ({ item }) => {
 		const isSender = item.type === "sender"
