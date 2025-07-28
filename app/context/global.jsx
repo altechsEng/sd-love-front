@@ -197,7 +197,7 @@ export const GlobalVariableProvider = ({
     if (result && navigation) {
       navigation.navigate("BottomTabsHome", { screen: "HomeFeed" })
     }
-  }, [])
+  }, [userData?.id])
 
 
   //for updating

@@ -122,13 +122,14 @@ export default function HomeFeed({ navigation }) {
 				);
 
 
-console.log(response.data,"resposne.data")
+ 
 				return response.data
 			}
 		} catch (err) {
 			console.log(err.message, "in getAllPost", Object.keys(err), err?.request);
 
-			throw err; // Important for React Query error handling
+			throw err; // Importa
+			// nt for React Query error handling
 		}
 	};
 
@@ -161,7 +162,7 @@ console.log(response.data,"resposne.data")
 		queryKey: ["posts"],
 		queryFn: getAllPosts,
 		getNextPageParam: (lastPage) => {
-			if (lastPage.hasMore) {
+			if (lastPage?.hasMore) {
 				return lastPage?.next_page;
 			}
 			return undefined;
@@ -178,7 +179,7 @@ console.log(response.data,"resposne.data")
 		queryKey: ["matches"],
 		queryFn: getAllMatches,
 		getNextPageParam: (lastPage) => {
-			if (lastPage.hasMore) {
+			if (lastPage?.hasMore) {
 				return lastPage?.next_page;
 			}
 			return undefined;

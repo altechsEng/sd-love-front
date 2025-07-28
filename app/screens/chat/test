@@ -1,192 +1,133 @@
-    
-    public function sendMessage(Request $request)
+APP_NAME=Laravel
+APP_ENV=local
+APP_KEY=base64:BbgReNFISj+WvqGaTjlUz3SglQf405wvUaPJTBXLcrc=
+APP_DEBUG=true
+APP_URL=https://app-api.barreaucameroun.org
+
+LOG_CHANNEL=stack
+LOG_DEPRECATIONS_CHANNEL=null
+LOG_LEVEL=debug
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=barreau_cba_app
+DB_USERNAME=barreau_cba_app_user
+DB_PASSWORD=c1b2a3_4a4p5p
+
+BROADCAST_DRIVER=pusher
+CACHE_DRIVER=file
+FILESYSTEM_DISK=local
+QUEUE_CONNECTION=sync
+SESSION_DRIVER=file
+SESSION_LIFETIME=120
+
+MEMCACHED_HOST=127.0.0.1
+
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+
+MAIL_HOST=mail.barreaucameroun.org
+MAIL_PORT=465
+MAIL_USERNAME=info@barreaucameroun.org
+MAIL_PASSWORD=AGY256ony89$25EF
+MAIL_ENCRYPTION=ssl
+
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_DEFAULT_REGION=us-east-1
+AWS_BUCKET=
+AWS_USE_PATH_STYLE_ENDPOINT=false
+
+PUSHER_APP_ID=1821753
+PUSHER_APP_KEY=eb6c70a861cda9345f53
+PUSHER_APP_SECRET=77be6b2242ecdc261faa
+PUSHER_HOST=
+PUSHER_PORT=443
+PUSHER_SCHEME=https
+PUSHER_APP_CLUSTER=eu
+
+VITE_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
+VITE_PUSHER_HOST="${PUSHER_HOST}"
+VITE_PUSHER_PORT="${PUSHER_PORT}"
+VITE_PUSHER_SCHEME="${PUSHER_SCHEME}"
+VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+///
+
+<?php
+
+namespace App\Events;
+
+use App\Models\Message;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class MessageSent implements ShouldBroadcast
+{
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    public $content;
+    public $contentImage;
+    public $contentDocument;
+    public $contentAudio;
+    public $message_contacts;
+    public $sender_id;
+    public $recipient_id;
+    public $id;
+    public $created_at;
+    public $date;
+
+    /**
+     * Create a new event instance.
+     */
+    public function __construct($id, $sender_id, $content, $contentImage, $contentDocument, $contentAudio, $message_contacts, $recipient_id, $date, $created_at )
     {
-
-        $request->validate([
-            // 'content' => 'required',
-            'sender_id' => 'required',
-            'recipient_id' => 'required',
-            'image' => 'nullable|image|max:2048',
-        ]);
-
-        $sender = User::where('id', $request->sender_id)->first();
-        $recipient = User::where('id', $request->recipient_id)->first();
-        
-        $message_contact = [];
-
-        if ($sender !== null) {
-            if ($recipient !== null) {
-                
-                 if ($request->hasFile('image')) {
-                      $file = $request->file('image');
-                        $contentImage = uniqid() . '_' . $file->getClientOriginalName();
-                        $file->storeAs('public/chat_files', $contentImage);
-            
-                  $message = Message::create([
-                        'contentImage' => $contentImage,
-                        'sender_id' => $request->sender_id,
-                        'recipient_id' => $request->recipient_id,
-                    ]); 
-              }  else if ($request->hasFile('document')) {
-                        $file = $request->file('document');
-                        $contentDocument = $file->getClientOriginalName();
-                        $file->storeAs('public/chat_files', $contentDocument);
-            
-                  $message = Message::create([
-                        'contentDocument' => $contentDocument,
-                        'sender_id' => $request->sender_id,
-                        'recipient_id' => $request->recipient_id,
-                    ]); 
-              }  else if ($request->hasFile('audio')) {
-                        $file = $request->file('audio');
-                        $contentAudio = $file->getClientOriginalName();
-                        $file->storeAs('public/chat_files', $contentAudio);
-            
-                  $message = Message::create([
-                        'contentAudio' => $contentAudio,
-                        'sender_id' => $request->sender_id,
-                        'recipient_id' => $request->recipient_id,
-                    ]); 
-              }  else if ($request->contactName) {
-                       
-                  $message = Message::create([
-                        'sender_id' => $request->sender_id,
-                        'recipient_id' => $request->recipient_id,
-                    ]); 
-            
-                  $message_contact = MessageContact::create([
-                        'name' => $request->contactName,
-                        'phone' => $request->contactPhone,
-                        'message_id' => $message->id,
-                    ]); 
-
-                    $message = Message::where('id', $message->id)->first();
-                 } else{
-                  $message = Message::create([
-                        'content' => $request->content,
-                        'sender_id' => $request->sender_id,
-                        'recipient_id' => $request->recipient_id,
-                    ]); 
-                 }
-                 
-                //  dd($content);
-
-
-                $id = $message->id;
-                $created_at = $message->created_at;
-                $date = $message->date;
-                $content = $message->content;
-                $contentImage = $message->contentImage;
-                $contentDocument = $message->contentDocument;
-                $contentAudio = $message->contentAudio;
-                
-                // if($message_contacts){
-                //     $message_contacts = $message_contacts;
-                // }else{
-                //     $message_contacts = null;
-                // }
-
-                 event(new MessageSent($id, $request->sender_id, $content, $contentImage, $contentDocument, $contentAudio, $message_contact, $request->recipient_id, $date, $created_at));
-                //   broadcast(new MessageSent($message))->toOthers();
-
-                return response()->json([
-                    'status' => 200,
-                    'message' => $message,
-                ]);
-                
-            } else {
-
-                return response()->json([
-                    'status' => 404,
-                    'message' => 'recipient not found',
-                ]);
-            }
-        } else {
-
-            return response()->json([
-                'status' => 404,
-                'message' => 'sender not found',
-            ]);
-        }
+        $this->id = $id;
+        $this->sender_id = $sender_id;
+        $this->content = $content;
+        $this->contentImage = $contentImage;
+        $this->contentDocument = $contentDocument;
+        $this->contentAudio = $contentAudio;
+        $this->message_contacts = $message_contacts;
+        $this->recipient_id = $recipient_id;
+        $this->date = $date;
+        $this->created_at = $created_at;
     }
 
-
-
-        public function getConversation(Request $request)
+    /**
+     * Get the channels the event should broadcast on.
+     *
+     * @return array<int, \Illuminate\Broadcasting\Channel>
+     */
+    public function broadcastOn(): array
     {
-    $sender_id = $request->sender_id;
-    $recipient_id = $request->recipient_id;
-    
-    
-    
-    $conversation = Message::with(['sender', 'recipient'])
-    ->where(function ($query) use ($sender_id, $recipient_id) {
-            $query->where('sender_id', $sender_id)
-                  ->where('recipient_id', $recipient_id);
-        })
-        ->orWhere(function ($query) use ($sender_id, $recipient_id) {
-            $query->where('sender_id', $recipient_id)
-                  ->where('recipient_id', $sender_id);
-        })
-  
-        ->orderBy('date', 'asc')
-        ->orderBy('created_at', 'asc')
-        ->get()
-        ->groupBy('date');
-        ;
-        
-    //      foreach ($conversation as $conversation) {
-        
-    //     //   $conversation->is_read = $request->is_read;
-    //     //   $conversation->save();
-    // Message::where('is_read', !$request->is_read )->update([
-    //                 'is_read' =>  $request->is_read
-    //             ]); 
-    //     }
-        
-        $conversation->groupBy('date');
-            
-      return response()->json([
-                    'status' => 200,
-                    'conversation' => $conversation,
-                ]);
+        return ['chat'];
+            // new PrivateChannel('chat'),
+            // new PrivateChannel('channel-name'),
     }
     
-    
-     public function getConv(Request $request)
-    {
-    $sender_id = $request->sender_id;
-    $recipient_id = $request->recipient_id;
-    
-    
-    Message::with(['sender', 'recipient'])
-    ->where(function ($query) use ($sender_id, $recipient_id) {
-            $query->where('sender_id',  $recipient_id)
-                  ->where('recipient_id', $sender_id);
-        })
-        // ->where('is_read', 1 )
-        ->update(['is_read' => 0]);
-        
-  
-        
-            $conversation = Message::with(['sender', 'recipient'])
-    ->where(function ($query) use ($sender_id, $recipient_id) {
-            $query->where('sender_id', $sender_id)
-                  ->where('recipient_id', $recipient_id);
-        })
-        ->orWhere(function ($query) use ($sender_id, $recipient_id) {
-            $query->where('sender_id', $recipient_id)
-                  ->where('recipient_id', $sender_id);
-        })
-  
-        ->orderBy('date', 'asc')
-        ->orderBy('created_at', 'asc')
-        ->get()
-        ->groupBy('date');
-        
-            
-      return response()->json([
-                    'status' => 200,
-                    'conversation' => $conversation,
-                ]);
+      public function broadcastAs(){
+        return 'message';
     }
+}
