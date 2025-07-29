@@ -15,9 +15,9 @@ import {
 
    const {width:SCREEN_WIDTH,height:SCREEN_HEIGHT} = Dimensions.get('window')
 
-const MessageSender = ({action,state,setState,placeHolder,ref}) => {
+const MessageSender = ({action,state,setState,placeHolder,ref,imageAction}) => {
      return <View style={{paddingHorizontal:2,alignItems:"center",justifyContent:"space-evenly",flexDirection:"row",paddingVertical :10}}>
-     <TouchableOpacity> 
+     <TouchableOpacity onPress={()=>imageAction()}> 
           <PostScreenImagePicker/> 
      </TouchableOpacity>
      <View style={{position:"relative",borderRadius:50,paddingVertical:0,paddingHorizontal:36,width:"80%", backgroundColor:"rgba(181, 181, 181, 0.12)"}}>

@@ -1,7 +1,7 @@
 
 
 import { PostAddDeleteIcon, PostScreenMediaCamera, PostScreenMediaGif, PostScreenMediaImage, PostScreenMediaVideo, PostScreenPlus } from '../../components/vectors'
-import { COLORS, TEXT_SIZE } from '../../../utils/constants'
+import { COLORS, MAX_FILE_SIZE, TEXT_SIZE } from '../../../utils/constants'
 import React, { useEffect, useState } from 'react'
 import { Text, View, TextInput, Dimensions, TouchableOpacity, Image, FlatList, Platform, ActivityIndicator, Alert } from 'react-native'
 import * as ImagePicker from 'expo-image-picker';
@@ -18,7 +18,7 @@ import { CustomRegularPoppingText } from "../../components/text"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window')
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
 const MAX_VIDEO_DURATION = 30; // 30 seconds
 
 const PostAdd = ({ navigation }) => {

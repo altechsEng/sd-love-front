@@ -14,8 +14,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const CustomProfileScreenHeader = ({ navigation }) => {
 
 
-	const { setActiveSubCat, activeSubCat, image, userData ,isProfileMenuAcitve, setIsProfileMenuActive} = useGlobalVariable()
-
+	const { setActiveSubCat, activeSubCat, image, userData ,isProfileMenuAcitve, setIsProfileMenuActive,loadData} = useGlobalVariable()
+	useEffect(()=>{
+		loadData()
+	},[userData?.id])
 	return (
 		<View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderBottomWidth: 2, backgroundColor: "white", padding: 20, borderColor: COLORS.light,height:100 }}>
 			<View style={{ flexDirection: "row", alignItems: "center" }}>

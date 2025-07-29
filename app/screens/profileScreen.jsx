@@ -34,13 +34,15 @@ const ProfileScreen = ({ navigation }) => {
 	const [churchOccupations, setchurchOccupations] = useState(["Travel", "Music", "Fishing", "Gym", "Bible", "Dance"])
 
 	useEffect(() => {
-		setchurchOccupations(JSON.parse(userData.user_infos?.qS10) || ["Travel", "Music", "Fishing", "Gym", "Bible", "Dance"])
+		setchurchOccupations(JSON.parse(userData?.user_infos?.qS10) || ["Travel", "Music", "Fishing", "Gym", "Bible", "Dance"])
 		// console.log(userData);
 		// console.log(interests);
 		// console.log(userData.user_infos);
 		// console.log(JSON.parse(userData.user_infos.qP16));
-		// loadData()
+ 
 	}, [])
+
+	
 
 	const [posts, setPosts] = useState([
 		{

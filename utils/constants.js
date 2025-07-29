@@ -82,6 +82,53 @@ export const FAMILLY = {
     light:  "Poppins-Light",
 };
 
-
+export const DefaultMessages = [
+          {
+               message: "Hi Fred.",
+               time: "15:45",
+               type: "receiver",
+               prohibited: false
+          },
+          {
+               message: "I finally understood the meaning of that last verse.",
+               time: "15:45",
+               type: "receiver",
+               prohibited: false
+          },
+          {
+               message: "Hi Cassandra.",
+               time: "15:45",
+               type: "sender",
+               prohibited: false
+          },
+          {
+               message: "ok. Tell me more.",
+               time: "15:45",
+               type: "sender",
+               prohibited: false
+          },
+          {
+               message: "",
+               asset: require("../assets/images/dis.jpg"),
+               time: "15:45",
+               type: "receiver",
+               prohibited: false
+          },
+          {
+               message: "Well it's clear.",
+               time: "15:45",
+               type: "sender",
+               prohibited: false
+          },
+          {
+               message: "",
+               asset: require("../assets/images/dis.jpg"),
+               time: "15:45",
+               type: "sender",
+               prohibited: true
+          }
+     ]
+export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 export const BaseImageUrl = `https://sdlove-api.altechs.africa/storage/app/private/public/user_images`
 export const BasePostImageUrl = `https://sdlove-api.altechs.africa/storage/app/private/public/post_media`
+export const BaseChatImageUrl = `https://sdlove-api.altechs.africa/storage/app/private`

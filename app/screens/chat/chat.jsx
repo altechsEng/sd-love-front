@@ -1,61 +1,64 @@
 import { CustomRegularPoppingText, CustomSemiBoldPoppingText } from '../../../app/components/text'
 import { ChatScreenDownArrow, ChatScreenUpArrow } from '../../components/vectors'
-import { COLORS, FAMILLY, TEXT_SIZE } from '../../../utils/constants'
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import React, { useState } from 'react'
+import { BaseImageUrl, COLORS, TEXT_SIZE } from '../../../utils/constants'
+import React, { useEffect, useState } from 'react'
 import { View, Text, TouchableOpacity, Image, FlatList } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { ScrollView } from 'react-native-gesture-handler';
+import axios from 'axios'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime"
+import { useGlobalVariable } from '../../context/global'
 
+
+dayjs.extend(relativeTime)
 const Chat = ({ navigation }) => {
 	const [showDesingaged, setShowDesingaged] = useState(false)
-	const [desingagedChats, setDesigngagedChats] = useState([
-		{
-			id: "grid1id",
-			img: require("../../../assets/images/grid3.png"),
-			name: "Cassandra Hub"
-		},
-		{
-			id: "grid1id9",
-			img: require("../../../assets/images/grid3.png"),
-			name: "Cassandra Hub"
-		},
-		{
-			id: "grid1id8",
-			img: require("../../../assets/images/grid3.png"),
-			name: "Cassandra Hub"
-		},
-		{
-			id: "grid1id7",
-			img: require("../../../assets/images/grid3.png"),
-			name: "Cassandra Hub"
-		},
-		{
-			id: "grid1id6",
-			img: require("../../../assets/images/grid3.png"),
-			name: "Cassandra Hub"
-		},
-		{
-			id: "grid1id5",
-			img: require("../../../assets/images/grid3.png"),
-			name: "Cassandra Hub"
-		},
-		{
-			id: "grid1id4",
-			img: require("../../../assets/images/grid3.png"),
-			name: "Cassandra Hub"
-		},
-		{
-			id: "grid1id3",
-			img: require("../../../assets/images/grid3.png"),
-			name: "Cassandra Hub"
-		},
-		{
-			id: "grid2id",
-			img: require("../../../assets/images/grid2.png"),
-			name: "Rosie"
-		}
-	])
+	const [desingagedChats, setDesigngagedChats] = useState([{
+		id: "grid1id",
+		img: require("../../../assets/images/grid3.png"),
+		name: "Cassandra Hub"
+	},
+	{
+		id: "grid2id",
+		img: require("../../../assets/images/grid2.png"),
+		name: "Rosie"
+	}])
+
+  const [conversations, setConversations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const {userData} = useGlobalVariable()
+
+
+  const getConversations = async () => {
+  try {
+    let token = await AsyncStorage.getItem("user_token");
+    const response = await axios.get('/api/conversations',{ headers: { "Authorization": `Bearer ${token}` } });
+//     console.log(response.data,"response data converstaion")
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching conversations-:', error?.request);
+    throw error;
+  }
+};
+  useEffect(() => {
+    const fetchConversations = async () => {
+      try {
+        const data = await getConversations();
+        setConversations(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchConversations();
+    
+    // Refresh conversations every 30 seconds
+    const interval = setInterval(fetchConversations, 30000);
+    return () => clearInterval(interval);
+  }, [userData?.id]);
 
 	const renderDesingagedChat = ({ item }) => {
 		return (
@@ -75,44 +78,42 @@ const Chat = ({ navigation }) => {
 		);
 	}
 
+	const renderConversations = ({item}) => {
+	 
+		return 			<TouchableOpacity onPress={() => navigation.navigate("chatDiscussion",{item})} style={{ paddingHorizontal: 20,paddingVertical:10, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+				<View style={{ position: "relative" }}>
+					<View style={{ height: 50, width: 50, borderRadius: 50, overflow: "hidden" }}>
+						<Image source={item?.other_user ? {uri:`${BaseImageUrl}/${item?.other_user?.user_image}`} : require("../../../assets/images/test_match1.jpg")} style={{ height: "100%", width: "100%" }} />
+					</View>
+					<View style={{ height: 10, width: 10, borderRadius: 50, backgroundColor: "green", zIndex: 5, position: "absolute", top: 2, right: 2 }}></View>
+				</View>
+
+				<View style={{ flex: 5, marginLeft: 10 }}>
+					<CustomSemiBoldPoppingText style={{}} color={"black"} fontSize={TEXT_SIZE.primary} value={item?.other_user ? `${item?.other_user?.firstname} ${item?.other_user?.lastname }`: "Maggy MacLeen"} />
+					<CustomRegularPoppingText style={{}} color={"rgba(0, 0, 0, 0.48)"} fontSize={TEXT_SIZE.small} value={item?.last_message ? item?.last_message?.message : "....."} />
+				</View>
+
+				<View onPress={() => navigation.navigate("Notifications")} style={{ flex: 0.7, flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+					<View style={{ height: 20, width: 20, borderRadius: 50, backgroundColor: COLORS.primary, alignItems: "center" }}>
+						<CustomSemiBoldPoppingText style={{}} color={"white"} fontSize={TEXT_SIZE.secondary} value={`${item?.unread_count}`} />
+					</View>
+					<View>
+						<CustomRegularPoppingText style={{}} color={COLORS.primary} fontSize={TEXT_SIZE.small} value={item?.last_message ? dayjs(item?.last_message?.created_at).format("HH:mm") : "10:50"} />
+					</View>
+				</View>
+			</TouchableOpacity>
+	}
+
 	return (
-		<View style={{ backgroundColor: "white", flex: 1 }}>
-			{/* Screen Header */}
-			<View clasName={'flex flex-row items-center justify-between py-4'} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 10, backgroundColor: "white", position: "relative", borderBottomWidth: 0, borderColor: COLORS.light }}>
-				<View style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "flex-start", paddingLeft: 20 }}>
-					<CustomSemiBoldPoppingText fontSize={TEXT_SIZE.title + 8} value="Chats" style={{ textAlign: "left" }} color={'black'} />
-				</View>
-
-				<View clasName={'gap-8'} style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "flex-end", paddingRight: 20 }}>
-					<TouchableOpacity className='rounded-full p-2 bg-black/10' onPress={() => navigation.navigate("EngagementRequests")} style={{ marginLeft: 20, }}>
-						<MaterialCommunityIcons name="tag-heart" size={24} color={COLORS.black} />
-					</TouchableOpacity>
-				</View>
-			</View>
-			{/* Discussions */}
-			<View className={'mt-3'} style={{ flex: 1 }} showsVerticalScrollIndicator={false} showsHorizontalScrollIndicator={false}>
-				<TouchableOpacity onPress={() => navigation.navigate("chatDiscussion")} style={{ paddingHorizontal: 20, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-					<View style={{ position: "relative" }}>
-						<View style={{ height: 50, width: 50, borderRadius: 50, overflow: "hidden" }}>
-							<Image source={require("../../../assets/images/test_match1.jpg")} style={{ height: "100%", width: "100%" }} />
-						</View>
-						<View style={{ height: 10, width: 10, borderRadius: 50, backgroundColor: "green", zIndex: 5, position: "absolute", top: 2, right: 2 }}></View>
-					</View>
-
-					<View style={{ flex: 5, marginLeft: 10 }}>
-						<CustomSemiBoldPoppingText style={{}} color={"black"} fontSize={TEXT_SIZE.primary} value="Maggy MacLeen" />
-						<CustomRegularPoppingText style={{}} color={"rgba(0, 0, 0, 0.48)"} fontSize={TEXT_SIZE.small} value="Sorry for the late response i wasn't.." />
-					</View>
-
-					<View onPress={() => navigation.navigate("Notifications")} style={{ flex: 0.7, flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-						<View style={{ height: 20, width: 20, borderRadius: 50, backgroundColor: COLORS.primary, alignItems: "center" }}>
-							<CustomSemiBoldPoppingText style={{}} color={"white"} fontSize={TEXT_SIZE.secondary} value="3" />
-						</View>
-						<View>
-							<CustomRegularPoppingText style={{}} color={COLORS.primary} fontSize={TEXT_SIZE.small} value="10:50" />
-						</View>
-					</View>
-				</TouchableOpacity>
+		<View className={'py-6'} style={{ backgroundColor: "white", flex: 1 }}>
+			<FlatList 
+			
+			data={conversations} 
+			renderItem={renderConversations}
+			showsVerticalScrollIndicator={false}
+			showsHorizontalScrollIndicator={false}
+			keyExtractor={(item) => item?.id}
+			/>
 
 				<View style={{ flex: 1 }}>
 					<TouchableOpacity onPress={() => setShowDesingaged(!showDesingaged)} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 20 }}>
