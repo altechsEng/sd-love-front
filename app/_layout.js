@@ -48,6 +48,7 @@ import PostEditHeader from "./components/postEditHeader";
 import PostEdit from "./screens/posts/postEdit";
 import EngagementRequestSent from "./screens/dating/engagementRequestSent";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import EngagementRequests from "./screens/chat/EngagementRequests";
 
 axios.defaults.baseURL = "https://sdlove-api.altechs.africa";
 // axios.defaults.baseURL = "http://127.0.0.1:8000";
@@ -186,6 +187,10 @@ export default function Application() {
 							<Stack.Screen options={{
 								headerShown: false
 							}} name="EngagementRequestSent" component={EngagementRequestSent} />
+
+							<Stack.Screen options={{
+								headerShown: false
+							}} name="EngagementRequests" component={EngagementRequests} />
 
 							<Stack.Screen options={{
 								header: ({ navigation }) => <View style={{ height: 50, backgroundColor: "white" }}></View>

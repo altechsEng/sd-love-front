@@ -104,13 +104,14 @@ export default function HomeTabs() {
 						tabBarLabelStyle: {
 							fontFamily: FAMILLY.regular,
 						},
-						header: ({ navigation }) => {
-							return (
-								<View className={'py-2'} style={{ backgroundColor: "white", borderBottomWidth: 2, borderColor: COLORS.light, justifyContent: "center", paddingHorizontal: 20 }}>
-									<CustomSemiBoldPoppingText fontSize={TEXT_SIZE.title + 8} value="Chats" style={{ textAlign: "left" }} color={'black'} />
-								</View>
-							)
-						},
+						// header: ({ navigation }) => {
+						// 	return (
+						// 		<View className={'py-2'} style={{ backgroundColor: "white", borderBottomWidth: 2, borderColor: COLORS.light, justifyContent: "center", paddingHorizontal: 20 }}>
+						// 			<CustomSemiBoldPoppingText fontSize={TEXT_SIZE.title + 8} value="Chats" style={{ textAlign: "left" }} color={'black'} />
+						// 		</View>
+						// 	)
+						// },
+						headerShown: false
 					}}
 				/>
 
