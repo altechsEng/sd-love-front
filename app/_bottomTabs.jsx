@@ -19,6 +19,7 @@ import ProfileScreen from "./screens/profileScreen";
 import CustomProfileScreenHeader from "./components/customProfileScreenHeader";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
+import Accademy from "./screens/Accademy";
 
 const Tab = createBottomTabNavigator();
 
@@ -82,7 +83,7 @@ export default function HomeTabs() {
 
 				<Tab.Screen
 					name="Learn"
-					component={HomeFeed}
+					component={Accademy}
 					options={{
 						tabBarIcon: (({ _, focused }) => (
 							focused == false ? <BottomTabsIconInactive_Learn /> : <BottomTabsIconActive_Learn />

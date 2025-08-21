@@ -15,19 +15,37 @@ import { useGlobalVariable } from "../context/global.jsx";
 
 
 export default function Register({ navigation }) {
+
 	const { setRegistrationData, registrationData } = useGlobalVariable()
 	const [country_phone, setcountry_phone] = useState()
+
+	const validateEmail = (email) => {
+		const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Basic email regex
+		return regex.test(email.trim());
+	};
+
 	const handleData = () => {
+		if (!firstName || !lastName || !email || !phone) {
+			setErr("All fields are required")
+			return
+		}
+
+		if (!validateEmail(email)) {
+			setErr("Please enter a valid email address!")
+			return
+		}
+
 		setRegistrationData((prev) => ({
 			...prev,
 			firstname: firstName,
 			lastname: lastName,
-			email:email.trim(),
+			email: email.trim(),
 			phone,
 			phone_code: country.dial_code,
 			country_phone
-
 		}))
+
+		setErr(null);
 
 		navigation.navigate("RegisterStep2")
 	}
@@ -42,6 +60,7 @@ export default function Register({ navigation }) {
 	}, [])
 
 	const [filter, setFilter] = useState('');
+	const [err, setErr] = useState(null);
 	const [email, setEmail] = useState(null)
 
 	const [firstName, setFirstName] = useState(null)
@@ -77,18 +96,18 @@ export default function Register({ navigation }) {
 
 			</View>
 
-			<View className={''} style={{ alignItems: "center", flex: 3, height: 500}}>
+			<View className={''} style={{ alignItems: "center", flex: 3, height: 500 }}>
 				<Text style={{ fontSize: TEXT_SIZE.title * 1.2, color: COLORS.gray, fontWeight: "bold", fontFamily: FAMILLY.semibold, marginVertical: 10 }}>Sign Up</Text>
 				<Text style={{ fontSize: TEXT_SIZE.small + 1, color: COLORS.gray, fontFamily: FAMILLY.regular, width: wp(70), textAlign: "center" }}>
 					All fields are required.
 				</Text>
 
 				<View style={{ marginTop: hp(5), position: "relative", borderRadius: 50, paddingVertical: 0, paddingHorizontal: 36, width: "80%", backgroundColor: "rgba(181, 181, 181, 0.12)", }}>
-					<CustomTextInput name="firstName" placeHolder="First Name" LeftIcon={"person"} LeftIconStyles={{ position: "absolute", top: 15, left: 18 }} RightIcon={null} RightIconStyles={null} setState={setFirstName} state={firstName} />
+					<CustomTextInput name="firstName" placeHolder="First name" LeftIcon={"person"} LeftIconStyles={{ position: "absolute", top: 15, left: 18 }} RightIcon={null} RightIconStyles={null} setState={setFirstName} state={firstName} />
 				</View>
 
 				<View style={{ marginTop: 10, position: "relative", borderRadius: 50, paddingVertical: 0, paddingHorizontal: 36, width: "80%", backgroundColor: "rgba(181, 181, 181, 0.12)", }}>
-					<CustomTextInput name="lastName" placeHolder="Last Name" LeftIcon={"person"} LeftIconStyles={{ position: "absolute", top: 15, left: 18 }} RightIcon={null} RightIconStyles={null} setState={setLastName} state={lastName} />
+					<CustomTextInput name="lastName" placeHolder="Last name" LeftIcon={"person"} LeftIconStyles={{ position: "absolute", top: 15, left: 18 }} RightIcon={null} RightIconStyles={null} setState={setLastName} state={lastName} />
 				</View>
 
 				<View style={{ marginTop: 10, paddingHorizontal: wp(10), flexDirection: "row", alignItems: "Center" }}>
@@ -97,7 +116,7 @@ export default function Register({ navigation }) {
 							<Text style={{ color: COLORS.gray, fontSize: TEXT_SIZE.title, fontFamily: FAMILLY.regular, textAlign: "center", marginTop: 5 }}>{country.flag}</Text>
 						</View>
 
-						<Text style={{ color: COLORS.gray, fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.regular, textAlign: "center", marginTop: 5 }}>{country ? `${country?.dial_code}` : "+1"}</Text>
+						<Text style={{ color: COLORS.gray, fontSize: TEXT_SIZE.medium, fontFamily: FAMILLY.regular, textAlign: "center", marginTop: 5 }}>{country ? `${country?.dial_code}` : "+1"}</Text>
 					</TouchableOpacity>
 					<View style={{ marginLeft: 10, flex: 2, position: "relative", borderRadius: 50, paddingVertical: 0, paddingHorizontal: 36, backgroundColor: "rgba(181, 181, 181, 0.12)" }}>
 						<CustomTextInput name="phone" placeHolder={"Phone"} LeftIcon={"phone"} LeftIconStyles={{ position: "absolute", top: 14, left: 18 }} RightIcon={null} RightIconStyles={null} setState={setPhone} state={phone} />
@@ -111,6 +130,10 @@ export default function Register({ navigation }) {
 				<TouchableOpacity onPress={() => handleData()} style={{ backgroundColor: COLORS.primary, marginTop: hp(6), paddingVertical: 15, marginVertical: 20, paddingHorizontal: 20, width: "80%", borderRadius: 100 }}>
 					<Text style={{ color: "white", textAlign: "center", fontFamily: FAMILLY.regular }} > Next </Text>
 				</TouchableOpacity>
+
+				{err != null &&
+					<Text style={{ fontSize: TEXT_SIZE.secondary, color: COLORS.red, fontFamily: FAMILLY.regular }}>{err}</Text>
+				}
 
 				<View style={{ flex: 3, height: hp(5), justifyContent: "flex-end" }}>
 					<View className={'pb-8'} style={{ alignItems: "center", justifyContent: "center", flexDirection: "row" }}>

@@ -1,6 +1,6 @@
 
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
 	CustomRegularPoppingText,
 	CustomSemiBoldPoppingText
@@ -16,7 +16,7 @@ import {
 	ChatDiscussionOptionsVideo,
 	MatchProfileArrowBack
 } from "../../components/vectors";
-import { COLORS, TEXT_SIZE } from "../../../utils/constants";
+import { BaseImageUrl, COLORS, TEXT_SIZE } from "../../../utils/constants";
 import {
 	View,
 	Image,
@@ -24,11 +24,17 @@ import {
 	Dimensions,
 	FlatList,
 	StyleSheet,
-	Switch
+	Switch,
+	ActivityIndicator,
+	Modal
 } from "react-native"
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { ScrollView } from 'react-native-gesture-handler';
+import { Pressable, ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRoute } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Foundation from '@expo/vector-icons/Foundation';
+import axios from 'axios';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -46,10 +52,91 @@ const ChatDiscussionOptions = ({ navigation }) => {
 
 	const [visibleCount, setVisibleCount] = useState(4);
 	const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+	const { item } = useRoute().params
+
+	const [isLoading, setIsLoading] = useState(false)
+
+	// Modals
+	const [cancelEgagementModal, setcCancelEgagementModal] = useState(false);
 
 	const loadMoreImages = () => {
 		setVisibleCount(prev => Math.min(prev + 4, allImages.length));
 	};
+
+	useEffect(() => {
+		console.log(item, "info in chat discussion options");
+		fetchConversation();
+	}, [])
+
+	const fetchConversation = async () => {
+		// setisLoading(true);
+		let token = await AsyncStorage.getItem("user_token");
+		let data = { userId: await AsyncStorage.getItem("user_id"), requestId: selectedRequest.id }
+
+		try {
+			let token = await AsyncStorage.getItem("user_token");
+
+			if (item.id) {
+				const response = await axios.get(`/api/conversations/${item.id}`, { headers: { "Authorization": `Bearer ${token}` } });
+				// const response = await axios.get(`/api/get-messages/${userId}?age=${page}`,{ headers: { "Authorization": `Bearer ${token}` } });
+
+				return response.data;
+			}
+
+		} catch (error) {
+			console.log('Error fetching messages:', error?.request, error);
+			throw error;
+		}
+	}
+
+	const cancelEgagement = async () => {
+		setIsLoading(true);
+		
+		let data = { engagementId: item?.engagement.id };
+
+		// if (token) {
+		// 	console.log('hi');
+		// 	axios.post('/api/cancel-engagement', data, { headers: { "Authorization": `Bearer ${token}` } })
+		// 		.then(async (res) => {
+		// 			if (res.data.status == 200) {
+		// 				console.log("Engagement cancelled successfully");
+		// 			}
+		// 			setisLoading(false);
+		// 		})
+		// 		.catch(error => {
+		// 			setError(error);
+		// 			setisLoading(false);
+		// 			console.log('Error cancelling engagement:', error);
+		// 			alert("Error cancelling engagement, please try again later");
+		// 		});
+		// } else {
+		// 	console.log('Not logged in');
+		// }
+
+		try {
+			let token = await AsyncStorage.getItem("user_token");
+
+			if (token) {
+				const response = await axios.post(`/api/cancel-engagement`, data, { headers: { "Authorization": `Bearer ${token}` } });
+				// const response = await axios.get(`/api/get-messages/${userId}?age=${page}`,{ headers: { "Authorization": `Bearer ${token}` } });
+
+				if (response.data.status === 200) {
+					console.log("Engagement cancelled successfully");
+					console.log(response.data.status, response.data.message);
+					setIsLoading(false)
+					// Optionally, you can navigate to a different screen or show a success message
+				}
+			} else {
+				console.log('Not logged in');
+			}
+
+		} catch (error) {
+			console.log('Error fetching messages:', error?.request, error);
+			throw error;
+		}
+	}
+
+
 
 	const renderImages = ({ item, index }) => {
 		const isLastVisible = index === visibleCount - 1;
@@ -102,19 +189,19 @@ const ChatDiscussionOptions = ({ navigation }) => {
 					<Image
 						style={styles.profileImage}
 						resizeMode="cover"
-						source={require('../../../assets/images/test_match1.jpg')}
+						source={item?.avatar ? { uri: `${BaseImageUrl}/${item?.avatar}` } : require("../../../assets/images/test_match1.jpg")}
 					/>
 				</View>
 
 				{/* Profile Info */}
 				<CustomSemiBoldPoppingText
-					value="Magy McLeen"
+					value={item?.name}
 					color="black"
 					fontSize={TEXT_SIZE.title + 3}
 					style={styles.name}
 				/>
 
-				<View style={styles.profileInfo}>
+				{/* <View style={styles.profileInfo}>
 					<View>
 						<CustomSemiBoldPoppingText
 							color={COLORS.black}
@@ -127,7 +214,7 @@ const ChatDiscussionOptions = ({ navigation }) => {
 							value="Choir Leader"
 						/>
 					</View>
-				</View>
+				</View> */}
 
 
 				{/* Action Buttons - Perfect Grid */}
@@ -208,7 +295,7 @@ const ChatDiscussionOptions = ({ navigation }) => {
 								color={COLORS.black}
 								value="Notifications"
 								style={styles.optionText}
-								fontSize={TEXT_SIZE.medium}
+								fontSize={TEXT_SIZE.primary}
 							/>
 						</View>
 						<Switch
@@ -224,9 +311,9 @@ const ChatDiscussionOptions = ({ navigation }) => {
 							<ChatDiscussionOptionsPersonCancel width={20} height={20} />
 							<CustomRegularPoppingText
 								color={COLORS.red}
-								value="Report user"
+								value={`Report ${item?.name}`}
 								style={styles.optionText}
-								fontSize={TEXT_SIZE.medium}
+								fontSize={TEXT_SIZE.primary}
 							/>
 						</View>
 					</TouchableOpacity>
@@ -238,20 +325,19 @@ const ChatDiscussionOptions = ({ navigation }) => {
 								color={COLORS.red}
 								value="Delete messages"
 								style={styles.optionText}
-								fontSize={TEXT_SIZE.medium}
+								fontSize={TEXT_SIZE.primary}
 							/>
 						</View>
 					</TouchableOpacity>
 
-
-					<TouchableOpacity style={styles.optionItem}>
+					<TouchableOpacity onPress={() => setcCancelEgagementModal(true)} style={styles.optionItem}>
 						<View style={styles.optionContent}>
 							<ChatDiscussionOptionsDesingaged width={20} height={20} />
 							<CustomRegularPoppingText
 								color={COLORS.red}
-								value="Disengage with Rosie"
+								value={`Cancel egagement with ${item?.name}`}
 								style={styles.optionText}
-								fontSize={TEXT_SIZE.medium}
+								fontSize={TEXT_SIZE.primary}
 							/>
 						</View>
 					</TouchableOpacity>
@@ -260,6 +346,49 @@ const ChatDiscussionOptions = ({ navigation }) => {
 				{/* Bottom Spacer */}
 				<View style={{ height: 50 }} />
 			</ScrollView>
+
+			<Modal
+				animationType="slide"
+				transparent={true}
+				visible={cancelEgagementModal}
+				onRequestClose={() => setcCancelEgagementModal(false)}
+			>
+				{/* Semi-transparent overlay (simulates blur effect) */}
+				<Pressable
+					style={styles.overlay}
+					onPress={() => setcCancelEgagementModal(false)}
+				>
+					{/* Actual modal content */}
+					<View style={styles.modalContainer}>
+						<View className={'gap-6 py-8'} style={styles.modalContent}>
+							<View className={'flex items-center w-full'}>
+								<View className={'relative flex flex-row items-center justify-center'}>
+									<View className='-mr-4 border-2 border-white' style={{ height: 60, width: 60, borderRadius: 50, overflow: "hidden" }}>
+										<Image source={item?.participants[0]?.avatar ? { uri: `${BaseImageUrl}/${item?.participants[0]?.avatar}` } : require("../../../assets/images/test_match1.jpg")} style={{ height: "100%", width: "100%" }} />
+									</View>
+									<Foundation  className='absolute -mb-20 z-10' name="unlink" size={24} color={COLORS.red} />
+									<View className='border-2 border-white' style={{ height: 60, width: 60, borderRadius: 50, overflow: "hidden" }}>
+										<Image source={item?.participants[1]?.avatar ? { uri: `${BaseImageUrl}/${item?.participants[1]?.avatar}` } : require("../../../assets/images/test_match1.jpg")} style={{ height: "100%", width: "100%" }} />
+									</View>
+								</View>
+								<View className='flex items-center' style={{ marginTop: 30, alignItems: "center" }}>
+									<CustomSemiBoldPoppingText value={"Quit engagement"} fontSize={TEXT_SIZE.primary} color={"black"} />
+									<CustomRegularPoppingText color={"#808A94"} style={{}} value={`You will not be able to chat with ${item?.name} anymore`} fontSize={TEXT_SIZE.secondary} />
+								</View>
+
+								{isLoading ?
+									<ActivityIndicator className='mt-4' color={COLORS.red} />
+									:
+									<TouchableOpacity onPress={() => cancelEgagement()}
+										style={{ alignItems: "center", justifyContent: "center", flexDirection: "row", backgroundColor: COLORS.red, paddingVertical: 10, paddingHorizontal: 20, borderRadius: 10, marginTop: 20 }}>
+										<CustomRegularPoppingText color={'white'} value={"Cancel engagement"} fontSize={TEXT_SIZE.primary} />
+									</TouchableOpacity>
+								}
+							</View>
+						</View>
+					</View>
+				</Pressable>
+			</Modal>
 		</SafeAreaView>
 	);
 }
@@ -267,7 +396,7 @@ const ChatDiscussionOptions = ({ navigation }) => {
 const styles = StyleSheet.create({
 	container: {
 		backgroundColor: "white",
-		padding: 15,
+		paddingHorizontal: 15,
 	},
 	profileImageContainer: {
 		height: hp('50%'),
@@ -379,6 +508,36 @@ const styles = StyleSheet.create({
 	},
 	optionText: {
 		marginLeft: 15,
+	},
+	overlay: {
+		flex: 1,
+		justifyContent: 'flex-end',
+		backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent black
+	},
+	modalContainer: {
+		width: '100%',
+		// height: SCREEN_HEIGHT * 0.89,
+		borderTopLeftRadius: 20,
+		borderTopRightRadius: 20,
+		overflow: 'hidden',
+	},
+	modalContent: {
+		backgroundColor: 'white',
+		padding: 20,
+		// height: '100%',
+		// justifyContent: 'flex-start',
+		// alignItems: 'flex-start',
+		borderTopLeftRadius: 20,
+		borderTopRightRadius: 20,
+	},
+	modalTitle: {
+		fontSize: 20,
+		fontWeight: 'bold',
+		marginBottom: 15,
+	},
+	modalText: {
+		fontSize: 16,
+		marginBottom: 20,
 	},
 });
 

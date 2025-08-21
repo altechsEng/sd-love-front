@@ -1,10 +1,10 @@
 
 import MessageSender from "../../../app/components/messageSender"
 import { CustomRegularPoppingText, CustomSemiBoldPoppingText } from "../../../app/components/text"
-import { ChatScreenCall, ChatScreenDoubleTick, ChatScreenEyeCancel, ChatScreenVideo } from "../../components/vectors"
+import { ChatScreenCall, ChatScreenDoubleTick, ChatScreenEyeCancel, ChatScreenVideo, MatchConnectionBackArrow } from "../../components/vectors"
 import { BaseChatImageUrl, BaseImageUrl, COLORS, MAX_FILE_SIZE, TEXT_SIZE } from "../../../utils/constants"
 import React, { useRef, useState } from "react"
-import { View, FlatList, Image, StyleSheet, TouchableOpacity,ActivityIndicator} from "react-native"
+import { View, FlatList, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { StatusBar } from "expo-status-bar"
 import Pusher from 'pusher-js'
@@ -15,164 +15,159 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useGlobalVariable } from "../../context/global";
 import dayjs from "dayjs"
 import relativeTime from 'dayjs/plugin/relativeTime';
- 
+
 import * as ImagePicker from 'expo-image-picker';
 import * as Camera from 'expo-camera';
- 
+
 import * as MediaLibrary from 'expo-media-library';
 import * as FileSystem from 'expo-file-system';
 
 dayjs.extend(relativeTime)
- 
+
 
 const ChatDiscussion = ({ navigation }) => {
 	const [data, setData] = useState("")
 	const [allowChat, setAllowChat] = useState(true)
-	const {userData} = useGlobalVariable()
+	const { userData } = useGlobalVariable()
 	const [messages, setMessages] = useState([])
-	const {item} = useRoute().params
-
- 
- 
- 
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const flatListRef = useRef();
-  	const [images, setImages] = useState([
+	const { item } = useRoute().params
+	const [loading, setLoading] = useState(true);
+	const [loadingMore, setLoadingMore] = useState(false);
+	const [page, setPage] = useState(1);
+	const [hasMore, setHasMore] = useState(false);
+	const flatListRef = useRef();
+	const [images, setImages] = useState([
 	]);
- 	const [cameraPermission, requestCameraPermission] = Camera.useCameraPermissions();
+	const [cameraPermission, requestCameraPermission] = Camera.useCameraPermissions();
 	const [mediaPermission, requestMediaPermission] = MediaLibrary.usePermissions();
 	const [isProcessing, setIsProcessing] = useState(false);
 
- 
+	useEffect(() => {
+		const pusher = new Pusher("eb6c70a861cda9345f53", { cluster: "eu" });
+		const channel = pusher.subscribe("chat");
 
+		channel.bind("message", (data) => {
+			console.log(data, "new messge recved pusher")
+			setMessages((prevMessages) => [...prevMessages, data]);
+		});
 
-	  useEffect(() => {
-	    const pusher = new Pusher("eb6c70a861cda9345f53", { cluster: "eu" });
-	    const channel = pusher.subscribe("chat");
-	
-	    channel.bind("message", (data) => {
-		console.log(data,"new messge recved pusher")
-		 setMessages((prevMessages) => [...prevMessages, data]);
-	    });
-	
-	    return () => {
-		 channel.unbind_all();
-		 channel.unsubscribe();
-	    };
-	  }, []);
+		return () => {
+			channel.unbind_all();
+			channel.unsubscribe();
+		};
+	}, []);
 
+	const getMessages = async (conversationId, page = 1) => {
+		try {
+			let token = await AsyncStorage.getItem("user_token");
 
+			if (conversationId) {
+				const response = await axios.get(`/api/conversations/${conversationId}/messages`, { headers: { "Authorization": `Bearer ${token}` } });
+				// const response = await axios.get(`/api/get-messages/${userId}?age=${page}`,{ headers: { "Authorization": `Bearer ${token}` } });
 
- 
+				return response.data;
+			}
 
- const getMessages = async (userId, page = 1) => {
-  try {
-	let token = await AsyncStorage.getItem("user_token");
-	 
-	if(userId) {
-    const response = await axios.get(`/api/get-messages/${userId}?age=${page}`,{ headers: { "Authorization": `Bearer ${token}` } });
-      
- 
-	 
-    return response.data;
-
-	}
-
-  } catch (error) {
-    console.log('Error fetching messages:', error?.request,error);
-    throw error;
-  }
-};
-
-  const sendMessage = async (messageData) => {
-  try {
-	let token = await AsyncStorage.getItem("user_token");
-    const formData = new FormData();
-    
-   
-    formData.append('receiver_id', messageData.receiver_id);
-    if(messageData.message.length < 1) return //no empty messages
-    if (messageData.message) {
-	let date = new Date().toISOString()
-	 
-      formData.append('message', messageData.message);
-	formData.append('date', date); //we create the date here to avoid time difference
-
-    }
-    if (messageData.image) {
-      formData.append('image', {
-        uri: messageData.image.uri,
-        type: messageData.image.type,
-        name: messageData.image.fileName || 'image.jpg',
-      });
-    }
-    
-    const response = await axios.post('/api/store-message', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-	    'Authorization': `Bearer ${token}` 
-      },
-    });
-    
-     setMessages(prev => [...prev,response.data.message] );
-	setData("")
-  } catch (error) {
-    console.error('Error sending message:', error?.request);
-    throw error;
-  }
-};
-
- 
- useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-		if(item){
-	   const response = await getMessages(item?.other_user.id);
-        setMessages(response.messages.data);
-        setHasMore(response.messages.current_page < response.messages.last_page);
+		} catch (error) {
+			console.log('Error fetching messages:', error?.request, error);
+			throw error;
 		}
-      } catch (error) {
-        console.log(error?.request,"error");
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchMessages();
-  }, [item?.other_user?.id]);
+	};
 
-  const loadMoreMessages = async () => {
-	 
-    if (!hasMore) return;
-    
-    setLoadingMore(true);
-    try {
-      const nextPage = page + 1;
-      const response = await getMessages(userData.id, nextPage);
-      
-      setMessages(prev => [...prev,...response.messages.data]);
-      setPage(nextPage);
-      setHasMore(response.messages.current_page < response.messages.last_page);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoadingMore(false);
-    }
-  };
+	const sendMessage = async (messageData) => {
+		try {
+			let token = await AsyncStorage.getItem("user_token");
+			const formData = new FormData();
 
-   
 
-  	// Verify and request permissions
+			formData.append('sender_id', userData?.id);
+			if (messageData.message.length < 1) return //no empty messages
+			if (messageData.message) {
+				let date = new Date().toISOString()
+
+				formData.append('message', messageData.message);
+				formData.append('date', date); //we create the date here to avoid time difference
+
+			}
+			if (messageData.image) {
+				formData.append('image', {
+					uri: messageData.image.uri,
+					type: messageData.image.type,
+					name: messageData.image.fileName || 'image.jpg',
+				});
+			}
+			return console.log("message data", messageData, "item", item, "formData", formData) //for debugging;
+			
+
+			const response = await axios.post(`/api/conversations/${item?.id}/messages`, formData, {
+				headers: {
+					'Content-Type': 'multipart/form-data',
+					'Authorization': `Bearer ${token}`
+				},
+			});
+			// const response = await axios.post('/api/store-message', formData, {
+			// 	headers: {
+			// 		'Content-Type': 'multipart/form-data',
+			// 		'Authorization': `Bearer ${token}`
+			// 	},
+			// });
+
+			setMessages(prev => [...prev, response.data.message]);
+			setData("")
+		} catch (error) {
+			console.error('Error sending message:', error);
+			throw error;
+		}
+	};
+
+
+	useEffect(() => {
+		const fetchMessages = async () => {
+			try {
+				if (item) {
+					const response = await getMessages(item?.id);
+					setMessages(response.data);
+					setHasMore(response.current_page < response.last_page);
+				}
+			} catch (error) {
+				console.log(error?.request, "error");
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchMessages();
+	}, [item.id]);
+
+	const loadMoreMessages = async () => {
+
+		if (!hasMore) return;
+
+		setLoadingMore(true);
+		try {
+			const nextPage = page + 1;
+			const response = await getMessages(item.id, nextPage);
+
+			setMessages(prev => [...prev, ...response.data]);
+			setPage(nextPage);
+			setHasMore(response.current_page < response.last_page);
+		} catch (error) {
+			console.error(error);
+		} finally {
+			setLoadingMore(false);
+		}
+	};
+
+
+
+	// Verify and request permissions
 	const verifyPermissions = async () => {
 		try {
 			if (!mediaPermission?.granted) {
 				const mediaStatus = await requestMediaPermission();
 				if (!mediaStatus.granted) return false;
 			}
-			 
+
 			return true;
 		} catch (error) {
 			console.error("Permission error:", error);
@@ -180,7 +175,7 @@ const ChatDiscussion = ({ navigation }) => {
 			return false;
 		}
 	};
-  
+
 	// Check file size
 	const checkFileSize = async (uri) => {
 		try {
@@ -195,21 +190,21 @@ const ChatDiscussion = ({ navigation }) => {
 			return false;
 		}
 	};
-  
+
 	// Handle image upload from gallery
 	const handleImageUpload = async () => {
 		try {
 			setIsProcessing(true);
 			const hasPermission = await verifyPermissions();
 			if (!hasPermission) return;
-  
+
 			let result = await ImagePicker.launchImageLibraryAsync({
 				mediaTypes: ['images'],
 				allowsEditing: true,
 				aspect: [4, 3],
 				quality: 0.7,
 			});
-  
+
 			if (!result.canceled && result.assets.length > 0) {
 				const validAssets = await Promise.all(
 					result.assets.map(async asset => {
@@ -217,21 +212,21 @@ const ChatDiscussion = ({ navigation }) => {
 						return isValidSize ? asset : null;
 					})
 				);
-  
+
 				const newImages = validAssets
 					.filter(asset => asset !== null)
 					.map(asset => ({
-						 uri: asset.uri, 
-						 name: "uploadImg.jpg",
-                                type: "image/jpeg"
+						uri: asset.uri,
+						name: "uploadImg.jpg",
+						type: "image/jpeg"
 					}));
-  
+
 				if (newImages.length > 0) {
-					sendMessage({message:"image",receiver_id:item?.other_user?.id,image:newImages[0]})
 					setImages(newImages[0]);
+					sendMessage({ message: "image", sender_id: userData?.id, image: newImages[0] })
 				}
 
-			 
+
 			}
 		} catch (error) {
 			console.error("Image upload error:", error);
@@ -241,39 +236,30 @@ const ChatDiscussion = ({ navigation }) => {
 		}
 	};
 
- 
-
-
- 
-
- 
-
-
 	const renderMessages = ({ item }) => {
-    const isSender = item?.sender?.id === userData?.id 
-    
-    // For debugging:
-//     console.log('Current User ID:', userData?.id);
-//     console.log('Message Sender ID:', item?.sender?.id);
-//     console.log('Is Sender?--', isSender,item);
- 
+		const isSender = item?.sender.id === userData?.id
+
+		// For debugging:
+		//     console.log('Current User ID:', userData?.id);
+		//     console.log('Message Sender ID:', item?.sender?.id);
+		//     console.log('Is Sender?--', isSender,item);
 
 		return (
 			<View style={[
 				styles.messageContainer,
 				isSender ? styles.senderContainer : styles.receiverContainer
 			]}>
-				{item?.message == "image" ? (
+				{item?.message_type == "image" ? (
 					<View style={[
 						styles.imageContainer,
 						isSender ? styles.senderImage : styles.receiverImage
 					]}>
 						<Image
-							source={{uri:`${BaseChatImageUrl}/${item?.image_path}`}}
+							source={{ uri: `${BaseChatImageUrl}/${item?.image_path}` }}
 							resizeMode="cover"
 							style={styles.image}
 						/>
-						{item.prohibited == true ? <View style={styles.prohibitedContainer}>
+						{item.is_sensored == true ? <View style={styles.prohibitedContainer}>
 							<ChatScreenEyeCancel />
 							<CustomRegularPoppingText
 								style={{ opacity: 1 }}
@@ -287,7 +273,7 @@ const ChatDiscussion = ({ navigation }) => {
 									style={{}}
 									fontSize={TEXT_SIZE.small}
 									color={"white"}
-									value={item?.time? item.time : dayjs(item?.created_at).format("HH:mm")}
+									value={item?.time ? item.time : dayjs(item?.sent_at).format("HH:mm")}
 								/>
 							</View>
 						}
@@ -303,7 +289,7 @@ const ChatDiscussion = ({ navigation }) => {
 							fontSize={TEXT_SIZE.secondary}
 							color={"black"}
 							//     color={isSender ? "white" : "black"} 
-							value={item.message}
+							value={item.content} 
 						/>
 						<View style={styles.messageFooter}>
 							{/* <ChatScreenDoubleTick color={isSender ? "#92D6FF" : "#8C8C8C"} /> */}
@@ -312,8 +298,7 @@ const ChatDiscussion = ({ navigation }) => {
 								style={styles.timeText}
 								fontSize={TEXT_SIZE.small}
 								color={isSender ? "#E3F2FD" : "#8C8C8C"}
-								value={item?.time? item.time : dayjs(item?.created_at).format("HH:mm")}
-								
+								value={item?.time ? item.time : dayjs(item?.sent_at).format("HH:mm")}
 							/>
 						</View>
 					</View>
@@ -325,14 +310,18 @@ const ChatDiscussion = ({ navigation }) => {
 	return (
 		<SafeAreaView className={'flex-1 bg-white'}>
 			<StatusBar style="dark" />
+			{/* Screen header */}
 			<View className={'py-3'} style={{ paddingHorizontal: 20, backgroundColor: "white", flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+				<TouchableOpacity onPress={() => navigation.goBack()} style={{ alignItems: "flex-start", justifyContent: "flex-start", marginRight:10 }}>
+					<MatchConnectionBackArrow />
+				</TouchableOpacity>
 				<TouchableOpacity onPress={() => navigation.navigate("ChatDiscussionOptions")} style={{ height: 40, width: 40, borderRadius: 50, overflow: "hidden" }}>
-					<Image source={item?.other_user ? {uri:`${BaseImageUrl}/${item?.other_user?.user_image}`} : require("../../../assets/images/test_match1.jpg")} style={{ height: "100%", width: "100%" }} />
+					<Image source={item?.avatar ? { uri: `${BaseImageUrl}/${item?.avatar}` } : require("../../../assets/images/test_match1.jpg")} style={{ height: "100%", width: "100%" }} />
 				</TouchableOpacity>
 
 				<View style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
-					<TouchableOpacity className={''} onPress={() => navigation.navigate("ChatDiscussionOptions")} style={{ flex: 2, marginLeft: 15 }}>
-						<CustomSemiBoldPoppingText style={{}} color={"black"} fontSize={TEXT_SIZE.primary} value={item?.other_user ? `${item?.other_user?.firstname} ${item?.other_user?.lastname }`: "Maggy MacLeen"} />
+					<TouchableOpacity className={''} onPress={() => navigation.navigate("ChatDiscussionOptions", { item })} style={{ flex: 2, marginLeft: 15 }}>
+						<CustomSemiBoldPoppingText style={{}} color={"black"} fontSize={TEXT_SIZE.primary} value={item?.name ? `${item?.name}` : "Maggy MacLeen"} />
 						<CustomRegularPoppingText style={{}} color={COLORS.primary} fontSize={TEXT_SIZE.small + 1} value={item?.other_user?.status || "Offline"} />
 					</TouchableOpacity>
 
@@ -346,34 +335,34 @@ const ChatDiscussion = ({ navigation }) => {
 					</View>
 				</View>
 			</View>
-			<View style={styles.container}>
+			{/* Messages container */}
+			<View className='bg-red-200' style={styles.container}>
 				<FlatList
 					data={messages}
-					 
+
 					showsVerticalScrollIndicator={false}
 					renderItem={renderMessages}
 					contentContainerStyle={styles.listContent}
-				     
+
 
 					ref={flatListRef}
-       
-         
-                         keyExtractor={(item, index) => item?.id+item?.message+dayjs(item?.created_at).format("HH:mm")}
-                          
-                         onEndReached={loadMoreMessages}
-                         onEndReachedThreshold={0.5}
-                         ListFooterComponent={
-                    loadingMore ? (
-              <View style={styles.loadMoreContainer}>
-                <ActivityIndicator size="small" color={COLORS.primary} />
-              </View>
-            ) : null
-          }
+
+
+					keyExtractor={(item, index) => item?.id}
+
+					onEndReached={loadMoreMessages}
+					onEndReachedThreshold={0.5}
+					ListFooterComponent={
+						loadingMore ? (
+							<View style={styles.loadMoreContainer}>
+								<ActivityIndicator size="small" color={COLORS.primary} />
+							</View>
+						) : null
+					}
 				/>
- 
 
 				{allowChat ? <View style={styles.inputContainer}>
-				     {/* {images && (
+					{/* {images && (
 						<View>
 						<Image style={{height:50,width:50}} resizeMode="contain" source={{uri:images?.img?.uri}}/>
 						<TouchableOpacity 
@@ -384,7 +373,7 @@ const ChatDiscussion = ({ navigation }) => {
 						</TouchableOpacity>
 						</View>
 					)} */}
-					<MessageSender action={()=>sendMessage({message:data,receiver_id:item?.other_user?.id})} placeHolder="" state={data} setState={setData} imageAction={handleImageUpload} />
+					<MessageSender action={() => sendMessage({ message: data, sender: userData?.id })} placeHolder="" state={data} setState={setData} imageAction={handleImageUpload} />
 				</View> : <View style={styles.prohibitedChat}>
 					<CustomRegularPoppingText color={COLORS.gray} style={{}} value={`You cannot chat with Cassandra anymore`} fontSize={TEXT_SIZE.secondary} />
 					<TouchableOpacity>
@@ -413,7 +402,7 @@ const styles = StyleSheet.create({
 	senderContainer: {
 		alignSelf: "flex-end",
 		alignItems: "flex-end",
-		
+
 	},
 	receiverContainer: {
 		alignSelf: "flex-start",
@@ -425,7 +414,7 @@ const styles = StyleSheet.create({
 		borderRadius: 18,
 		borderBottomRightRadius: 4,
 	},
-	
+
 	senderBubble: {
 		backgroundColor: COLORS.primary,
 		borderBottomRightRadius: 4,
@@ -434,7 +423,7 @@ const styles = StyleSheet.create({
 	receiverBubble: {
 		backgroundColor: "white",
 		borderBottomRightRadius: 18,
-		borderBottomLeftRadius: 4,
+		borderTopLeftRadius: 0,
 	},
 	messageText: {
 		paddingRight: 60, // Space for time and ticks
@@ -505,23 +494,23 @@ const styles = StyleSheet.create({
 
 
 
-	  dateHeaderContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 15,
-  },
-  dateHeaderLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#E5E5E5',
-    marginHorizontal: 10,
-  },
-  dateHeaderText: {
-    color: '#777',
-    fontSize: 12,
-    fontWeight: '500',
-  },
+	dateHeaderContainer: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		marginVertical: 15,
+	},
+	dateHeaderLine: {
+		flex: 1,
+		height: 1,
+		backgroundColor: '#E5E5E5',
+		marginHorizontal: 10,
+	},
+	dateHeaderText: {
+		color: '#777',
+		fontSize: 12,
+		fontWeight: '500',
+	},
 })
 
 export default ChatDiscussion

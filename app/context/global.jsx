@@ -93,6 +93,7 @@ export const GlobalVariableProvider = ({
       qP14: "", // Dominant temperament
       qP15: [], // Important things in relationship (max 5)
       qP16: [], // Interests/hobbies (min 5)
+      qP17: "", // Profession
 
       // Spiritual Questions (qS) - from Questionaire2
       qS1: "", // Relationship with God description
@@ -128,6 +129,7 @@ export const GlobalVariableProvider = ({
       qP14: false, // Dominant temperament
       qP15: false, // Important things in relationship (max 5)
       qP16: false, // Interests/hobbies (min 5)
+      qP17: false, // Profession
 
       // Spiritual Questions (qS) - from Questionaire2
       qS1: false, // Relationship with God description

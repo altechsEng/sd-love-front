@@ -19,13 +19,9 @@ import { getEmojiFlag } from "countries-list";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
-
-
-
 export function Questionaire({ navigation }) {
 
-	const { setRegistrationData, registrationData, questionnaireData, setQuestionnaireData } = useGlobalVariable()
+	const { setRegistrationData, registrationData, err, questionnaireData, setQuestionnaireData } = useGlobalVariable()
 
 	useEffect(() => {
 		// Calculate initial progress when component mounts
@@ -306,7 +302,6 @@ export function Questionaire({ navigation }) {
 						safeSelectedValues.length >= maxSelections &&
 						!isSelected;
 
-
 					return (
 						<TouchableOpacity
 							key={answer}
@@ -364,14 +359,14 @@ export function Questionaire({ navigation }) {
 				<View style={{ height: 50 }}></View>
 
 				<View style={{ marginVertical: 10, paddingHorizontal: 20 }}>
-					<CustomRegularPoppingText value="Quel est ton sexe :" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomRegularPoppingText value="Quel est ton sexe :" color={err.qP1 ? COLORS.red : 'black'} fontSize={TEXT_SIZE.primary} />
 					<CustomQuestionDisplayer answers={["Homme", "Femme"]} direction={"row"} currentValue={questionnaireData.answers.qP1} onSelect={(value) => updateAnswer("qP1", value)} />
 				</View>
 
 				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
 
 				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-					<Text style={{ fontFamily: FAMILLY.regular, fontSize: TEXT_SIZE.primary, marginBottom: 10 }}>Quel est ta date de naissance ?</Text>
+					<Text style={{ fontFamily: FAMILLY.regular, fontSize: TEXT_SIZE.primary, marginBottom: 10, color: err.qP2 ? COLORS.red : 'black' }}>Quel est ta date de naissance ?</Text>
 					<View style={{ paddingVertical: 10, paddingHorizontal: 10, width: "100%", backgroundColor: "#F3F3F3", borderRadius: 10, flexDirection: "row", alignItems: "center" }}>
 						<TouchableOpacity onPress={() => setShow(true)} style={{ alignSelf: "flex-start" }}><TextInputDate /></TouchableOpacity>
 						<View style={{ marginTop: 2, marginLeft: 5 }}>
@@ -391,7 +386,7 @@ export function Questionaire({ navigation }) {
 				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
 
 				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-					<CustomRegularPoppingText value="Quel est ton état civil :" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomRegularPoppingText value="Quel est ton état civil :" color={err.qP3 ? COLORS.red : 'black'} fontSize={TEXT_SIZE.primary} />
 					<CustomQuestionDisplayer answers={["Célibataire", "Divorcé(e)", "Veuf(ve)"]} direction={"row"} currentValue={questionnaireData.answers.qP3} onSelect={(value) => updateAnswer("qP3", value)} />
 				</View>
 
@@ -400,7 +395,7 @@ export function Questionaire({ navigation }) {
 				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
 
 				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-					<CustomRegularPoppingText value="As-tu un ou des enfants :" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomRegularPoppingText value="As-tu un ou des enfants :" color={err.qP4 ? COLORS.red : 'black'} fontSize={TEXT_SIZE.primary} />
 					<CustomQuestionDisplayer answers={["oui", "non"]} direction={"row"} currentValue={questionnaireData.answers.qP4} onSelect={(value) => updateAnswer("qP4", value)} />
 				</View>
 
@@ -420,9 +415,9 @@ export function Questionaire({ navigation }) {
 				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
 
 				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-					<CustomRegularPoppingText style={{ marginBottom: 10 }} value="Quelle est ta taille (En centimètres)" color={'black'} fontSize={TEXT_SIZE.primary} />
-					<Pressable style={{ paddingVertical: 0, paddingHorizontal: 10, width: "100%", backgroundColor: "#F3F3F3", borderRadius: 20, flexDirection: "row", alignItems: "center" }}>
-						<CustomTextInput rightIconAction={null} name="height" placeHolder="180" LeftIcon={null} LeftIconStyles={null} RightIcon={null} RightIconStyles={null} directState={true} setState={(text) => updateAnswer("qP6", text)} state={questionnaireData.answers.qP6} />
+					<CustomRegularPoppingText style={{ marginBottom: 10 }} value="Quelle est ta taille (En centimètres)" color={err.qP6 ? COLORS.red : 'black'} fontSize={TEXT_SIZE.primary} />
+					<Pressable style={{ paddingVertical: 0, paddingHorizontal: 10, width: "100%", backgroundColor: "#F3F3F3", borderRadius: 10, flexDirection: "row", alignItems: "center" }}>
+						<CustomTextInput rightIconAction={null} name="height" placeHolder="Ex:180" LeftIcon={null} LeftIconStyles={null} RightIcon={null} RightIconStyles={null} directState={true} setState={(text) => updateAnswer("qP6", text)} state={questionnaireData.answers.qP6} />
 					</Pressable>
 				</View>
 
@@ -456,7 +451,7 @@ export function Questionaire({ navigation }) {
 				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
 
 				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-					<CustomRegularPoppingText style={{ marginBottom: 10 }} value="Quelle est ta nationalité ?" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomRegularPoppingText style={{ marginBottom: 10 }} value="Quelle est ta nationalité ?" color={err.qP9 ? COLORS.red : 'black'} fontSize={TEXT_SIZE.primary} />
 					<View style={{ position: "relative", borderRadius: 10, paddingVertical: 5, paddingHorizontal: 18, backgroundColor: "rgba(181, 181, 181, 0.12)", flexDirection: "row", alignItems: "center" }}>
 						{visible && <CountryPickerModal type={'country'} title="Select country" visible={visible} onSelect={onSelect} onClose={() => setVisible(false)} />
 						}
@@ -493,7 +488,6 @@ export function Questionaire({ navigation }) {
 					<CustomQuestionDisplayer answers={["Collège", "Lycée", "Licence (Bachelor, Bac+3)", "Maitrise (Master)", "Doctorat", "autre"]} direction={"column"} currentValue={questionnaireData.answers.qP11} onSelect={(value) => updateAnswer("qP11", value)} />
 				</View>
 
-
 				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
 
 				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
@@ -504,6 +498,20 @@ export function Questionaire({ navigation }) {
 					</View>
 					<CustomRegularPoppingText value="Es-tu à l’aise à rencontrer un partenaire qui a un niveau d’études inférieur au tien ?" color={'black'} fontSize={TEXT_SIZE.primary} />
 					<CustomQuestionDisplayer answers={["oui", "non", "ça dépend"]} direction={"row"} currentValue={questionnaireData.answers.qP12} onSelect={(value) => updateAnswer("qP12", value)} />
+				</View>
+
+				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
+
+				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
+					<View className={'flex flex-row mb-4'}>
+						<View className={'bg-gray-100 rounded-lg py-1 px-2'}>
+							<CustomSemiBoldPoppingText value="Question facultative" color={null} fontSize={TEXT_SIZE.small} />
+						</View>
+					</View>
+					<CustomRegularPoppingText style={{ marginBottom: 10 }} value="Quelle est ta profession" color={err.qP6 ? COLORS.red : 'black'} fontSize={TEXT_SIZE.primary} />
+					<Pressable style={{ paddingVertical: 0, paddingHorizontal: 10, width: "100%", backgroundColor: "#F3F3F3", borderRadius: 10, flexDirection: "row", alignItems: "center" }}>
+						<CustomTextInput rightIconAction={null} name="height" placeHolder="" LeftIcon={null} LeftIconStyles={null} RightIcon={null} RightIconStyles={null} directState={true} setState={(text) => updateAnswer("qP17", text)} state={questionnaireData.answers.qP17} />
+					</Pressable>
 				</View>
 
 
@@ -517,7 +525,7 @@ export function Questionaire({ navigation }) {
 				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
 					<CustomRegularPoppingText
 						value="Quels sont tes principaux langages d'amour ? (deux choix maximum)"
-						color={'black'}
+						color={err.qP13 ? COLORS.red : 'black'}
 						fontSize={TEXT_SIZE.primary}
 					/>
 					<MultiSelectAnswer
@@ -533,7 +541,7 @@ export function Questionaire({ navigation }) {
 				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
 
 				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-					<CustomRegularPoppingText value="Quel est ton tempérament dominant ?" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomRegularPoppingText value="Quel est ton tempérament dominant ?" color={err.qP14 ? COLORS.red : 'black'} fontSize={TEXT_SIZE.primary} />
 					<CustomQuestionDisplayer answers={["Rouge (fonceur, indépendant, exigeant, factuel, positif…)", "Bleu (prudent, analytique, réservé, distant, organisé…)", "Vert (patient, fiable, calme, attentionné, protecteur…)", "Jaune (démonstratif, sociable, dynamique, enthousiaste, optimiste…)"]} direction={"column"} currentValue={questionnaireData.answers.qP14} onSelect={(value) => updateAnswer("qP14", value)} />
 				</View>
 
@@ -542,7 +550,7 @@ export function Questionaire({ navigation }) {
 				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
 					<CustomRegularPoppingText
 						value="Nomme les 5 choses les plus importantes pour toi dans une relation amoureuse :"
-						color={'black'}
+						color={err.qP15 ? COLORS.red : 'black'}
 						fontSize={TEXT_SIZE.primary}
 					/>
 					<MultiSelectAnswer
@@ -560,7 +568,7 @@ export function Questionaire({ navigation }) {
 				<View className={'gap-4'} style={{ marginVertical: 20, paddingHorizontal: 20 }}>
 					<CustomRegularPoppingText
 						value="Mes centres d'intérêts (5 minimum)"
-						color={'black'}
+						color={err.qP16 ? COLORS.red : 'black'}
 						fontSize={TEXT_SIZE.primary}
 					/>
 
@@ -587,6 +595,7 @@ export function Questionaire({ navigation }) {
 export function Questionaire2({ navigation }) {
 
 	const { questioniareLevel, err, setErr, registrationData, setQuestionaireLevel, setQuestionnaireProgress, questionnaireData, setQuestionnaireData } = useGlobalVariable()
+	const [emailExists, setEmailExists] = useState(false);
 
 	useEffect(() => {
 		// Calculate initial progress when component mounts
@@ -596,9 +605,9 @@ export function Questionaire2({ navigation }) {
 		setQuestionnaireProgress(initialProgress);
 	}, []);
 
-	useEffect(() => {
-		setTimeout(() => setErr(""), 2000)
-	}, [err])
+	// useEffect(() => {
+	// 	setTimeout(() => setErr(""), 2000)
+	// }, [err])
 
 
 	const handleSubmission = async () => {
@@ -617,14 +626,18 @@ export function Questionaire2({ navigation }) {
 		await axios.post("/api/register/en", data,
           { headers: { "Authorization": `Bearer ${token}` } }
 		).then((res) => {
-			console.log(res.data, "resdata")
 			if (res.data.errors) {
-				setErr(`address: ${res.data.errors?.address}` || `city: ${res.data.errors?.city}`)
+				console.log(res.data.errors, "resdata")
+				// setErr(`address: ${res.data.errors?.address}` || `city: ${res.data.errors?.city}`)
+				setErr(res.data.errors)
+				setIsLoading(false)
 			} else if (res.data.status === 401) {
-				setErr(`email error : ${res.data.message}`)
+				console.log(`email error : ${res.data.message}`)
+				setErr("")
+				setEmailExists(true)
+				setIsLoading(false)
 			} else {
-
-				navigation.navigate("BottomTabsHome")
+				navigation.navigate("AccountCreated")
 			}
 			setIsLoading(false)
 		}).catch((err) => {
@@ -634,8 +647,6 @@ export function Questionaire2({ navigation }) {
 
 		})
 	}
-
-
 
 	const MultiSelectAnswer = ({
 		questionKey,
@@ -829,7 +840,7 @@ export function Questionaire2({ navigation }) {
 				<View style={{ height: 50 }}></View>
 
 				<View className={'gap-3'} style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-					<CustomRegularPoppingText value="En quelques mots, comment décrirais-tu ta relation avec Dieu (Ce que Jésus représente pour toi, le type d’église que tu fréquentes…) ?" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomRegularPoppingText value="En quelques mots, comment décrirais-tu ta relation avec Dieu (Ce que Jésus représente pour toi, le type d’église que tu fréquentes…) ?" color={err.qS1 ? COLORS.red : 'black'} fontSize={TEXT_SIZE.primary} />
 					<CustomRegularPoppingText value="C’est l’une des premières choses que les gens liront sur ton profil. Tu auras l’occasion d’en dire plus par la suite" color={null} fontSize={TEXT_SIZE.small} />
 
 					<Pressable style={{ paddingVertical: 0, marginVertical: 0, borderRadius: 10, paddingHorizontal: 15, backgroundColor: "rgba(181, 181, 181, 0.12)" }}>
@@ -840,15 +851,15 @@ export function Questionaire2({ navigation }) {
 				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
 
 				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-					<CustomRegularPoppingText value="Depuis combien de temps estimes tu que tu marches pleinement, de tout ton cœur avec le Seigneur ?" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomRegularPoppingText value="Depuis combien de temps estimes tu que tu marches pleinement, de tout ton cœur avec le Seigneur ?" color={err.qS2 ? COLORS.red : 'black'} fontSize={TEXT_SIZE.primary} />
 					<CustomQuestionDisplayer answers={["Moins d’un an", "1 à 2 ans", "2 à 5 ans", "5 à 10 ans", "10 à 20 ans", "Plus de 20 ans"]} direction={"column"} currentValue={questionnaireData.answers.qS2} onSelect={(value) => updateAnswer("qS2", value)} />
 				</View>
 
 				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
 
 				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-					<CustomRegularPoppingText value="Quelle est ta dénomination religieuse ?" color={'black'} fontSize={TEXT_SIZE.primary} />
-					<CustomQuestionDisplayer answers={["Catholique", "Calviniste", "Évangélique", "Charismatique", "Méthodiste", "Chrétien non pratiquant", "Non croyant"]} direction={"column"} currentValue={questionnaireData.answers.qS3} onSelect={(value) => updateAnswer("qS3", value)} />
+					<CustomRegularPoppingText value="Quelle est ta dénomination religieuse ?" color={err.qS3 ? COLORS.red : 'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomQuestionDisplayer answers={["Catholique", "Calviniste", "Évangélique", "Baptiste", "Protestante", "Pentecôtiste", "Presbytérienne", "Charismatique", "Adventiste", "Méthodiste", "Chrétien non pratiquant", "Non croyant"]} direction={"column"} currentValue={questionnaireData.answers.qS3} onSelect={(value) => updateAnswer("qS3", value)} />
 				</View>
 
 				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
@@ -866,14 +877,14 @@ export function Questionaire2({ navigation }) {
 				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
 
 				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-					<CustomRegularPoppingText value="Es-tu baptisé(e) d’eau ?" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomRegularPoppingText value="Es-tu baptisé(e) d’eau ?" color={err.qS5 ? COLORS.red : 'black'} fontSize={TEXT_SIZE.primary} />
 					<CustomQuestionDisplayer answers={["Oui, par immersion", "Oui, par aspersion mais sans confirmation", "Oui, par aspersion et avec confirmation", "non"]} direction={"column"} currentValue={questionnaireData.answers.qS5} onSelect={(value) => updateAnswer("qS5", value)} />
 				</View>
 
 				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
 
 				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-					<CustomRegularPoppingText value="Es-tu baptisé(e) du Saint Esprit ?" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomRegularPoppingText value="Es-tu baptisé(e) du Saint Esprit ?" color={err.qS6 ? COLORS.red : 'black'} fontSize={TEXT_SIZE.primary} />
 					<CustomQuestionDisplayer answers={["Oui et je parle en langues", "Oui, mais je ne parle pas en langues", "Je ne crois pas au baptême du Saint Esprit", "Je ne sais pas ce que cela veut dire", "non"]} direction={"column"} currentValue={questionnaireData.answers.qS6} onSelect={(value) => updateAnswer("qS6", value)} />
 				</View>
 
@@ -926,7 +937,7 @@ export function Questionaire2({ navigation }) {
 				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
 					<CustomRegularPoppingText
 						value="Comment aimes-tu servir au sein de l’église locale ? (trois choix maximum)"
-						color={'black'}
+						color={err.qS10 ? COLORS.red : 'black'}
 						fontSize={TEXT_SIZE.primary}
 					/>
 					<MultiSelectAnswer
@@ -942,7 +953,7 @@ export function Questionaire2({ navigation }) {
 				<View style={{ height: 1, backgroundColor: "#F3F3F3" }}></View>
 
 				<View style={{ marginVertical: 20, paddingHorizontal: 20 }}>
-					<CustomRegularPoppingText value="Crois-tu en l’abstinence sexuelle avant le mariage ?" color={'black'} fontSize={TEXT_SIZE.primary} />
+					<CustomRegularPoppingText value="Crois-tu en l’abstinence sexuelle avant le mariage ?" color={err.qS11 ? COLORS.red : 'black'} fontSize={TEXT_SIZE.primary} />
 					<CustomQuestionDisplayer answers={["Oui, et je compte fermement la respecter", "Non, j’ai mon avis sur ce sujet et je préfère en parler en privé avec la personne concernée", "Ça dépend"]} direction={"column"} currentValue={questionnaireData.answers.qS11} onSelect={(value) => updateAnswer("qS11", value)} />
 				</View>
 
@@ -973,10 +984,10 @@ export function Questionaire2({ navigation }) {
 
 				<View style={{ height: 1, backgroundColor: "#F3F3F3", marginVertical: 10 }}></View>
 
-				{err !== "" ? <CustomRegularPoppingText style={{ alignSelf: 'center', marginTop: 10 }} fontSize={TEXT_SIZE.small} color={COLORS.red} value={err} /> : null}
+				{err !== "" ? <CustomRegularPoppingText style={{ alignSelf: 'center', marginBottom: 5 }} fontSize={TEXT_SIZE.medium} color={COLORS.red} value={'Please, fill in all the mendory fields'} /> : null}
+				{emailExists ? <CustomRegularPoppingText style={{ alignSelf: 'center', marginBottom: 5 }} fontSize={TEXT_SIZE.medium} color={COLORS.red} value={'A user with this email already exists'} /> : null}
 
 				<View style={{ height: 50, paddingHorizontal: 20 }}>
-
 					<TouchableOpacity onPress={() => handleSubmission()} style={{ borderRadius: 10, alignItems: 'center', justifyContent: "center", backgroundColor: COLORS.primary, paddingVertical: 10, paddingHorizontal: 20 }}>
 						{isLoading ? <ActivityIndicator color="white" /> :
 							<CustomRegularPoppingText color={"white"} fontSize={TEXT_SIZE.primary} value="Suivant" />}

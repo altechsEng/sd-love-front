@@ -14,6 +14,7 @@ import { getEmojiFlag } from "countries-list";
 import { useGlobalVariable } from "../context/global";
 
 export default function RegisterStep2({ navigation }) {
+	const [err, setErr] = useState(null);
 	const { setRegistrationData, registrationData } = useGlobalVariable()
 
 	useEffect(() => {
@@ -23,15 +24,33 @@ export default function RegisterStep2({ navigation }) {
 	}, [])
 
 	const handleData = () => {
-		setRegistrationData((prev) => ({
 
+		// if (!address || !city || !country) {
+		// 	setErr("All fields are required")
+		// 	return
+		// }
+		if (!country) {
+			setErr("Please select a country")
+			return
+		}
+		if (!city) {
+			setErr("Please select a city")
+			return
+		}
+		if (!address) {
+			setErr("Please enter your address")
+			return
+		}
+
+		setRegistrationData((prev) => ({
 			...prev,
 			address,
 			city,
 			country: country?.name,
 			country_dat: country,
-
 		}))
+
+		setErr("null");
 
 		navigation.navigate("Questionaire")
 	}
@@ -104,6 +123,8 @@ export default function RegisterStep2({ navigation }) {
 				<TouchableOpacity onPress={() => handleData()} style={{ backgroundColor: COLORS.primary, marginTop: hp(6), paddingVertical: 15, marginVertical: 20, paddingHorizontal: 20, width: "80%", borderRadius: 100 }}>
 					<Text style={{ color: "white", textAlign: "center", fontFamily: FAMILLY.regular }} > Next </Text>
 				</TouchableOpacity>
+
+				{err && <Text style={{ color: COLORS.red, fontSize: TEXT_SIZE.secondary, fontFamily: FAMILLY.regular, marginTop: 10 }}>{err}</Text>}
 
 				<View style={{ flex: 3, height: hp(5), justifyContent: "flex-end" }}>
 					<View className={'pb-8'} style={{ alignItems: "center", justifyContent: "center", flexDirection: "row" }}>

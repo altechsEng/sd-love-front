@@ -21,6 +21,8 @@ import {
 } from "react-native-responsive-screen";
 import { calculateAge } from "../../utils/functions";
 import VerticalCardCarousel from "../components/verticalCardCarousel";
+import { CustomRegularPoppingText, CustomSemiBoldPoppingText } from "../components/text";
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window')
 
@@ -252,179 +254,191 @@ const MatchScreen = ({ navigation }) => {
     return (
         <View style={{ backgroundColor: "white", paddingHorizontal: 20, position: "relative", flex: 1 }}>
 
-            <View className={'relative z-10 py-4 bg-white'} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                <TouchableOpacity className={'flex flex-row items-center bg-gray-100 py-2 px-2 rounded-lg gap-2'}>
-                    <MatchScreenAdress />
-                    <Text style={{ color: COLORS.black, fontFamily: FAMILLY.medium, textTransform: "capitalize" }}>Chicago</Text>
-                    <MatchScreenDownArrow />
-                </TouchableOpacity>
+            {allMatches.length > 0 ?
+                (
+                    <>
+                        <View className={'relative z-10 py-4 bg-white'} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                            <TouchableOpacity className={'flex flex-row items-center bg-gray-100 py-2 px-2 rounded-lg gap-2'}>
+                                <MatchScreenAdress />
+                                <Text style={{ color: COLORS.black, fontFamily: FAMILLY.medium, textTransform: "capitalize" }}>Chicago</Text>
+                                <MatchScreenDownArrow />
+                            </TouchableOpacity>
 
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <TouchableOpacity onPress={() => setActiveScreen('side')} style={{ marginRight: 20 }}><MatchScreenSideCards stroke={activeScreen == 'side' ? "#D7A898" : "#5E5E5E"} /></TouchableOpacity>
-                    <TouchableOpacity onPress={() => setActiveScreen('grid')} style={{ marginRight: 20 }}><MatchScreenGridCards stroke={activeScreen == 'grid' ? "#D7A898" : "#5E5E5E"} /></TouchableOpacity>
-                    <TouchableOpacity onPress={() => setActiveScreen('box')} style={{ marginRight: 20 }}><MatchScreenAdressWithBox stroke={activeScreen == 'box' ? "#D7A898" : "#5E5E5E"} /></TouchableOpacity>
-                    <TouchableOpacity style={{ marginRight: 0 }}><MatchScreenFilters /></TouchableOpacity>
-                </View>
-            </View>
+                            <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                <TouchableOpacity onPress={() => setActiveScreen('side')} style={{ marginRight: 20 }}><MatchScreenSideCards stroke={activeScreen == 'side' ? "#D7A898" : "#5E5E5E"} /></TouchableOpacity>
+                                <TouchableOpacity onPress={() => setActiveScreen('grid')} style={{ marginRight: 20 }}><MatchScreenGridCards stroke={activeScreen == 'grid' ? "#D7A898" : "#5E5E5E"} /></TouchableOpacity>
+                                <TouchableOpacity onPress={() => setActiveScreen('box')} style={{ marginRight: 20 }}><MatchScreenAdressWithBox stroke={activeScreen == 'box' ? "#D7A898" : "#5E5E5E"} /></TouchableOpacity>
+                                <TouchableOpacity style={{ marginRight: 0 }}><MatchScreenFilters /></TouchableOpacity>
+                            </View>
+                        </View>
 
-            {activeScreen == 'side' &&
-                <View style={{ marginVertical: 10, height: '100%', alignItems: "center", flexDirection: "column" }} >
-                    <CardContainer data={allMatches} isLoading={isFetching} maxVisibleItems={3} />
-                    <Text className='absolute text-gray-400 bottom-10' style={{ position: "absolute", bottom: 10 }}>Swip vertically</Text>
-                </View>
-            }
+                        {activeScreen == 'side' &&
+                            <View style={{ marginVertical: 10, height: '100%', alignItems: "center", flexDirection: "column" }} >
+                                <CardContainer data={allMatches} isLoading={isFetching} maxVisibleItems={3} />
+                                <Text className='absolute text-gray-400 bottom-10' style={{ position: "absolute", bottom: 10 }}>Swip vertically</Text>
+                            </View>
+                        }
 
-            {activeScreen == 'grid' &&
+                        {activeScreen == 'grid' &&
+                            <FlatList
+                                keyExtractor={(item, index) => item?.key + "" + index}
+                                data={allMatches.length > 0 ? allMatches : profiles}
+                                renderItem={renderProfile}
+                                numColumns={2}
+                                showsVerticalScrollIndicator={false}
 
-                <FlatList
-                    keyExtractor={(item, index) => item?.key + "" + index}
-                    data={allMatches.length > 0 ? allMatches : profiles}
-                    renderItem={renderProfile}
-                    numColumns={2}
-                    showsVerticalScrollIndicator={false}
+                                onEndReached={loadMoreItem}
+                                onEndReachedThreshold={0.3}
 
-                    onEndReached={loadMoreItem}
-                    onEndReachedThreshold={0.3}
+                                ListFooterComponentStyle={{ alignItems: "center", justifyContent: "center" }}
+                            />
 
-                    ListFooterComponentStyle={{ alignItems: "center", justifyContent: "center" }}
+                        }
 
-                />
+                        {activeScreen == "box" &&
+                            <View style={{ flex: 1 }}>
 
-            }
-
-            {activeScreen == "box" &&
-                <View style={{ flex: 1 }}>
-
-                    <View style={{ flex: 1 }}>
-                        {activeScreen == "box" && userLocation && (
-                            <MapView
-                                style={{ flex: 1 }}
-                                initialRegion={userLocation}
-                                showsUserLocation={false}
-                            >
-
-                                {userLocation && (
-                                    <Marker
-                                        coordinate={userLocation}
-                                        anchor={{ x: 0.5, y: 0.5 }}
-
-                                    >
-                                        <View style={{
-                                            backgroundColor: 'white',
-                                            padding: 3,
-                                            borderRadius: 30,
-                                            shadowColor: '#000',
-                                            shadowOffset: { width: 0, height: 2 },
-                                            shadowOpacity: 0.2,
-                                            shadowRadius: 4,
-                                            elevation: 5
-                                        }}>
-                                            <View style={{
-                                                width: 35,
-                                                height: 35,
-                                                borderRadius: 25,
-                                                borderWidth: 3,
-                                                borderColor: COLORS.primary,
-                                                overflow: 'hidden'
-                                            }}>
-                                                <Image
-                                                    source={require('../../assets/images/match_con1.jpg.jpg')}
-                                                    style={{
-                                                        width: '100%',
-                                                        height: '100%',
-                                                        resizeMode: 'cover'
-                                                    }}
-                                                />
-                                            </View>
-                                        </View>
-                                    </Marker>
-                                )}
-
-                                {/* Concentric Circles */}
-                                <Circle
-                                    center={userLocation}
-                                    radius={1000} // 1km
-                                    fillColor={"rgba(215, 168, 152, 1)"}
-
-                                    strokeWidth={0}
-                                />
-                                <Circle
-                                    center={userLocation}
-                                    radius={1500} // 3km
-                                    fillColor="rgba(215, 168, 152, 0.5)"
-
-                                    strokeWidth={0}
-                                />
-                                <Circle
-                                    center={userLocation}
-                                    radius={2000} // 5km
-                                    fillColor="rgba(215, 168, 152, 0.19)"
-
-                                    strokeWidth={0}
-                                />
-
-
-
-                                {/* Profile Markers */}
-                                {profiles.map((profile) => {
-                                    const distance = getDistance(
-                                        userLocation.latitude,
-                                        userLocation.longitude,
-                                        profile.latitude,
-                                        profile.longitude
-                                    );
-
-                                    return (
-                                        <Marker
-                                            key={profile.key}
-                                            coordinate={{
-                                                latitude: profile.latitude,
-                                                longitude: profile.longitude
-                                            }}
-
+                                <View style={{ flex: 1 }}>
+                                    {activeScreen == "box" && userLocation && (
+                                        <MapView
+                                            style={{ flex: 1 }}
+                                            initialRegion={userLocation}
+                                            showsUserLocation={false}
                                         >
-                                            <View style={{
-                                                backgroundColor: 'white',
-                                                padding: 3,
-                                                borderRadius: 25,
-                                                shadowColor: '#000',
-                                                shadowOffset: { width: 0, height: 2 },
-                                                shadowOpacity: 0.2,
-                                                shadowRadius: 4,
-                                                elevation: 3
-                                            }}>
-                                                <View style={{
-                                                    width: 30,
-                                                    height: 30,
-                                                    borderRadius: 20,
-                                                    borderWidth: 2,
-                                                    borderColor: getColorForDistance(distance),
-                                                    overflow: 'hidden'
-                                                }}>
-                                                    <Image
-                                                        source={profile.image}
-                                                        style={{
-                                                            width: '100%',
-                                                            height: '100%',
-                                                            resizeMode: 'cover'
+
+                                            {userLocation && (
+                                                <Marker
+                                                    coordinate={userLocation}
+                                                    anchor={{ x: 0.5, y: 0.5 }}
+
+                                                >
+                                                    <View style={{
+                                                        backgroundColor: 'white',
+                                                        padding: 3,
+                                                        borderRadius: 30,
+                                                        shadowColor: '#000',
+                                                        shadowOffset: { width: 0, height: 2 },
+                                                        shadowOpacity: 0.2,
+                                                        shadowRadius: 4,
+                                                        elevation: 5
+                                                    }}>
+                                                        <View style={{
+                                                            width: 35,
+                                                            height: 35,
+                                                            borderRadius: 25,
+                                                            borderWidth: 3,
+                                                            borderColor: COLORS.primary,
+                                                            overflow: 'hidden'
+                                                        }}>
+                                                            <Image
+                                                                source={require('../../assets/images/match_con1.jpg.jpg')}
+                                                                style={{
+                                                                    width: '100%',
+                                                                    height: '100%',
+                                                                    resizeMode: 'cover'
+                                                                }}
+                                                            />
+                                                        </View>
+                                                    </View>
+                                                </Marker>
+                                            )}
+
+                                            {/* Concentric Circles */}
+                                            <Circle
+                                                center={userLocation}
+                                                radius={1000} // 1km
+                                                fillColor={"rgba(215, 168, 152, 1)"}
+
+                                                strokeWidth={0}
+                                            />
+                                            <Circle
+                                                center={userLocation}
+                                                radius={1500} // 3km
+                                                fillColor="rgba(215, 168, 152, 0.5)"
+
+                                                strokeWidth={0}
+                                            />
+                                            <Circle
+                                                center={userLocation}
+                                                radius={2000} // 5km
+                                                fillColor="rgba(215, 168, 152, 0.19)"
+
+                                                strokeWidth={0}
+                                            />
+
+
+
+                                            {/* Profile Markers */}
+                                            {profiles.map((profile) => {
+                                                const distance = getDistance(
+                                                    userLocation.latitude,
+                                                    userLocation.longitude,
+                                                    profile.latitude,
+                                                    profile.longitude
+                                                );
+
+                                                return (
+                                                    <Marker
+                                                        key={profile.key}
+                                                        coordinate={{
+                                                            latitude: profile.latitude,
+                                                            longitude: profile.longitude
                                                         }}
-                                                    />
-                                                </View>
-                                            </View>
-                                        </Marker>
-                                    );
-                                })}
 
-                            </MapView>
-                        )}
+                                                    >
+                                                        <View style={{
+                                                            backgroundColor: 'white',
+                                                            padding: 3,
+                                                            borderRadius: 25,
+                                                            shadowColor: '#000',
+                                                            shadowOffset: { width: 0, height: 2 },
+                                                            shadowOpacity: 0.2,
+                                                            shadowRadius: 4,
+                                                            elevation: 3
+                                                        }}>
+                                                            <View style={{
+                                                                width: 30,
+                                                                height: 30,
+                                                                borderRadius: 20,
+                                                                borderWidth: 2,
+                                                                borderColor: getColorForDistance(distance),
+                                                                overflow: 'hidden'
+                                                            }}>
+                                                                <Image
+                                                                    source={profile.image}
+                                                                    style={{
+                                                                        width: '100%',
+                                                                        height: '100%',
+                                                                        resizeMode: 'cover'
+                                                                    }}
+                                                                />
+                                                            </View>
+                                                        </View>
+                                                    </Marker>
+                                                );
+                                            })}
+
+                                        </MapView>
+                                    )}
 
 
+                                </View>
+
+                            </View>
+                        }
+                    </>
+                ) : (
+                    <View style={{ flex: 1, backgroundColor: "white", padding: 20, alignItems: "center", justifyContent: "center" }}>
+                        <View style={{ flex: 5, alignItems: "center", justifyContent: "center" }}>
+                            <View style={{ height: hp("10%"), marginBottom: 15, width: hp("10%"), borderRadius: "100%", alignItems: "center", justifyContent: "center" }}>
+                                <Ionicons name="people-outline" size={64} color="gray" />
+                            </View>
+                            <CustomSemiBoldPoppingText value={`No match found`} style={{ textTransform: "capitalize" }} fontSize={TEXT_SIZE.primary + 2} color={"black"} />
+                            <CustomRegularPoppingText style={{ width: wp("85%"), marginTop: 5, textAlign: "center" }} value={"We have found no one that match your profile yet"} fontSize={TEXT_SIZE.primary} color={"gray"} />
+                        </View>
                     </View>
-
-                </View>
-
+                )
             }
-
         </View>
     )
 

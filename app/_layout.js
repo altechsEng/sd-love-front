@@ -49,6 +49,8 @@ import PostEdit from "./screens/posts/postEdit";
 import EngagementRequestSent from "./screens/dating/engagementRequestSent";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import EngagementRequests from "./screens/chat/EngagementRequests";
+import AccountCreated from "./sc./screens/AccountCreated
+import AccountDeleted from "./screens/AccountDeleted";
 
 axios.defaults.baseURL = "https://sdlove-api.altechs.africa";
 // axios.defaults.baseURL = "http://127.0.0.1:8000";
@@ -124,6 +126,14 @@ export default function Application() {
 							<Stack.Screen options={{
 								header: ({ navigation }) => <View style={{ height: 70, backgroundColor: "white" }}></View>
 							}} name="Login" component={Login} />
+
+							<Stack.Screen options={{
+								headerShown: false
+							}} name="AccountDeleted" component={AccountDeleted} />
+
+							<Stack.Screen options={{
+								headerShown: false
+							}} name="AccountCreated" component={AccountCreated} />
 
 							<Stack.Screen options={{
 								headerShown: false

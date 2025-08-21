@@ -124,25 +124,25 @@ const Login = ({ navigation }) => {
 				<View style={{ position: "relative", marginVertical: 15, borderRadius: 50, paddingVertical: 0, paddingHorizontal: 36, width: "80%", backgroundColor: "rgba(181, 181, 181, 0.12)", }}>
 					<CustomTextInput secure={true} name="password" placeHolder="Password" LeftIcon={"lock"} LeftIconStyles={{ position: "absolute", top: 15, left: 18 }} RightIcon={"eye"} RightIconStyles={{ position: "absolute", top: 12, right: 18 }} setState={setPassword} state={password} />
 					{/* <View style={{position:"absolute",top:15,left:18}}>
-          <TextInputLock/>
-          </View> */}
-					{/* <TouchableOpacity style={{position:"absolute",top:12,right:18}}>
-          <TextInputEye/>
-          </TouchableOpacity> */}
+						<TextInputLock/>
+						</View> */}
+									{/* <TouchableOpacity style={{position:"absolute",top:12,right:18}}>
+						<TextInputEye/>
+						</TouchableOpacity> */}
 
-					{/* <TextInput
-            style={{
-            marginTop:3,
-            height:25, 
-            fontSize: TEXT_SIZE.primary,
-            fontFamily: FAMILLY.regular,
-            color:"#818181",
-            }}
-            placeholderTextColor="#818181"
-            placeholder="Password"
-            onChangeText={(text) => setPassword(text)}
-            name="password"
-                      ></TextInput> */}
+									{/* <TextInput
+							style={{
+							marginTop:3,
+							height:25, 
+							fontSize: TEXT_SIZE.primary,
+							fontFamily: FAMILLY.regular,
+							color:"#818181",
+							}}
+							placeholderTextColor="#818181"
+							placeholder="Password"
+							onChangeText={(text) => setPassword(text)}
+							name="password"
+									></TextInput> */}
 				</View>
 
 

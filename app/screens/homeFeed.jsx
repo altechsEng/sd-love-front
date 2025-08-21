@@ -122,7 +122,7 @@ export default function HomeFeed({ navigation }) {
 				);
 
 
- 
+
 				return response.data
 			}
 		} catch (err) {
@@ -366,47 +366,53 @@ export default function HomeFeed({ navigation }) {
 				onLayout={handleLayout}
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{ backgroundColor: "white", position: "relative" }}>
+				{allmatches.length > 0 &&
+					<>
+						<View style={{ flexDirection: "row", height: 40, alignContent: "center", alignItems: "center", justifyContent: "space-between", marginVertical: 0, paddingHorizontal: 20 }}>
+							<View ><Text style={{ fontSize: TEXT_SIZE.title, color: COLORS.gray, fontWeight: "bold", fontFamily: FAMILLY.semibold }}>New Matches</Text></View>
+							<TouchableOpacity style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+								<Text onPress={() => navigation.navigate("Match")} style={{ fontSize: TEXT_SIZE.mediam, fontFamily: FAMILLY.regular, color: COLORS.primary, marginRight: 15, textAlignVertical: "center" }}>see all</Text>
+								<View style={{ marginTop: 1 }}><HomeFeedSmallArrowRight /></View>
+							</TouchableOpacity>
+						</View>
 
-				<View style={{ flexDirection: "row", height: 40, alignContent: "center", alignItems: "center", justifyContent: "space-between", marginVertical: 0, paddingHorizontal: 20 }}>
-					<View ><Text style={{ fontSize: TEXT_SIZE.title, color: COLORS.gray, fontWeight: "bold", fontFamily: FAMILLY.semibold }}>New Matches</Text></View>
-					<TouchableOpacity style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
-						<Text onPress={() => navigation.navigate("Match")} style={{ fontSize: TEXT_SIZE.mediam, fontFamily: FAMILLY.regular, color: COLORS.primary, marginRight: 15, textAlignVertical: "center" }}>see all</Text>
-						<View style={{ marginTop: 1 }}><HomeFeedSmallArrowRight /></View>
-					</TouchableOpacity>
-				</View>
+						<View style={{ paddingLeft: 20 }}>
+							<FlatList
+								data={allmatches.length > 0 ? allmatches : newMatches}
+								renderItem={renderMatches}
+								keyExtractor={(item) => item?.key || item?.id}
+								horizontal={true}
+								showsHorizontalScrollIndicator={false}
+								style={{ height: 180 }}
 
-				<View style={{ paddingLeft: 20 }}>
-					<FlatList
-						data={allmatches.length > 0 ? allmatches : newMatches}
-						renderItem={renderMatches}
-						keyExtractor={(item) => item?.key || item?.id}
-						horizontal={true}
-						showsHorizontalScrollIndicator={false}
-						style={{ height: 180 }}
+								onEndReached={loadMoreMatch}
+								onEndReachedThreshold={0.5}
+								ListFooterComponent={renderLoaderMatch}
+								ListFooterComponentStyle={{ alignItems: "center", justifyContent: "center" }}
 
-						onEndReached={loadMoreMatch}
-						onEndReachedThreshold={0.5}
-						ListFooterComponent={renderLoaderMatch}
-						ListFooterComponentStyle={{ alignItems: "center", justifyContent: "center" }}
+							/>
+						</View>
+					</>
+				}
 
-					/>
-				</View>
-
-
-				<View style={{ paddingLeft: 20 }}>
-					<FlatList
-						data={allPosts.length == 0 ? posts : allPosts}
-						renderItem={renderPosts}
-						keyExtractor={(item) => item?.key || item?.id}
-						horizontal={false}
-						scrollEnabled={false}
-						showsHorizontalScrollIndicator={false}
-						onEndReached={loadMoreMatch}
-						onEndReachedThreshold={0.5}
-						ListFooterComponent={renderLoader}
-						ListFooterComponentStyle={{ alignItems: "center", justifyContent: "center", paddingBottom: 50 }}
-					/>
-				</View>
+				{allPosts.length > 0 &&
+					<>
+						<View style={{ paddingLeft: 20 }}>
+							<FlatList
+								data={allPosts.length == 0 ? posts : allPosts}
+								renderItem={renderPosts}
+								keyExtractor={(item) => item?.key || item?.id}
+								horizontal={false}
+								scrollEnabled={false}
+								showsHorizontalScrollIndicator={false}
+								onEndReached={loadMoreMatch}
+								onEndReachedThreshold={0.5}
+								ListFooterComponent={renderLoader}
+								ListFooterComponentStyle={{ alignItems: "center", justifyContent: "center", paddingBottom: 50 }}
+							/>
+						</View>
+					</>
+				}
 				<View style={{ height: 100 }}></View>
 			</ScrollView>
 			<TouchableOpacity clasName={'absolute'} onPress={() => navigation.navigate("PostAdd")} style={{ height: 50, width: 50, position: "absolute", zIndex: 99, bottom: 20, right: 10, borderRadius: 100, backgroundColor: "#2E2E2E", alignItems: "center", justifyContent: "center" }}>

@@ -8,7 +8,7 @@ import { FlatList } from 'react-native-gesture-handler'
 import dayjs from 'dayjs'
 import axios from 'axios'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { PostScreenDots, ProfileScreenPostDelete } from '../../components/vectors'
+import { MatchConnectionBackArrow, PostScreenDots, ProfileScreenPostDelete } from '../../components/vectors'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 const EngagementRequests = ({ navigation }) => {
@@ -67,7 +67,7 @@ const EngagementRequests = ({ navigation }) => {
     const acceptEngagementRequest = async () => {
         setisLoading(true);
         let token = await AsyncStorage.getItem("user_token");
-        let data = { userId: await AsyncStorage.getItem("user_id"),  requestId: selectedRequest.id }
+        let data = { userId: await AsyncStorage.getItem("user_id"), requestId: selectedRequest.id }
 
         if (token) {
             axios.post('/api/accept-engagement-request', data, { headers: { "Authorization": `Bearer ${token}` } })
@@ -131,8 +131,11 @@ const EngagementRequests = ({ navigation }) => {
     return (
         <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
             {/* Screen Header */}
-            <View clasName={'flex flex-row items-center justify-between py-4'} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 10, backgroundColor: "white", position: "relative", borderBottomWidth: 0, borderColor: COLORS.light }}>
-                <View style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "flex-start", paddingLeft: 20 }}>
+            <View clasName={'flex flex-row items-center justify-between py-4'} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 10, paddingHorizontal: 10, backgroundColor: "white", position: "relative", borderBottomWidth: 0, borderColor: COLORS.light }}>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={{ alignItems: "flex-start", justifyContent: "flex-start", marginRight:10 }}>
+                    <MatchConnectionBackArrow />
+                </TouchableOpacity>
+                <View style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "flex-start" }}>
                     <CustomSemiBoldPoppingText fontSize={TEXT_SIZE.title + 4} value="Engament requests" style={{ textAlign: "left" }} color={'black'} />
                 </View>
 
