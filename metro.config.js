@@ -17,6 +17,9 @@ config.resolver = {
   sourceExts: [...config.resolver.sourceExts, 'svg'],
 };
 
+config.resolver.assetExts.push('worklets');
+
+// module.exports = withNativeWind(config, { input: './global.css' });
 module.exports = wrapWithReanimatedMetroConfig(withNativeWind(config, { input: './global.css' }));
 
 // module.exports = config;  

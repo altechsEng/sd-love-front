@@ -2,7 +2,8 @@
   "expo": {
     "name": "sdlove-app",
     "slug": "sdlove-app",
-    "version": "1.0.0",
+    "scheme": "sdloveapp",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -15,8 +16,13 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.maindev.sdloveapp",
+      "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "Allow SDlove to access your camera to verify your identity for safe Christian connections, share video teachings, participate in live prayer sessions, and enable faith-based video dating with accountability features. We respect your modesty and values in all media interactions.",
+        "NSPhotoLibraryUsageDescription": "SDlove requests photo access to share faith-based content including scripture images, church event photos, and profile pictures that reflect Christian values. All shared photos are moderated for appropriate content.",
+        "NSPhotoLibraryAddUsageDescription": "Allow SDlove to save prayer journals, Bible study materials, and faith-inspired artwork to your library. We will never modify or access other photos without your permission.",
+        "NSLocationWhenInUseUsageDescription": "Used to connect you with nearby believers for Bible studies, church events, and accountable dating. Your exact location is never shared publicly - only approximate distances to maintain safety."
       }
     },
     "android": {
@@ -39,11 +45,31 @@
       [
         "expo-build-properties",
         {
+          "android": {
+            "newArchEnabled": false
+          },
           "ios": {
-            "useFrameworks": "static"
+            "useFrameworks": "static",
+            "newArchEnabled": false
           }
         }
-      ]
+      ],
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-video",
+        {
+          "supportsBackgroundPlayback": true,
+          "supportsPictureInPicture": true
+        }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
+        }
+      ],
+      "expo-localization"
     ],
     "extra": {
       "eas": {
