@@ -35,10 +35,8 @@ import { ThemedButton } from "@/src/components/ThemedButton";
 import Email from "@/src/components/icons/Email";
 import Lock from "@/src/components/icons/Lock";
 
-type LoginFormData = {
+type recoverFormData = {
   email: string;
-  password: string;
-  device_name: string;
 };
 
 type ApiResponse = {
@@ -55,12 +53,12 @@ type ApiResponse = {
   user_image?: string;
 };
 
-const Login = () => {
-  const { user, isAuthenticated, error, setError, isLoading, login } =
+const ResetPassword = () => {
+  const { user, isAuthenticated, error, setError, isLoading, recoverPass } =
     useAuth();
   //   const { err, setErr } = useGlobalVariable();
   const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+ 
 
   const scheme = useColorScheme();
   const theme = scheme === "dark" ? colors.dark : colors.light;
@@ -70,19 +68,16 @@ const Login = () => {
   }, []);
 
   const handleSubmission = async (): Promise<void> => {
-    const data: LoginFormData = {
+    const data: recoverFormData = {
       email: email.trim(),
-      password: password.trim(),
-      device_name: deviceName ?? "",
+ 
     };
-
-    login(data);
+    recoverPass(data);
   };
 
   return (
     <View className={"flex-1 bg-white px-10"}>
-      {/* <View style={{ flex: 2, height: 70 }}></View> */}
-
+      
       <View
         className={"relative flex-1 justify-center"}
         style={{ alignItems: "center" }}
@@ -99,65 +94,8 @@ const Login = () => {
         >
           SDLOVE
         </Text>
-        <Text
-          style={{
-            fontSize: TEXT_SIZE.title * 1.2,
-            color: COLORS.gray,
-            fontWeight: "bold",
-            fontFamily: FAMILLY.semibold,
-            marginVertical: 10,
-            marginBottom: 30,
-          }}
-        >
-          Se connecter
-        </Text>
-
-        {/* <View
-          style={{
-            position: "relative",
-            borderRadius: 50,
-            paddingVertical: 0,
-            paddingHorizontal: 36,
-            width: "80%",
-            backgroundColor: "rgba(181, 181, 181, 0.12)",
-          }}
-        >
-          <CustomTextInput
-            RightIconStyles={null}
-            secure={false}
-            name="email"
-            placeHolder="Email"
-            LeftIcon={"person"}
-            LeftIconStyles={{ position: "absolute", top: 15, left: 18 }}
-            RightIcon={null}
-            setState={setEmail}
-            state={email}
-          />
-        </View>
-
-        <View
-          style={{
-            position: "relative",
-            marginVertical: 15,
-            borderRadius: 50,
-            paddingVertical: 0,
-            paddingHorizontal: 36,
-            width: "80%",
-            backgroundColor: "rgba(181, 181, 181, 0.12)",
-          }}
-        >
-          <CustomTextInput
-            secure={true}
-            name="password"
-            placeHolder="Password"
-            LeftIcon={"lock"}
-            LeftIconStyles={{ position: "absolute", top: 15, left: 18 }}
-            RightIcon={"eye"}
-            RightIconStyles={{ position: "absolute", top: 12, right: 18 }}
-            setState={setPassword}
-            state={password}
-          />
-        </View> */}
+       
+ 
 
         <View className='flex flex-col w-full gap-6'>
           <View className="flex flex-col w-full gap-4">
@@ -170,15 +108,7 @@ const Login = () => {
               leftIcon={<Email color={theme.textSecondary} />}
             />
 
-            {/* password field */}
-            <ThemedInput
-              placeholder="Mot de passe"
-              value={password}
-              onChangeText={setPassword}
-              borderRadius={25}
-              secureTextEntry={true}
-              leftIcon={<Lock color={theme.textSecondary} />}
-            />
+ 
           </View>
           <View
             style={{
@@ -189,46 +119,15 @@ const Login = () => {
             }}
           >
             <ThemedText variant="caption" color="textPrimary">
-              Mot de passe oublié ?{" "}
+              Veiller entre votre adresse mail pour obtenir un nouvau mot de passe {" "}
             </ThemedText>
-            <Link href={"/reset-password"} asChild>
-              <TouchableOpacity style={{ marginTop: 1 }}>
-                <ThemedText variant="caption" color="main">
-                  Reinitialiser
-                </ThemedText>
-              </TouchableOpacity>
-            </Link>
+ 
           </View>
 
-          {/* <TouchableOpacity
-          className={"mb-5"}
-          onPress={() => handleSubmission()}
-          style={{
-            backgroundColor: COLORS.primary,
-            paddingVertical: 15,
-            marginTop: 20,
-            paddingHorizontal: 20,
-            width: "75%",
-            borderRadius: 100,
-          }}
-        >
-          {isLoading === true ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <Text
-              style={{
-                color: "white",
-                textAlign: "center",
-                fontFamily: FAMILLY.regular,
-              }}
-            >
-              Login
-            </Text>
-          )}
-        </TouchableOpacity> */}
+   
           <ThemedButton
             label="Connexion"
-			borderRadius={25}
+               borderRadius={25}
             onPress={() => handleSubmission()}
             variant="filled"
             isLoading={isLoading}
@@ -252,7 +151,7 @@ const Login = () => {
             flexDirection: "row",
           }}
         >
-		  <ThemedText variant="caption" color="textPrimary">
+            <ThemedText variant="caption" color="textPrimary">
             Vous n'avez pas un compte ?{" "}
           </ThemedText>
           <Link href={"/register-step-1"} asChild>
@@ -268,4 +167,48 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default ResetPassword;
+
+
+
+
+
+//recover 
+     // recover password
+//        public function recover(Request $request, $lang = "en")
+//     {
+        
+//         try {
+//         App::SetLocale($lang);
+        
+//         $request->validate([
+//             'email' => 'required|email',
+//         ]);
+        
+//         $email =  $request->email;
+//         $password = Str::password(8,true,false,false,false);
+        
+//         $user = User::where('email', $email)->first();
+        
+//         $name =  $user->name;
+            
+//         User::where('id', $user->id)->update([
+//                     'password' => Hash::make($password)
+//             ]);
+                
+//             // Mail::to($request->user())->send(new RecoverPassword( $name, $email, $password));
+//             Mail::to($request->email)->send(new RecoverPassword( $name, $email, $password));
+
+//             return response()->json([
+//                     'status' => 200,
+//                     'message' => 'user password is sucessfully updated',
+//             ]);
+//         } catch(\Exception $e) {
+//             return response()->json([
+//                     'status' => 500,
+//                     'message' => $e->getMessage(),
+//             ]);
+//         }
+        
+            
+//     }

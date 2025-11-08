@@ -16,6 +16,7 @@ type AuthContextType = {
   setError: any;
   login: (credentials: any) => Promise<any>;
   register: (userData: any) => Promise<any>;
+  recoverPass:(resetPassData: any) => Promise<any>;
   logout: () => void;
   isAuthenticated: boolean;
   userData: object;
@@ -37,6 +38,10 @@ type credentials = {
   email: string;
   password: string;
   device_name: string;
+};
+
+type resetPass = {
+  email: string;
 };
 
 type registerData = {
@@ -128,6 +133,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (status === 200) {
         // return console.log(user_token)
+         
         await AsyncStorage.setItem("user", JSON.stringify(userData));
         await AsyncStorage.setItem("user_token", user_token);
         setUserData({ ...userData, dob: userData?.user_info?.qP2 })
@@ -138,7 +144,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return router.replace("/protected/(tabs)");
       }
     } catch (e: any) {
-      console.log(e, "Une erreur s'est produite lors de l'authentification");
+      console.log(e.request,e, "Une erreur s'est produite lors de l'authentification");
       setError("Une erreur s'est produite lors de l'authentification");
       setIsLoading(false);
     }
@@ -182,6 +188,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // api.post("/logout");
   };
 
+
+  const recoverPass = async (resetPassData: resetPass) => {
+
+    setIsLoading(true);
+
+    try {
+      const response = await api.post("/recover-password", resetPassData);
+      console.log(response.data,"response . data")  
+      const { status, error } = response.data;
+  
+
+      if (error || status === 500) {
+        setIsLoading(false);
+        return setError(error || "Une erreur s'est produite");
+      }
+  
+      if (status === 200) {
+        setError("");
+        setIsLoading(false);
+        return router.replace("/(auth)/login");
+      }
+      
+    } catch (e:any) {
+      setError("Une erreur s'est produite lors de la reinitialisation du mot de passe");
+      setIsLoading(false);
+    }
+
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -195,6 +230,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         login,
         register,
         logout,
+        recoverPass,
         isAuthenticated: !!user,
       }}
     >

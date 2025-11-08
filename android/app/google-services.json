@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "256434205831",
+    "project_id": "sdlove-9f43f",
+    "storage_bucket": "sdlove-9f43f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:256434205831:android:ac70f8a3133c94fdc0b422",
+        "android_client_info": {
+          "package_name": "com.maindev.sdloveapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDpoqtEgpfRCuLF6T8i6BBmE0QX4O9AbM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
