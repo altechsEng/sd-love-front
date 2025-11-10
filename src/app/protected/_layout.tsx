@@ -3,8 +3,8 @@ import axios from "axios";
 import { Redirect, Stack } from "expo-router";
 import React from "react";
 
-// axios.defaults.baseURL = "https://sdlove-api.altechs.africa";
-axios.defaults.baseURL = "http://192.168.1.103:8000";
+axios.defaults.baseURL = "https://sdlove-api.altechs.africa";
+// axios.defaults.baseURL = "http://192.168.1.103:8000";
 axios.defaults.headers.post["Accept"] = "application/json";
 axios.defaults.headers.post["Content-Type"] = "application/json";
 axios.defaults.headers.post["Content-Type"] = "multipart/form-data";

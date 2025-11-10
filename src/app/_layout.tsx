@@ -6,7 +6,6 @@ import "../../global.css";
 import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { GlobalVariableProvider } from "../context/global";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { AuthProvider, useAuth } from "@/src/context/AuthContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";
@@ -69,7 +68,8 @@ function RootLayoutNav() {
           <AuthProvider>
             <QueryClientProvider client={queryClient}>
               <StatusBar style="auto" />
-              <Stack>
+             
+                <Stack>
                 <Stack.Screen name="(auth)" options={{ headerShown: false }} />
                 <Stack.Screen
                   name="protected"
@@ -77,6 +77,7 @@ function RootLayoutNav() {
                 />
                 {/* <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> */}
               </Stack>
+              
             </QueryClientProvider>
           </AuthProvider>
         </GlobalVariableProvider>

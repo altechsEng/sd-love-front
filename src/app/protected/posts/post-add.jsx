@@ -17,6 +17,7 @@ import {
 import { CustomRegularPoppingText } from "../../../components/text"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PostAddHeader from '../../../components/postAddHeader';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window')
 
@@ -54,7 +55,7 @@ const PostAdd = ({ navigation }) => {
 						source={{ uri: item.img.uri }}
 						style={{ height: "100%", width: "100%" }}
 						resizeMode="cover"
-						shouldPlay={false}
+						shouldPlay={true}
 						useNativeControls={false}
 					/>
 				) : (
@@ -126,25 +127,28 @@ const PostAdd = ({ navigation }) => {
 			if (!hasPermission) return;
 
 			let result = await ImagePicker.launchImageLibraryAsync({
-				mediaTypes: ['images'],
-				allowsEditing: true,
+				mediaTypes: ImagePicker.MediaTypeOptions.All,
+				allowsEditing: false,
+				videoMaxDuration:MAX_VIDEO_DURATION,
 				aspect: [4, 4],
-				quality: 0.7,
+				quality: 1,
 			});
 
 			if (!result.canceled && result.assets.length > 0) {
-				const validAssets = await Promise.all(
-					result.assets.map(async asset => {
-						const isValidSize = await checkFileSize(asset.uri);
-						return isValidSize ? asset : null;
-					})
-				);
+				// const validAssets = await Promise.all(
+				// 	result.assets.map(async asset => {
+				// 		const isValidSize = await checkFileSize(asset.uri);
+				// 		return isValidSize ? asset : null;
+				// 	})
+				// );
 
-				const newImages = validAssets
+				const newImages = result.assets
 					.filter(asset => asset !== null)
 					.map(asset => ({
 						id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-						img: { uri: asset.uri, type: asset.type, name: asset.fileName }
+						img: { uri: asset.uri, type: asset.type , name: asset.fileName },
+						isVideo:asset.type=="video",
+						videoUri:asset.type=="video"? asset.uri:null
 					}));
 
 				if (newImages.length > 0) {
@@ -167,7 +171,7 @@ const PostAdd = ({ navigation }) => {
 			if (!hasPermission) return;
 
 			let result = await ImagePicker.launchImageLibraryAsync({
-				mediaTypes: ['images', 'videos'],
+				mediaTypes: ImagePicker.MediaTypeOptions.Images,
 				allowsEditing: false,
 				aspect: [4, 3],
 				quality: 1,
@@ -175,9 +179,7 @@ const PostAdd = ({ navigation }) => {
 
 			if (!result.canceled && result.assets.length > 0) {
 				const asset = result.assets[0];
-				const isValidSize = await checkFileSize(asset.uri);
-
-				if (!isValidSize) return;
+				 
 
 				// Check if the selected file is a GIF (simple check by extension)
 				if (asset.uri.toLowerCase().endsWith('.gif')) {
@@ -214,14 +216,16 @@ const PostAdd = ({ navigation }) => {
 
 			if (!result.canceled && result.assets.length > 0) {
 				const asset = result.assets[0];
-				const isValidSize = await checkFileSize(asset.uri);
+				// const isValidSize = await checkFileSize(asset.uri);
 
-				if (isValidSize) {
-					setImages(prev => [...prev, {
+				// if (isValidSize) {
+
+				// }
+
+				setImages(prev => [...prev, {
 						id: ` ${Date.now()}_photo`,
 						img: { uri: asset.uri, type: asset.type, name: asset.fileName }
 					}]);
-				}
 			}
 		} catch (error) {
 			console.error("Camera error:", error);
@@ -239,29 +243,40 @@ const PostAdd = ({ navigation }) => {
 			if (!hasPermission) return;
 
 			let result = await ImagePicker.launchCameraAsync({
-				mediaTypes: ['videos'],
+				mediaTypes: ImagePicker.MediaTypeOptions.Videos,
 				allowsEditing: false,
 				aspect: [4, 4],
-				quality: Camera.Constants.VideoQuality["480p"],
+				quality: 1,
 				videoMaxDuration: MAX_VIDEO_DURATION,
 			});
 
 			if (!result.canceled && result.assets.length > 0) {
 				const asset = result.assets[0];
-				const isValidSize = await checkFileSize(asset.uri);
+				console.log(asset,"in video")
+				// const isValidSize = await checkFileSize(asset.uri);
 
 
-				if (isValidSize) {
-					// Generate thumbnail
-					const thumbnail = await generateVideoThumbnail(asset.uri);
+				// if (isValidSize) {
+				// 	// Generate thumbnail
+				// 	const thumbnail = await generateVideoThumbnail(asset.uri);
 
+				// 	setImages(prev => [...prev, {
+				// 		id: `${Date.now()}_video`,
+				// 		img: { uri: thumbnail },
+				// 		videoUri: asset.uri,
+				// 		isVideo: true
+				// 	}]);
+				// }
+
+					 
+					 
 					setImages(prev => [...prev, {
 						id: `${Date.now()}_video`,
-						img: { uri: thumbnail },
+						img: { uri: asset.uri,type:asset.type,name:asset.fileName },
 						videoUri: asset.uri,
 						isVideo: true
 					}]);
-				}
+				
 			}
 		} catch (error) {
 			console.error("Video recording error:", error);
@@ -294,19 +309,20 @@ const PostAdd = ({ navigation }) => {
 	return (
 		<>
 			<PostAddHeader />
-			{isLoading ?
+		
+							{isLoading ?
 				<View style={{ flex: 1, backgroundColor: "white", alignItems: "center", justifyContent: "center" }}>
 					<ActivityIndicator size={34} color={COLORS.primary} />
 					<CustomRegularPoppingText style={{}} color={COLORS.black} fontSize={TEXT_SIZE.primary} value="Loading please wait..." />
 				</View>
 				:
-				<View style={{ flex: 1, backgroundColor: "white" }}>
+				<SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
 					<TextInput
 						placeholder='Express your thoughts....'
 						multiline={true}
 						value={thoughts}
 						onChangeText={(text) => setThoughts(text)}
-						style={{ flex: 1, backgroundColor: "white", textAlignVertical: "top", paddingLeft: 20, paddingTop: 20 }}
+						style={{ flex: 1, backgroundColor: "white", textAlignVertical: "top", paddingLeft: 20, paddingTop: 0 }}
 					/>
 
 					<View style={{ backgroundColor: "white", marginVertical: 20, paddingHorizontal: 20 }}>
@@ -356,7 +372,8 @@ const PostAdd = ({ navigation }) => {
 							<PostScreenMediaVideo fill={isProcessing ? COLORS.light : COLORS.dark} />
 						</TouchableOpacity>
 					</View>
-				</View>}
+				</SafeAreaView>}
+		 
 		</>
 	)
 }

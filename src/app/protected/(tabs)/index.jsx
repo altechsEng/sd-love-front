@@ -25,7 +25,7 @@ dayjs.extend(relativeTime)
 
 export default function Index() {
 
-	const navigation = useNavigation;
+	const navigation = useNavigation();
 
 	const [contentHeight, setContentHeight] = useState(0);
 	const [scrollViewHeight, setScrollViewHeight] = useState(0);
@@ -249,7 +249,7 @@ export default function Index() {
 					</TouchableOpacity>
 				</View>
 
-				<Pressable onPress={() => navigation.navigate("/protected/posts/posts", { item })} style={{ margin: 0, padding: 0, overflow: "hidden" }}>
+				<Pressable onPress={() => router.navigate("/protected/posts/posts", { item })} style={{ margin: 0, padding: 0, overflow: "hidden" }}>
 					<View style={{ marginVertical: 10 }}>
 						<Text style={{ lineHeight: 22, color: COLORS.black, fontSize: TEXT_SIZE.primary, fontWeight: FAMILLY.light }}>
 							{item?.text}

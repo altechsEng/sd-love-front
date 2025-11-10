@@ -21,6 +21,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import CustomProfileScreenHeader from "../../../components/customProfileScreenHeader";
 import { router, Stack } from "expo-router";
 import { useAuth } from "@/src/context/AuthContext";
+import { Ionicons } from "@expo/vector-icons";
 
 dayjs.extend(relativeTime)
 
@@ -36,12 +37,14 @@ const ProfileScreen = () => {
     const [churchOccupations, setchurchOccupations] = useState(["Travel", "Music", "Fishing", "Gym", "Bible", "Dance"])
 
     useEffect(() => {
-        setchurchOccupations(userData?.user_infos?.qS10 || ["Travel", "Music", "Fishing", "Gym", "Bible", "Dance"])
-        console.log(userData);
-        console.log(userData?.user_infos?.qS10);
+ 
+        let interest = JSON.parse(userData?.user_info?.qS10)
+        setchurchOccupations(interest || ["Travel", "Music", "Fishing", "Gym", "Bible", "Dance"])
+        console.log(userData,"data......");
+        // console.log(Object.keys(userData),"q20....",userData?.user_info?.qS10 );
         // console.log(interests);
-        // console.log(userData.user_infos);
-        // console.log(JSON.parse(userData.user_infos.qP16));
+        // console.log(userData.user_info);
+        // console.log(JSON.parse(userData.user_info.qP16));
     }, [])
 
     const [activePostItem, setActivePostItem] = useState(null)
@@ -109,7 +112,7 @@ const ProfileScreen = () => {
     const [interest, setInterest] = useState(["Travel", "Music", "Fishing", "Gym", "Bible", "Dance"])
     useEffect(() => {
         if (activeSubCat == "About") {
-            let data = userData?.user_infos?.qP16
+            let data = userData?.user_info?.qP16
             setInterest(data)
         }
     }, [activeSubCat])
@@ -294,7 +297,7 @@ const ProfileScreen = () => {
     const logout = () => {
         AsyncStorage.removeItem("user_data").then(() => {
             AsyncStorage.removeItem("user_token").then(() => {
-                navigation.navigate("Login")
+                router.navigate("login")
             })
         });
     }
@@ -399,7 +402,7 @@ const ProfileScreen = () => {
                             </View>
 
                             <View style={{ alignItems: "flex-start", flexDirection: "column", justifyContent: "flex-start", marginTop: 9 }}>
-                                <CustomSemiBoldPoppingText style={{ marginRight: 5, lineHeight: 14 }} fontSize={TEXT_SIZE.primary} color={"black"} value={userData.firstname + ' ' + userData.lastname} />
+                                <CustomSemiBoldPoppingText style={{ marginRight: 5, lineHeight: 14 }} fontSize={TEXT_SIZE.primary} color={"black"} value={userData?.user?.firstname + ' ' + userData?.user?.lastname} />
 
                                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                                     <CustomRegularPoppingText style={{ marginRight: 5 }} fontSize={TEXT_SIZE.small - 1} color={"#A0A7AE"} value={`18 posts`} />
@@ -478,7 +481,7 @@ const ProfileScreen = () => {
                                     <View style={{ marginRight: 20, backgroundColor: COLORS.light, height: 30, width: 30, alignItems: "center", borderRadius: 20, justifyContent: "center" }}><MatchProfileSexIcon /></View>
                                     <View>
                                         <CustomRegularPoppingText style={{ lineHieght: 8 }} color={null} fontSize={TEXT_SIZE.small} value="Gender" />
-                                        <CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary} value={userData?.user_infos?.qP1 || "Not specified"} />
+                                        <CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary} value={userData?.user_info?.qP1 || "Not specified"} />
                                     </View>
                                 </View>
 
@@ -486,7 +489,7 @@ const ProfileScreen = () => {
                                     <View style={{ marginRight: 20, backgroundColor: COLORS.light, height: 30, width: 30, alignItems: "center", borderRadius: 20, justifyContent: "center" }}><MatchProfileBirthDay /></View>
                                     <View>
                                         <CustomRegularPoppingText style={{ lineHieght: 8 }} color={null} fontSize={TEXT_SIZE.small} value="Birthday" />
-                                        <CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary} value={dayjs(userData?.user_infos?.qP2).format("DD MMMM YYYY") || "Not specified"} />
+                                        <CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary} value={dayjs(userData?.user_info?.qP2).format("DD MMMM YYYY") || "Not specified"} />
                                     </View>
                                 </View>
 
@@ -494,7 +497,7 @@ const ProfileScreen = () => {
                                     <View style={{ marginRight: 20, backgroundColor: COLORS.light, height: 30, width: 30, alignItems: "center", borderRadius: 20, justifyContent: "center" }}><MatchProfileHome /></View>
                                     <View>
                                         <CustomRegularPoppingText style={{ lineHieght: 8 }} color={null} fontSize={TEXT_SIZE.small} value="Home" />
-                                        <CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary} value={userData.address + ', ' + userData.city + ', ' + userData.country} />
+                                        <CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary} value={userData?.user?.address + ', ' + userData?.user.city + ', ' + userData?.user?.country} />
                                     </View>
                                 </View>
 
@@ -514,7 +517,7 @@ const ProfileScreen = () => {
                                     <View style={{ marginRight: 20, backgroundColor: COLORS.light, height: 30, width: 30, alignItems: "center", borderRadius: 20, justifyContent: "center" }}><MatchProfileFaithIcon1 /></View>
                                     <View>
                                         <CustomRegularPoppingText style={{ lineHieght: 8 }} color={null} fontSize={TEXT_SIZE.small} value="Gave my life to God" />
-                                        <CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary} value={userData?.user_infos?.qS2} />
+                                        <CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary} value={userData?.user_info?.qS2} />
                                     </View>
                                 </View>
 
@@ -531,11 +534,11 @@ const ProfileScreen = () => {
                                     <View>
                                         <CustomRegularPoppingText style={{ lineHieght: 8 }} color={null} fontSize={TEXT_SIZE.small} value="Occupation" />
                                         <View className={''} style={{ flexDirection: "row", flexWrap: "wrap" }}>
-                                            {/* {churchOccupations.map((d) => (
+                                            {churchOccupations.map((d) => (
                                                 <View className={'mr-2'} key={d} style={{ marginRight: 10, marginBottom: 5, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, backgroundColor: COLORS.light }}>
                                                     <CustomRegularPoppingText fontSize={TEXT_SIZE.small} color={null} value={d} />
                                                 </View>
-                                            ))} */}
+                                            ))}
                                         </View>
                                     </View>
                                 </View>
@@ -548,7 +551,7 @@ const ProfileScreen = () => {
                                     <View style={{ marginRight: 20, backgroundColor: COLORS.light, height: 30, width: 30, alignItems: "center", borderRadius: 20, justifyContent: "center" }}><MatchProfileEducation /></View>
                                     <View>
                                         <CustomRegularPoppingText style={{ lineHieght: 8 }} color={null} fontSize={TEXT_SIZE.small} value="Education" />
-                                        <CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary} value={userData?.user_infos?.qP11 || "Not specified"} />
+                                        <CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary} value={userData?.user_info?.qP11 || "Not specified"} />
                                     </View>
                                 </View>
                             </View>
@@ -557,7 +560,7 @@ const ProfileScreen = () => {
                                     <View style={{ marginRight: 20, backgroundColor: COLORS.light, height: 30, width: 30, alignItems: "center", borderRadius: 20, justifyContent: "center" }}><MatchProfileEducation /></View>
                                     <View>
                                         <CustomRegularPoppingText style={{ lineHieght: 8 }} color={null} fontSize={TEXT_SIZE.small} value="Profession" />
-                                        <CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary} value={userData?.user_infos?.qP17 || "Not specified"} />
+                                        <CustomRegularPoppingText style={{ lineHeight: 15 }} color={null} fontSize={TEXT_SIZE.primary} value={userData?.user_info?.qP17 || "Not specified"} />
                                     </View>
                                 </View>
                             </View>

@@ -119,7 +119,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     try {
       const response = await api.post("/login", credentials);
-      const { user: userData, user_token, status, error } = response.data;
+      // const { user: userData, user_token, status, error } = response.data;
+      const { user_data:userData, user_token, status, error } = response.data;
 
       if (status === 401) {
         setIsLoading(false);
@@ -138,7 +139,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         await AsyncStorage.setItem("user_token", user_token);
         setUserData({ ...userData, dob: userData?.user_info?.qP2 })
         setUser(userData);
-        setImage(userData?.user_image)
+        console.log(userData?.user?.user_image,"image image.....")
+        setImage(userData?.user?.user_image)
         setError("");
         setIsLoading(false);
         return router.replace("/protected/(tabs)");

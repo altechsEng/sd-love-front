@@ -11,7 +11,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Stack } from "expo-router";
+import { router, Stack } from "expo-router";
 import { useAuth } from "../context/AuthContext";
 
 const PostAddHeader = ({ navigation }) => {
@@ -48,10 +48,12 @@ const PostAddHeader = ({ navigation }) => {
 			formData.append('post_id', postId);
 
 			postAddData?.media?.forEach((data) => {
+				console.log(data?.img,"Daat dot image ",data?.img?.type === "video" ?"video/mp4":data?.img?.type === "gif" ? "image/gif":"image/jpeg")
 				formData.append('media[]', {
 					uri: data?.img?.uri,
 					name: "uploadImg.jpg",
-					type: "image/jpeg"
+					type: data?.img?.type === "video" ?"video/mp4":data?.img?.type === "gif" ? "image/gif":"image/jpeg"
+				 
 				});
 			});
 
@@ -89,7 +91,7 @@ const PostAddHeader = ({ navigation }) => {
 			]);
 
 			ToastAndroid.show("Post created successfully", ToastAndroid.SHORT);
-			navigation.goBack();
+			router.back();
 		} catch (error) {
 			console.error("Error in post creation flow:", error);
 		} finally {
@@ -108,7 +110,7 @@ const PostAddHeader = ({ navigation }) => {
 							<Image source={{ uri: `${image}` }} style={{ height: "100%", width: "100%" }} />
 						</View>
 
-						<CustomSemiBoldPoppingText style={{}} fontSize={TEXT_SIZE.primary} color={"black"} value={`${userData?.firstname} ${userData?.lastname}` || 'Sam Orlan'} />
+						<CustomSemiBoldPoppingText style={{}} fontSize={TEXT_SIZE.primary} color={"black"} value={`${userData?.user?.firstname} ${userData?.user?.lastname}` || 'Sam Orlan'} />
 
 					</View>
 				),

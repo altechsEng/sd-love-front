@@ -661,7 +661,7 @@ const BlogPostScreen = ({ navigation }) => {
               <TouchableOpacity>
                 <HomeFeedComment stroke={"#2E2E2E"} fill={"white"} />
               </TouchableOpacity>
-              <Text style={styles.postActionCount}>{mainItem.comment_count > 0 ? mainItem.comment_count : ''}</Text>
+              <Text style={styles.postActionCount}>{mainItem?.comment_count > 0 ? mainItem.comment_count : ''}</Text>
             </View>
 
             {/* <View style={styles.postActionItem}>
