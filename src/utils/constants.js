@@ -130,5 +130,6 @@ export const FAMILLY = {
 //      ]
 export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 export const BaseImageUrl = `https://sdlove-api.altechs.africa/storage/app/private/public/user_images`
+export const BaseVideoUrl = `https://sdlove-api.altechs.africa/storage/app/private/public/post_media/videos`
 export const BasePostImageUrl = `https://sdlove-api.altechs.africa/storage/app/private/public/post_media`
 export const BaseChatImageUrl = `https://sdlove-api.altechs.africa/storage/app/private`

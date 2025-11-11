@@ -3,7 +3,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
-  SafeAreaView,
   FlatList,
   Image,
   TouchableOpacity,
@@ -24,13 +23,17 @@ import {
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useRoute } from '@react-navigation/native';
 import { useGlobalVariable } from '../../../context/global';
-import { BaseImageUrl, COLORS, FAMILLY, POST_LIMIT, TEXT_SIZE } from '../../../utils/constants';
+import { BaseImageUrl, BaseVideoUrl, COLORS, FAMILLY, POST_LIMIT, TEXT_SIZE } from '../../../utils/constants';
 import { HomeFeedComment, HomeFeedHeart, HomeFeedShare, PostScreenBigComment, PostScreenBookMark, PostScreenDots, PostScreenMiniHeart, ProfileScreenPostDelete, ProfileScreenPostEdit } from '../../../components/vectors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { CustomRegularPoppingText, CustomSemiBoldPoppingText } from '../../../components/text';
 import MessageSender from '../../../components/messageSender';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useLocalSearchParams } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Video } from 'expo-av';
+ 
 // import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 dayjs.extend(relativeTime);
@@ -38,7 +41,12 @@ dayjs.extend(relativeTime);
 const BlogPostScreen = ({ navigation }) => {
 
   const queryClient = useQueryClient()
-  const { item: mainItem } = useRoute().params;
+  // const { item: mainItem } = useRoute().params;
+  const {item:itemPost} = useLocalSearchParams()
+  const [mainItem,setMainItem] = useState(null)
+  useEffect(()=>{
+    setMainItem(JSON.parse(itemPost))
+  },[])
 
   const [comment, setComment] = useState("");
   const [showComment, setShowComment] = useState(true);
@@ -618,7 +626,7 @@ const BlogPostScreen = ({ navigation }) => {
 
         {/* Post Image */}
         <View style={mainItem?.media?.length >= 1 && styles.postMediaContainer}>
-          {mainItem?.media?.length === 1 ? (
+          {mainItem?.media?.length === 1 && mainItem?.media[0]?.type =="image"  ? (
             <View className='px-3'>
               <Image
                 source={{ uri: `https://sdlove-api.altechs.africa/storage/app/private/public/post_media/${mainItem?.media[0]?.url}` }}
@@ -626,20 +634,44 @@ const BlogPostScreen = ({ navigation }) => {
                 resizeMode="cover"
               />
             </View>
-          ) : mainItem?.media?.length > 1 ? (
+          ) :
+          
+          mainItem?.media?.length === 1 && mainItem?.media[0]?.type =="video"?
+          //post video
+           <View className='px-3'>
+          <Video
+            source={{ uri: `${BaseVideoUrl}/${mainItem?.media[0]?.url}`}}
+            style={{...styles.singleMedia }}
+            resizeMode="cover"
+            shouldPlay={false}
+            useNativeControls={true}
+                                  />
+        </View>
+          :
+          mainItem?.media?.length > 1 ? (
             <FlatList
               data={mainItem?.media}
               horizontal
               showsHorizontalScrollIndicator={false}
-              renderItem={({ item }) => (
+              renderItem={({ item }) =>   mainItem?.media?.length === 1 && mainItem?.media[0]?.type =="video"? 
                 <View style={styles.multiMediaItem}>
+                  <Video
+            source={{ uri: `${BaseVideoUrl}/${mainItem?.media[0]?.url}`}}
+            style={{...styles.multiMediaImage }}
+            resizeMode="cover"
+            shouldPlay={false}
+            useNativeControls={true}
+                  />
+                </View> :
+                              <View style={styles.multiMediaItem}>
                   <Image
                     source={{ uri: `https://sdlove-api.altechs.africa/storage/app/private/public/post_media/${item?.url}` }}
                     style={styles.multiMediaImage}
                     resizeMode="cover"
                   />
                 </View>
-              )}
+
+              }
               keyExtractor={(item, index) => index.toString()}
             />
           ) : (
@@ -715,7 +747,8 @@ const BlogPostScreen = ({ navigation }) => {
       </ScrollView>
 
       {/* Comment Input */}
-      <View style={styles.commentInputContainer}>
+<SafeAreaView>
+        <View style={styles.commentInputContainer}>
 
 
         <View style={styles.messageSenderContainer}>
@@ -746,6 +779,7 @@ const BlogPostScreen = ({ navigation }) => {
         </View>
 
       </View>
+</SafeAreaView>
 
       <Modal
         animationType="slide"

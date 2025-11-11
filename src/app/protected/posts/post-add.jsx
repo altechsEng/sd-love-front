@@ -8,7 +8,6 @@ import * as ImagePicker from 'expo-image-picker';
 import * as Camera from 'expo-camera';
 import { Video } from 'expo-av';
 import * as MediaLibrary from 'expo-media-library';
-import * as FileSystem from 'expo-file-system';
 import { useGlobalVariable } from '../../../context/global';
 import {
 	widthPercentageToDP as wp,
@@ -18,6 +17,9 @@ import { CustomRegularPoppingText } from "../../../components/text"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PostAddHeader from '../../../components/postAddHeader';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as FileSystem from 'expo-file-system';
+import * as VideoThumbnails from 'expo-video-thumbnails';
+
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window')
 
@@ -104,20 +106,112 @@ const PostAdd = ({ navigation }) => {
 		}
 	};
 
-	// Check file size
-	const checkFileSize = async (uri) => {
-		try {
-			const fileInfo = await FileSystem.getInfoAsync(uri);
-			if (fileInfo.size > MAX_FILE_SIZE) {
-				Alert.alert("File too large", `Please select a file smaller than ${MAX_FILE_SIZE / (1024 * 1024)}MB`);
-				return false;
-			}
-			return true;
-		} catch (error) {
-			console.error("File size check error:", error);
-			return false;
-		}
-	};
+
+ const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+
+// Create app-specific directories for better file management
+const setupDirectories = async () => {
+  try {
+    const appDir = new FileSystem.Directory(FileSystem.documentDirectory + 'app_media/');
+    const videoDir = new FileSystem.Directory(FileSystem.documentDirectory + 'app_media/videos/');
+    const tempDir = new FileSystem.Directory(FileSystem.cacheDirectory + 'temp/');
+    
+    // Ensure directories exist
+    await appDir.makeDirectoryAsync({ intermediates: true });
+    await videoDir.makeDirectoryAsync({ intermediates: true });
+    await tempDir.makeDirectoryAsync({ intermediates: true });
+    
+    return { appDir, videoDir, tempDir };
+  } catch (error) {
+    console.error('Directory setup error:', error);
+  }
+};
+
+const checkFileSize = async (uri) => {
+  try {
+    // Use File class
+    const file = new FileSystem.File(uri);
+    const fileInfo = await file.getInfoAsync();
+    
+    if (!fileInfo.exists) {
+      Alert.alert("Error", "Selected file no longer exists");
+      return false;
+    }
+
+    console.log('File size:', fileInfo.size, 'bytes');
+    
+    if (fileInfo.size > MAX_FILE_SIZE) {
+      const maxSizeMB = MAX_FILE_SIZE / (1024 * 1024);
+      const currentSizeMB = (fileInfo.size / (1024 * 1024)).toFixed(2);
+      Alert.alert(
+        "File too large", 
+        `Maximum size: ${maxSizeMB}MB\nYour file: ${currentSizeMB}MB`
+      );
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error("File size check error:", error);
+    // Allow upload to proceed if check fails
+    return true;
+  }
+};
+
+const copyFileToAppDirectory = async (sourceUri, fileName) => {
+  try {
+    await setupDirectories();
+    
+    const sourceFile = new FileSystem.File(sourceUri);
+    const destPath = FileSystem.documentDirectory + 'app_media/videos/' + fileName;
+    const destFile = new FileSystem.File(destPath);
+    
+    // Copy file to app directory for reliable access
+    await sourceFile.copyAsync(destFile);
+    
+    return destPath;
+  } catch (error) {
+    console.error('File copy error:', error);
+    return sourceUri; // Return original if copy fails
+  }
+};
+
+const generateVideoThumbnail = async (videoUri) => {
+  try {
+    const videoFile = new FileSystem.File(videoUri);
+    const fileInfo = await videoFile.getInfoAsync();
+    
+    if (!fileInfo.exists) {
+      return videoUri;
+    }
+
+    // Generate thumbnail
+    const { uri } = await VideoThumbnails.getThumbnailAsync(videoUri, {
+      time: 1000,
+      quality: 0.7,
+    });
+    
+    return uri;
+  } catch (e) {
+    console.warn("Thumbnail generation failed:", e);
+    return videoUri;
+  }
+};
+
+// Clean up temporary files
+const cleanupTempFiles = async () => {
+  try {
+    const tempDir = new FileSystem.Directory(FileSystem.cacheDirectory + 'temp/');
+    const dirInfo = await tempDir.getInfoAsync();
+    
+    if (dirInfo.exists) {
+      await tempDir.deleteAsync();
+      console.log('Temporary files cleaned up');
+    }
+  } catch (error) {
+    console.error('Cleanup error:', error);
+  }
+};
 
 	// Handle image upload from gallery
 	const handleImageUpload = async () => {
@@ -135,14 +229,14 @@ const PostAdd = ({ navigation }) => {
 			});
 
 			if (!result.canceled && result.assets.length > 0) {
-				// const validAssets = await Promise.all(
-				// 	result.assets.map(async asset => {
-				// 		const isValidSize = await checkFileSize(asset.uri);
-				// 		return isValidSize ? asset : null;
-				// 	})
-				// );
+				const validAssets = await Promise.all(
+					result.assets.map(async asset => {
+						const isValidSize = await checkFileSize(asset.uri);
+						return isValidSize ? asset : null;
+					})
+				);
 
-				const newImages = result.assets
+				const newImages = validAssets
 					.filter(asset => asset !== null)
 					.map(asset => ({
 						id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -253,29 +347,25 @@ const PostAdd = ({ navigation }) => {
 			if (!result.canceled && result.assets.length > 0) {
 				const asset = result.assets[0];
 				console.log(asset,"in video")
-				// const isValidSize = await checkFileSize(asset.uri);
+				const isValidSize = await checkFileSize(asset.uri);
 
 
-				// if (isValidSize) {
-				// 	// Generate thumbnail
-				// 	const thumbnail = await generateVideoThumbnail(asset.uri);
+				if (isValidSize) {
+				 
+					// Generate thumbnail
+					const thumbnail = await generateVideoThumbnail(asset.uri);
 
-				// 	setImages(prev => [...prev, {
-				// 		id: `${Date.now()}_video`,
-				// 		img: { uri: thumbnail },
-				// 		videoUri: asset.uri,
-				// 		isVideo: true
-				// 	}]);
-				// }
-
-					 
-					 
-					setImages(prev => [...prev, {
+ 					setImages(prev => [...prev, {
 						id: `${Date.now()}_video`,
-						img: { uri: asset.uri,type:asset.type,name:asset.fileName },
+						img: { uri: thumbnail,type:asset.type,name:asset.fileName },
 						videoUri: asset.uri,
 						isVideo: true
 					}]);
+				}
+
+					 
+					 
+
 				
 			}
 		} catch (error) {
@@ -286,20 +376,6 @@ const PostAdd = ({ navigation }) => {
 		}
 	};
 
-	// Generate video thumbnail
-	const generateVideoThumbnail = async (videoUri) => {
-		try {
-			const { uri } = await FileSystem.getInfoAsync(videoUri);
-			const thumbnail = await VideoThumbnails.getThumbnailAsync(uri, {
-				time: 1000, // Take thumbnail at 1 second
-				quality: 0.7,
-			});
-			return thumbnail.uri;
-		} catch (e) {
-			console.warn("Thumbnail generation failed:", e);
-			return videoUri; // Fallback to video URI if thumbnail fails
-		}
-	};
 
 	// Delete media item
 	const handleDeleteMedia = (id) => {

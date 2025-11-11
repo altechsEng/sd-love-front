@@ -5,7 +5,7 @@ import {
 	heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { HomeFeedBell, HomeFeedComment, HomeFeedGradient, HomeFeedHeart, HomeFeedSearch, HomeFeedShare, HomeFeedSmallArrowRight, HomeFeedThreeDots, LogoSmall, PostAddIcon, PostScreenBookMark, PostScreenDots } from "../../../components/vectors.js";
-import { BaseImageUrl, COLORS, FAMILLY, POST_LIMIT, TEXT_SIZE } from "../../../utils/constants.js";
+import { BaseImageUrl, BasePostImageUrl, BaseVideoUrl, COLORS, FAMILLY, POST_LIMIT, TEXT_SIZE } from "../../../utils/constants.js";
 import { LinearGradient } from "react-native-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import axios from "axios";
@@ -20,6 +20,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { CustomRegularPoppingText, CustomSemiBoldPoppingText } from "../../../components/text.jsx";
 import Ionicons from "@expo/vector-icons/Ionicons.js";
 import { Link, router, Stack, useNavigation } from "expo-router";
+import { Video } from "expo-av";
 
 dayjs.extend(relativeTime)
 
@@ -218,7 +219,10 @@ export default function Index() {
 	}
 
 	const renderPosts = ({ item, index }) => {
-
+		
+		 
+			             
+		  
 		if (isFetching) {
 			return <CustomPostLoader />
 		}
@@ -249,15 +253,16 @@ export default function Index() {
 					</TouchableOpacity>
 				</View>
 
-				<Pressable onPress={() => router.navigate("/protected/posts/posts", { item })} style={{ margin: 0, padding: 0, overflow: "hidden" }}>
+				<Pressable onPress={() => router.navigate({pathname:"/protected/posts/posts",params:{item:JSON.stringify(item)}})} style={{ margin: 0, padding: 0, overflow: "hidden" }}>
 					<View style={{ marginVertical: 10 }}>
 						<Text style={{ lineHeight: 22, color: COLORS.black, fontSize: TEXT_SIZE.primary, fontWeight: FAMILLY.light }}>
 							{item?.text}
 						</Text>
 					</View>
-					{item?.media?.length > 0 &&
+						<Text style={{ color: "white", fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.semibold }}>{item?.media[0]?.type}</Text>
+					{item?.media?.length > 0 && item?.media[0]?.type =="image" &&
 						<View className='relative'>
-							<Image source={item?.media?.length > 0 ? { uri: `https://sdlove-api.altechs.africa/storage/app/private/public/post_media/${item?.media[0]?.url}` } : <></>} resizeMode="cover" style={{ width: "100%", height: 280, borderRadius: 20 }} />
+							<Image source={item?.media?.length > 0 ? { uri: `${BasePostImageUrl}/${item?.media[0]?.url}` } :<></>} resizeMode="cover" style={{ width: "100%", height: 280, borderRadius: 20 }} />
 							{item?.media?.length > 1 &&
 								<View className='absolute flex flex-row items-center justify-center' style={{ bottom: 10, right: 10, backgroundColor: "rgba(0,0,0,0.6)", paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10 }}>
 									<Text style={{ color: "white", fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.semibold }}>+{item?.media?.length - 1}</Text>
@@ -266,6 +271,29 @@ export default function Index() {
 							}
 						</View>
 					}
+
+
+					{item?.media?.length > 0 && item?.media[0]?.type =="video" &&
+						<View className='relative'>
+								
+
+							<Video
+							source={{ uri: `${BaseVideoUrl}/${item?.media[0]?.url}`}}
+							style={{ width: "100%", height: 280, borderRadius: 20 }}
+							resizeMode="cover"
+							shouldPlay={false}
+							useNativeControls={true}
+												/>
+							{item?.media?.length > 1 &&
+								<View className='absolute flex flex-row items-center justify-center' style={{ bottom: 10, right: 10, backgroundColor: "rgba(0,0,0,0.6)", paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10 }}>
+									<Text style={{ color: "white", fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.semibold }}>+{item?.media?.length - 1}</Text>
+									<Ionicons className='ml-2' name="image-outline" size={16} color="white" />
+								</View>
+							}
+						</View>
+					}
+
+					
 				</Pressable>
 				<View style={{ height: 30, flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 10 }}>
 

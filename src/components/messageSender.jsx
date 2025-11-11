@@ -9,11 +9,13 @@ import {
 } from "react-native-responsive-screen";
 import { CustomRegularPoppingText, CustomSemiBoldPoppingText } from './text';
 import CustomTextInput from "./textInput";
+ 
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window')
 
 const MessageSender = ({ action, state, setState, placeHolder, ref, imageAction }) => {
-     return <View style={{ paddingHorizontal: 2, alignItems: "center", justifyContent: "space-evenly", flexDirection: "row", paddingVertical: 10 }}>
+     
+          return <View style={{ paddingHorizontal: 2, alignItems: "center", justifyContent: "space-evenly", flexDirection: "row", paddingVertical: 10 }}>
           <TouchableOpacity onPress={() => imageAction()}>
                <PostScreenImagePicker />
           </TouchableOpacity>
@@ -24,6 +26,7 @@ const MessageSender = ({ action, state, setState, placeHolder, ref, imageAction 
                <PostScreenSendComment />
           </TouchableOpacity>
      </View>
+     
 }
 
 export default MessageSender

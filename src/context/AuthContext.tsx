@@ -3,6 +3,7 @@ import axios from "axios";
 import { router } from "expo-router";
 import { createContext, useContext, useEffect, useState } from "react";
 import api from "../services/api";
+import { ToastAndroid } from "react-native";
 
 type AuthProviderProps = {
   children: React.ReactNode;
@@ -209,6 +210,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (status === 200) {
         setError("");
         setIsLoading(false);
+        ToastAndroid.show("Mot de passe mise a jour", ToastAndroid.SHORT);
         return router.replace("/(auth)/login");
       }
       

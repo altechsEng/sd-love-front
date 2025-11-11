@@ -48,11 +48,20 @@ const PostAddHeader = ({ navigation }) => {
 			formData.append('post_id', postId);
 
 			postAddData?.media?.forEach((data) => {
-				console.log(data?.img,"Daat dot image ",data?.img?.type === "video" ?"video/mp4":data?.img?.type === "gif" ? "image/gif":"image/jpeg")
+				let type = ""
+				if(data?.img?.type === "video"){
+					type = "video/mp4"
+				} else if (data?.img?.type === "gif") {
+					type =  "image/gif"
+				} else {
+					type = "image/jpeg"
+				}
+
+				console.log(type,"Daat dot image ")
 				formData.append('media[]', {
 					uri: data?.img?.uri,
 					name: "uploadImg.jpg",
-					type: data?.img?.type === "video" ?"video/mp4":data?.img?.type === "gif" ? "image/gif":"image/jpeg"
+					type
 				 
 				});
 			});
@@ -65,7 +74,7 @@ const PostAddHeader = ({ navigation }) => {
 			});
 		},
 		onError: (error) => {
-			console.error("Image upload error:", error);
+			console.error("Image upload error:", error?.request);
 			setIsLoading(false);
 			ToastAndroid.show("Failed to upload images", ToastAndroid.SHORT);
 		}
@@ -93,7 +102,7 @@ const PostAddHeader = ({ navigation }) => {
 			ToastAndroid.show("Post created successfully", ToastAndroid.SHORT);
 			router.back();
 		} catch (error) {
-			console.error("Error in post creation flow:", error);
+			console.error("Error in post creation flow:", error?.request);
 		} finally {
 			setIsLoading(false);
 		}
