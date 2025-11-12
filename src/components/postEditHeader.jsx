@@ -11,7 +11,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Stack } from "expo-router";
+import { router, Stack } from "expo-router";
 import { useAuth } from "../context/AuthContext";
 
 const PostEditHeader = ({ navigation }) => {
@@ -143,7 +143,7 @@ const PostEditHeader = ({ navigation }) => {
 			]);
 
 			ToastAndroid.show("Post updated successfully", ToastAndroid.SHORT);
-			navigation.goBack();
+			router.back();
 		} catch (error) {
 			console.error("Error in post update flow:", error);
 		} finally {
@@ -154,7 +154,7 @@ const PostEditHeader = ({ navigation }) => {
 
 	return (
 		<View style={{ backgroundColor: "white", paddingHorizontal: 20 }}>
-			<View style={{ height: 50 }}></View>
+			 
 			<View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
 
 				<Stack.Screen
@@ -165,7 +165,7 @@ const PostEditHeader = ({ navigation }) => {
 									<Image source={{ uri: `${image}` }} style={{ height: "100%", width: "100%" }} />
 								</View>
 
-								<CustomSemiBoldPoppingText style={{}} fontSize={TEXT_SIZE.primary} color={"black"} value={`${userData?.firstname} ${userData?.lastname}` || 'Sam Orlan'} />
+								<CustomSemiBoldPoppingText style={{}} fontSize={TEXT_SIZE.primary} color={"black"} value={`${userData?.user?.firstname} ${userData?.user?.lastname}` || 'Sam Orlan'} />
 							</View>
 						),
 						headerRight: () =>

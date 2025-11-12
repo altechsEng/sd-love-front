@@ -43,6 +43,7 @@ const Matches = ({ navigation }) => {
 					{ page: pageParam },
 					{ headers: { "Authorization": `Bearer ${token}` } }
 				);
+				console.log(response.data,"matches data")
 				return response.data
 			}
 		} catch (err) {
@@ -130,6 +131,10 @@ const Matches = ({ navigation }) => {
 	useEffect(() => {
 		if (activeScreen === "box") requestLocationPermission();
 	}, [activeScreen]);
+
+		useEffect(() => {
+		console.log(allMatches,data,"data all mtched")
+	}, []);
 
 	const [activeScreen, setActiveScreen] = useState('side')
 

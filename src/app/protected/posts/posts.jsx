@@ -624,60 +624,59 @@ const BlogPostScreen = ({ navigation }) => {
           {mainItem?.text || ""}
         </Text>
 
-        {/* Post Image */}
-        <View style={mainItem?.media?.length >= 1 && styles.postMediaContainer}>
-          {mainItem?.media?.length === 1 && mainItem?.media[0]?.type =="image"  ? (
-            <View className='px-3'>
-              <Image
-                source={{ uri: `https://sdlove-api.altechs.africa/storage/app/private/public/post_media/${mainItem?.media[0]?.url}` }}
-                style={styles.singleMedia}
-                resizeMode="cover"
-              />
-            </View>
-          ) :
-          
-          mainItem?.media?.length === 1 && mainItem?.media[0]?.type =="video"?
-          //post video
-           <View className='px-3'>
-          <Video
-            source={{ uri: `${BaseVideoUrl}/${mainItem?.media[0]?.url}`}}
-            style={{...styles.singleMedia }}
-            resizeMode="cover"
-            shouldPlay={false}
-            useNativeControls={true}
-                                  />
-        </View>
-          :
-          mainItem?.media?.length > 1 ? (
-            <FlatList
-              data={mainItem?.media}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              renderItem={({ item }) =>   mainItem?.media?.length === 1 && mainItem?.media[0]?.type =="video"? 
-                <View style={styles.multiMediaItem}>
-                  <Video
-            source={{ uri: `${BaseVideoUrl}/${mainItem?.media[0]?.url}`}}
-            style={{...styles.multiMediaImage }}
-            resizeMode="cover"
-            shouldPlay={false}
-            useNativeControls={true}
-                  />
-                </View> :
-                              <View style={styles.multiMediaItem}>
-                  <Image
-                    source={{ uri: `https://sdlove-api.altechs.africa/storage/app/private/public/post_media/${item?.url}` }}
-                    style={styles.multiMediaImage}
-                    resizeMode="cover"
-                  />
-                </View>
-
-              }
-              keyExtractor={(item, index) => index.toString()}
+{/* Post Media */}
+<View style={mainItem?.media?.length >= 1 && styles.postMediaContainer}>
+  {mainItem?.media?.length === 1 ? (
+    // Single media item
+    mainItem?.media[0]?.type === "image" ? (
+      <View className='px-3'>
+        <Image
+          source={{ uri: `https://sdlove-api.altechs.africa/storage/app/private/public/post_media/${mainItem?.media[0]?.url} `}}
+          style={styles.singleMedia}
+          resizeMode="cover"
+        />
+      </View>
+    ) : (
+      // Single video
+      <View className='px-3'>
+        <Video
+          source={{ uri: `${BaseVideoUrl}/${mainItem?.media[0]?.url}` }}
+          style={styles.singleMedia}
+          resizeMode="cover"
+          shouldPlay={false}
+          useNativeControls={true}
+        />
+      </View>
+    )
+  ) : mainItem?.media?.length > 1 ? (
+    // Multiple media items
+    <FlatList
+      data={mainItem?.media}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      renderItem={({ item }) => (
+        <View style={styles.multiMediaItem}>
+          {item?.type === "video" ? (
+            <Video
+              source={{ uri: `${BaseVideoUrl}/${item?.url}` }}
+              style={styles.multiMediaImage}
+              resizeMode="cover"
+              shouldPlay={false}
+              useNativeControls={true}
             />
           ) : (
-            null
+            <Image
+              source={{ uri: `https://sdlove-api.altechs.africa/storage/app/private/public/post_media/${item?.url} `}}
+              style={styles.multiMediaImage}
+              resizeMode="cover"
+            />
           )}
         </View>
+      )}
+      keyExtractor={(item, index) => index.toString()}
+    />
+  ) : null}
+</View>
 
 
         <View style={styles.postActions}>

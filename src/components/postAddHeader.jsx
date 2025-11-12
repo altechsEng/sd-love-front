@@ -57,10 +57,11 @@ const PostAddHeader = ({ navigation }) => {
 					type = "image/jpeg"
 				}
 
-				console.log(type,"Daat dot image ")
+				console.log(type,"Daat dot image ",data?.img?.name)
 				formData.append('media[]', {
 					uri: data?.img?.uri,
-					name: "uploadImg.jpg",
+					// name: "uploadImg.jpg",
+					name:data?.img?.name,
 					type
 				 
 				});
@@ -89,7 +90,11 @@ const PostAddHeader = ({ navigation }) => {
 
 			// Step 2: Upload images if they exist
 			if (postAddData?.media?.length > 0) {
-				await uploadImagesMutation.mutateAsync({ postId, token });
+				await uploadImagesMutation.mutateAsync({ postId, token }).then((res) =>{
+					console.log(res?.data?.media)
+					console.log(res?.data?.media[0])
+					console.log(res?.data?.media[1])
+				});
 			}
 
 			// Step 3: Invalidate queries and navigate

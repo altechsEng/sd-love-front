@@ -8,7 +8,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as Camera from 'expo-camera';
 import { Video } from 'expo-av';
 import * as MediaLibrary from 'expo-media-library';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { useGlobalVariable } from '../../../context/global';
  import {
      widthPercentageToDP as wp,
@@ -17,6 +17,9 @@ import { useGlobalVariable } from '../../../context/global';
 import {CustomRegularPoppingText} from "../../../components/text"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRoute } from '@react-navigation/native';
+import { useLocalSearchParams } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import PostEditHeader from '@/src/components/postEditHeader';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window')
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -31,7 +34,13 @@ const PostEdit = ({ navigation }) => {
     // { id: "imk2", img: require("../../../assets/images/match_pro2.jpg") },
     // { id: "imk3", img: require("../../../assets/images/match_pro3.jpg") },
   ]);
-  const {item} = useRoute().params
+  // const {item} = useRoute().params
+    const {item:itemPost} = useLocalSearchParams()
+    const [item,setItem] = useState(null)
+    useEffect(()=>{
+      setItem(JSON.parse(itemPost))
+    },[])
+  
 
 
   const [cameraPermission, requestCameraPermission] = Camera.useCameraPermissions();
@@ -307,16 +316,17 @@ if (isValidSize) {
 
   return (
 <>
+<PostEditHeader/>
     {isLoading ? <View style={{flex:1,backgroundColor:"white",alignItems:"center",justifyContent:"center"}}>
       <ActivityIndicator size={34} color={COLORS.primary}/>
       <CustomRegularPoppingText style={{}} color={COLORS.black} fontSize={TEXT_SIZE.primary} value="Updating post please wait..."/>
-    </View> :     <View style={{ flex: 1, backgroundColor: "white" }}>
+    </View> :     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
       <TextInput
         placeholder='Express your thoughts....'
         multiline={true}
         value={thoughts}
         onChangeText={(text)=> setThoughts(text)}
-        style={{ flex: 1, backgroundColor: "white", textAlignVertical: "top", paddingLeft: 20, paddingTop: 20 }}
+        style={{ flex: 1, backgroundColor: "white", textAlignVertical: "top", paddingLeft: 20, paddingTop: 0 }}
       />
 
       <View style={{ backgroundColor: "white", marginVertical: 20, paddingHorizontal: 20 }}>
@@ -366,7 +376,7 @@ if (isValidSize) {
           <PostScreenMediaVideo fill={isProcessing ? COLORS.light : COLORS.dark} />
         </TouchableOpacity>
       </View>
-    </View>}
+    </SafeAreaView>}
 </>
   )
 }

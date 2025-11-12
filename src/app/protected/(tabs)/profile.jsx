@@ -8,7 +8,7 @@ import {
 } from "react-native-responsive-screen";
 import { useCallback, useEffect, useState } from "react";
 import { PostAddIcon, MatchProfileArrowBack, MatchProfileBirthDay, MatchProfileEducation, MatchProfileFaithChurch, MatchProfileFaithIcon1, MatchProfileFaithOccupation, MatchProfileHome, MatchProfileLang, MatchProfilePlus, MatchProfileSexIcon, MatchProfileSmallHeart, MatchProfleSmallFace, PostScreenBookMark, ProfileScreenBookMark, ProfileScreenAddPost, PostScreenDots, ProfileScreenPostEdit, ProfileScreenPostDelete, ProfileScreenManageProfile, ProfileScreenAccountSecurity, ProfileScreenTheme, ProfileScreenGlobe, ProfileScreenPermissions, ProfileScreenQuestionMark, ProfileSCreenExclamation, ProfileScreenPrivacyPolicy, ProfileScreenLogOut, HomeFeedHeart, ProfileScreenBars } from "../../../components/vectors";
-import { BaseImageUrl, COLORS, FAMILLY, POST_LIMIT, TEXT_SIZE } from "../../../utils/constants";
+import { BaseImageUrl, BasePostImageUrl, BaseVideoUrl, COLORS, FAMILLY, POST_LIMIT, TEXT_SIZE } from "../../../utils/constants";
 import { useGlobalVariable } from "../../../context/global";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -22,6 +22,7 @@ import CustomProfileScreenHeader from "../../../components/customProfileScreenHe
 import { router, Stack } from "expo-router";
 import { useAuth } from "@/src/context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
+import { Video } from "expo-av";
 
 dayjs.extend(relativeTime)
 
@@ -52,6 +53,7 @@ const ProfileScreen = () => {
 
     const deletePostMutation = useMutation({
         mutationFn: async (postId) => {
+            setIsLoading(true)
             const token = await AsyncStorage.getItem("user_token");
             const formData = new FormData();
             formData.append("post_id", postId);
@@ -60,9 +62,12 @@ const ProfileScreen = () => {
             }).then(res => {
                 console.log(res.data, "Data----")
                 ToastAndroid.show("Post deleted", 1000)
+                setIsLoading(false)
 
             }).catch(err => {
                 console.log(err?.request, "opo")
+                setIsLoading(false)
+
             })
         },
 
@@ -72,6 +77,8 @@ const ProfileScreen = () => {
         },
         onError: (error) => {
             console.error("Error deleting post:", error);
+            setIsLoading(false)
+
         }
     });
 
@@ -81,17 +88,21 @@ const ProfileScreen = () => {
 
     const removeFromFavouritePostMutation = useMutation({
         mutationFn: async (postId) => {
+            setIsLoading(true)
             const token = await AsyncStorage.getItem("user_token");
             const formData = new FormData();
+                
+
             formData.append("post_id", postId);
             return axios.post("/api/remove-favourite-post", formData, {
                 headers: { "Authorization": `Bearer ${token}` }
             }).then(res => {
                 console.log(res.data, "Data----")
                 ToastAndroid.show("Post removed", 1000)
-
+                 setIsLoading(false)
             }).catch(err => {
                 console.log(err?.request, "opo")
+                setIsLoading(false)
             })
         },
 
@@ -101,6 +112,7 @@ const ProfileScreen = () => {
         },
         onError: (error) => {
             console.error("Error removing from favourite post:", error);
+            setIsLoading(false)
         }
     });
 
@@ -328,19 +340,40 @@ const ProfileScreen = () => {
                         <PostScreenDots />
                     </TouchableOpacity>
                 </View>
-                <Pressable onPress={() => navigation.navigate("Post", { item })} style={{ margin: 0, padding: 0, overflow: "hidden" }}>
+                <Pressable onPress={() => router.navigate({pathname:"/protected/posts/posts",params:{item:JSON.stringify(item)}})} style={{ margin: 0, padding: 0, overflow: "hidden" }}>
                     <View style={{ marginVertical: 10 }}>
                         <Text style={{ lineHeight: 22, color: COLORS.black, fontSize: TEXT_SIZE.primary, fontWeight: FAMILLY.light }}>
                             {item?.text}
                         </Text>
                     </View>
-                    {item?.media?.length > 0 &&
+                    {item?.media?.length > 0 && item?.media[0]?.type =="image" &&
                         <View className='relative'>
-                            <Image source={item?.media?.length > 0 ? { uri: `https://sdlove-api.altechs.africa/storage/app/private/public/post_media/${item?.media[0]?.url}` } : <></>} resizeMode="cover" style={{ width: "100%", height: 280, borderRadius: 20 }} />
+                            <Image source={item?.media?.length > 0 ? { uri: `${BasePostImageUrl}/${item?.media[0]?.url}` } :<></>} resizeMode="cover" style={{ width: "100%", height: 280, borderRadius: 20 }} />
                             {item?.media?.length > 1 &&
                                 <View className='absolute flex flex-row items-center justify-center' style={{ bottom: 10, right: 10, backgroundColor: "rgba(0,0,0,0.6)", paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10 }}>
                                     <Text style={{ color: "white", fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.semibold }}>+{item?.media?.length - 1}</Text>
                                     <Ionicons className='ml-2' name="images-outline" size={16} color="white" />
+                                </View>
+                            }
+                        </View>
+                    }
+
+
+                    {item?.media?.length > 0 && item?.media[0]?.type =="video" &&
+                        <View className='relative'>
+                                
+
+                            <Video
+                            source={{ uri: `${BaseVideoUrl}/${item?.media[0]?.url}`}}
+                            style={{ width: "100%", height: 280, borderRadius: 20 }}
+                            resizeMode="cover"
+                            shouldPlay={false}
+                            useNativeControls={true}
+                                                />
+                            {item?.media?.length > 1 &&
+                                <View className='absolute flex flex-row items-center justify-center' style={{ bottom: 10, right: 10, backgroundColor: "rgba(0,0,0,0.6)", paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10 }}>
+                                    <Text style={{ color: "white", fontSize: TEXT_SIZE.small, fontFamily: FAMILLY.semibold }}>+{item?.media?.length - 1}</Text>
+                                    <Ionicons className='ml-2' name="image-outline" size={16} color="white" />
                                 </View>
                             }
                         </View>
@@ -789,10 +822,11 @@ const ProfileScreen = () => {
                     >
                         {/* Actual modal content */}
                         <View style={styles.modalContainer}>
-                            <View className={'gap-6 py-8'} style={styles.modalContent}>
+                            <SafeAreaView>
+                                                            <View className={'gap-6 py-8'} style={styles.modalContent}>
                                 {activeSubCat == "Posts" && (
                                     <>
-                                        <TouchableOpacity style={{ alignItems: "center", justifyContent: "flex-start", flexDirection: "row" }} onPress={() => navigation.navigate("PostEdit", { item: activePostItem })}>
+                                        <TouchableOpacity style={{ alignItems: "center", justifyContent: "flex-start", flexDirection: "row" }} onPress={() => router.navigate({pathname:"/protected/posts/post-edit",params:{item:JSON.stringify(activePostItem)}})}>
                                             <ProfileScreenPostEdit />
                                             <CustomRegularPoppingText color={null} style={{ marginLeft: 20 }} value={"Edit post"} fontSize={TEXT_SIZE.primary} />
                                         </TouchableOpacity>
@@ -800,7 +834,10 @@ const ProfileScreen = () => {
 
                                         <TouchableOpacity onPress={() => handleDeletePost(activePostItem)} style={{ alignItems: "center", justifyContent: "flex-start", flexDirection: "row" }}>
                                             <ProfileScreenPostDelete />
-                                            {isLoading ? <ActivityIndicator color={COLORS.primary} /> : <CustomRegularPoppingText color={null} style={{ marginLeft: 20 }} value={"Delete post"} fontSize={TEXT_SIZE.primary} />}
+                                            {isLoading ? <View style={{ alignItems: "center", justifyContent: "flex-start", flexDirection: "row"}}>
+                                                <ActivityIndicator color={COLORS.primary} />
+                                                <CustomRegularPoppingText color={null} style={{ marginLeft: 20 }} value={"Deleting...."} fontSize={TEXT_SIZE.primary} /> 
+                                                </View>: <CustomRegularPoppingText color={null} style={{ marginLeft: 20 }} value={"Delete post"} fontSize={TEXT_SIZE.primary} />}
                                         </TouchableOpacity>
                                     </>
                                 )}
@@ -814,6 +851,7 @@ const ProfileScreen = () => {
                                     </>
                                 )}
                             </View>
+                            </SafeAreaView>
                         </View>
                     </Pressable>
                 </Modal>

@@ -222,7 +222,7 @@ export default function Index() {
 		
 		 
 			             
-		  
+	 
 		if (isFetching) {
 			return <CustomPostLoader />
 		}
